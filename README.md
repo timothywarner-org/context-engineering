@@ -1,2 +1,1 @@
-# context-engineering
-MCP in Practice: Engineering AI Memory from Prompt to Persistence
+# Mastering MCP: Build Enterprise AI Tool-Calling and Memory Systems
