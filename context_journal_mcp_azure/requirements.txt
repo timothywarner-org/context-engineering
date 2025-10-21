@@ -1,0 +1,16 @@
+# MCP Context Journal Server Dependencies
+# Install with: pip install -r requirements.txt
+
+# Core MCP SDK
+mcp>=1.0.0
+
+# Input validation
+pydantic>=2.0.0
+
+# HTTP client (for future Azure integration)
+httpx>=0.27.0
+
+# Azure Cosmos DB (for Phase 2 migration)
+# Uncomment when moving to Azure:
+# azure-cosmos>=4.5.0
+# azure-identity>=1.15.0
