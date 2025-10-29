@@ -1,0 +1,13 @@
+node_modules
+npm-debug.log
+.env
+.env.local
+.git
+.gitignore
+README.md
+.vscode
+data/*.json
+*.log
+TEACHING_GUIDE.md
+CONFIG_GUIDE.md
+test-*.js

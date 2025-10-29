@@ -1,0 +1,33 @@
+{
+  "name": "coretext-mcp",
+  "version": "1.0.0",
+  "description": "Context Engineering MCP Server - Persistent AI Memory with CRUD + Deepseek Enrichment",
+  "author": "Tim Warner <tim@techtrainertim.com>",
+  "license": "MIT",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "inspector": "npx @modelcontextprotocol/inspector node src/index.js",
+    "test": "node src/test-client.js",
+    "test-api": "node test-api-key.js",
+    "demo:reset": "node scripts/demo-reset.js",
+    "demo:populate": "node scripts/demo-populate.js",
+    "demo:segment1": "node scripts/demo-segment1.js",
+    "demo:segment2": "node scripts/demo-segment2.js",
+    "demo:segment3": "node scripts/demo-segment3.js",
+    "demo:all": "npm run demo:segment1 -- --auto && npm run demo:segment2 -- --auto && npm run demo:segment3 -- --auto"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "latest",
+    "uuid": "^11.0.3",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/inspector": "latest"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

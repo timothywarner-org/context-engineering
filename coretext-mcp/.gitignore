@@ -1,0 +1,15 @@
+node_modules
+npm-debug.log
+.env
+.env.local
+data/*.json
+!data/memory.json.example
+*.log
+.DS_Store
+.vscode
+.idea
+dist
+build
+*.swp
+*.swo
+*~
