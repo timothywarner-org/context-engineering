@@ -1,0 +1,6 @@
+# Ignore all text files except examples
+*.txt
+
+# Keep example files
+!sample-import.txt
+!README.md

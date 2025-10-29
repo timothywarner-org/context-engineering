@@ -1,0 +1,152 @@
+name: Deploy Stoic MCP to Azure
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'stoic-mcp/local/**'
+      - 'stoic-mcp/azure/**'
+      - '.github/workflows/deploy-stoic-mcp.yml'
+  workflow_dispatch:
+
+env:
+  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  AZURE_RESOURCE_GROUP: context-engineering-rg
+  AZURE_LOCATION: eastus
+  AZURE_MANAGED_IDENTITY: context-msi
+  IMAGE_NAME: stoic-mcp
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Get or Create Azure Container Registry
+        id: acr
+        run: |
+          # Check for existing ACR in resource group
+          EXISTING_ACR=$(az acr list --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query "[0].name" -o tsv 2>/dev/null || echo "")
+
+          if [ -n "$EXISTING_ACR" ]; then
+            echo "Found existing ACR: $EXISTING_ACR"
+            echo "acr_name=$EXISTING_ACR" >> $GITHUB_OUTPUT
+          else
+            # Generate unique ACR name
+            ACR_NAME="stoicacr$(date +%s | tail -c 6)"
+            echo "Creating new ACR: $ACR_NAME"
+
+            az acr create \
+              --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+              --name "$ACR_NAME" \
+              --sku Basic \
+              --location ${{ env.AZURE_LOCATION }} \
+              --admin-enabled false
+
+            echo "acr_name=$ACR_NAME" >> $GITHUB_OUTPUT
+          fi
+
+          # Get login server
+          ACR_LOGIN_SERVER=$(az acr show --name $(cat $GITHUB_OUTPUT | grep acr_name | cut -d'=' -f2) --query loginServer -o tsv)
+          echo "acr_login_server=$ACR_LOGIN_SERVER" >> $GITHUB_OUTPUT
+
+      - name: Login to Azure Container Registry
+        run: |
+          az acr login --name ${{ steps.acr.outputs.acr_name }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./stoic-mcp/local
+          file: ./stoic-mcp/local/Dockerfile
+          push: true
+          tags: |
+            ${{ steps.acr.outputs.acr_login_server }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+            ${{ steps.acr.outputs.acr_login_server }}/${{ env.IMAGE_NAME }}:latest
+          cache-from: type=registry,ref=${{ steps.acr.outputs.acr_login_server }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ steps.acr.outputs.acr_login_server }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+
+      - name: Deploy to Azure with Bicep
+        id: deploy
+        run: |
+          DEPLOYMENT_NAME="stoic-mcp-$(date +%Y%m%d-%H%M%S)"
+          echo "deployment_name=$DEPLOYMENT_NAME" >> $GITHUB_OUTPUT
+
+          az deployment group create \
+            --name "$DEPLOYMENT_NAME" \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --template-file stoic-mcp/azure/main.bicep \
+            --parameters \
+              location="${{ env.AZURE_LOCATION }}" \
+              managedIdentityName="${{ env.AZURE_MANAGED_IDENTITY }}" \
+              containerImage="${{ steps.acr.outputs.acr_login_server }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}" \
+              deepseekApiKey="${{ secrets.DEEPSEEK_API_KEY }}"
+
+      - name: Get deployment outputs
+        id: outputs
+        run: |
+          CONTAINER_APP_URL=$(az deployment group show \
+            --name ${{ steps.deploy.outputs.deployment_name }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --query properties.outputs.containerAppUrl.value \
+            -o tsv)
+
+          echo "container_app_url=$CONTAINER_APP_URL" >> $GITHUB_OUTPUT
+
+          echo "### Deployment Complete! 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Container App URL:** $CONTAINER_APP_URL" >> $GITHUB_STEP_SUMMARY
+          echo "**Image:** ${{ steps.acr.outputs.acr_login_server }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployment:** ${{ steps.deploy.outputs.deployment_name }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Health check
+        run: |
+          echo "Waiting 30 seconds for container to start..."
+          sleep 30
+
+          echo "Running health check..."
+          HEALTH_URL="${{ steps.outputs.container_app_url }}/health"
+
+          for i in {1..5}; do
+            echo "Attempt $i/5..."
+            if curl -f -s "$HEALTH_URL" | jq -e '.status == "healthy"' > /dev/null; then
+              echo "✅ Health check passed!"
+              echo "Response: $(curl -s $HEALTH_URL)"
+              exit 0
+            fi
+            echo "Health check failed, retrying in 10 seconds..."
+            sleep 10
+          done
+
+          echo "⚠️ Health check did not pass after 5 attempts"
+          echo "This may be normal if the container is still starting"
+          exit 0
+
+      - name: Post deployment info
+        run: |
+          echo "================================================================"
+          echo "Stoic MCP Deployment Summary"
+          echo "================================================================"
+          echo "Container App URL: ${{ steps.outputs.container_app_url }}"
+          echo "Health Check: ${{ steps.outputs.container_app_url }}/health"
+          echo "Deployment Name: ${{ steps.deploy.outputs.deployment_name }}"
+          echo "Image: ${{ steps.acr.outputs.acr_login_server }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+          echo "================================================================"
+          echo ""
+          echo "View logs with:"
+          echo "az containerapp logs show -n \$(az containerapp list -g ${{ env.AZURE_RESOURCE_GROUP }} --query '[0].name' -o tsv) -g ${{ env.AZURE_RESOURCE_GROUP }} --follow"

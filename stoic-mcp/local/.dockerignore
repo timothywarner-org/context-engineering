@@ -1,0 +1,41 @@
+# Node modules
+node_modules/
+npm-debug.log
+
+# Environment files
+.env
+.env.*
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+BUILD_REMINDER.md
+DEMO_RUNBOOK.md
+IMPORT_GUIDE.md
+SCHEMA_MIGRATION.md
+
+# Source (we copy dist/ instead)
+src/
+tsconfig.json
+
+# Test files
+test/
+*.test.js
+*.test.ts
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Source quotes (included quotes.json is enough)
+quotes-source/

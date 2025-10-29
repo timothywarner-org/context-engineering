@@ -1,13 +1,34 @@
-node_modules
+# Node modules
+node_modules/
 npm-debug.log
+
+# Environment files
 .env
-.env.local
-.git
+.env.*
+
+# Git
+.git/
 .gitignore
-README.md
-.vscode
-data/*.json
+
+# Documentation
+*.md
+docs/
+
+# Azure deployment files
+azure/
+
+# IDE
+.vscode/
+.idea/
+
+# Data and logs
+data/
+*.json
 *.log
-TEACHING_GUIDE.md
-CONFIG_GUIDE.md
+
+# Test files
 test-*.js
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -67,7 +67,7 @@ cp .env.example .env
       "command": "node",
       "args": ["C:/github/coretext-mcp/src/index.js"],
       "env": {
-        "DEEPSEEK_API_KEY": "sk-1234567890abcdef1234567890abcdef"
+        "DEEPSEEK_API_KEY": "test-sk-1234567890abcdef1234567890abcdef"
       }
     }
   }
@@ -98,14 +98,14 @@ Create `.vscode/mcp.json` in your workspace:
       "command": "node",
       "args": ["${workspaceFolder}/src/index.js"],
       "env": {
-        "DEEPSEEK_API_KEY": "sk-1234567890abcdef1234567890abcdef"
+        "DEEPSEEK_API_KEY": "test-sk-1234567890abcdef1234567890abcdef"
       }
     }
   }
 }
 ```
 
-**Note**: The API key examples use `sk-1234...` format for teaching demonstrations. In production, use environment variables or Azure Key Vault instead of hardcoding keys in config files.
+**Note**: The API key examples use `test-sk-1234...` format for teaching demonstrations. In production, use environment variables or Azure Key Vault instead of hardcoding keys in config files.
 
 ## Architecture
 

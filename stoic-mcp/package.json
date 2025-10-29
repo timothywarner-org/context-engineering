@@ -1,0 +1,32 @@
+{
+  "name": "stoic-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for Stoic philosophy quotes - Local and Azure implementations",
+  "private": true,
+  "workspaces": [
+    "local",
+    "azure"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "clean": "npm run clean --workspaces"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "stoicism",
+    "developer-wellness",
+    "developer-productivity",
+    "mcp-server",
+    "azure",
+    "cosmosdb",
+    "deepseek",
+    "quotes"
+  ],
+  "author": "Tim Warner",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

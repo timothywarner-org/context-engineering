@@ -1,22 +1,29 @@
 # ============================================================
-# CoreText MCP - Production Dockerfile for Azure Container Apps
+# Stoic MCP - Production Dockerfile for Azure Container Apps
 # ============================================================
 # Multi-stage build for minimal image size and security
 # ============================================================
 
 # ============================================================
-# Stage 1: Dependencies
+# Stage 1: Build TypeScript
 # ============================================================
-FROM node:20-alpine AS deps
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
+COPY tsconfig.json ./
 
-# Install production dependencies only
-RUN npm ci --only=production && \
-    npm cache clean --force
+# Install dependencies (including dev dependencies for TypeScript)
+RUN npm ci
+
+# Copy source code
+COPY src/ ./src/
+COPY quotes.json ./quotes.json
+
+# Build TypeScript
+RUN npm run build
 
 # ============================================================
 # Stage 2: Production Runtime
@@ -32,15 +39,17 @@ RUN addgroup -g 1001 -S nodejs && \
 
 WORKDIR /app
 
-# Copy dependencies from deps stage
-COPY --from=deps --chown=nodejs:nodejs /app/node_modules ./node_modules
+# Copy only production dependencies
+COPY package*.json ./
+RUN npm ci --only=production && \
+    npm cache clean --force
 
-# Copy application source
-COPY --chown=nodejs:nodejs package*.json ./
-COPY --chown=nodejs:nodejs src/ ./src/
+# Copy compiled JavaScript from builder
+COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
+COPY --from=builder --chown=nodejs:nodejs /app/quotes.json ./quotes.json
 
-# Create data directory for fallback storage
-RUN mkdir -p /app/data && chown nodejs:nodejs /app/data
+# Create quotes-source directory (for bulk imports)
+RUN mkdir -p /app/quotes-source && chown nodejs:nodejs /app/quotes-source
 
 # Set environment variables
 ENV NODE_ENV=production
@@ -60,16 +69,17 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 ENTRYPOINT ["dumb-init", "--"]
 
 # Start the server
-CMD ["node", "src/index.js"]
+CMD ["node", "dist/index.js"]
 
 # ============================================================
 # Build & Run Instructions:
 #
 # Build:
-#   docker build -t coretext-mcp:latest .
+#   cd stoic-mcp/local
+#   docker build -t stoic-mcp:latest .
 #
 # Local Test:
 #   docker run -p 3000:3000 \
 #     -e DEEPSEEK_API_KEY=your_key \
-#     coretext-mcp:latest
+#     stoic-mcp:latest
 # ============================================================

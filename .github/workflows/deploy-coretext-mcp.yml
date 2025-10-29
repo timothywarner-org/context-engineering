@@ -1,0 +1,165 @@
+# ============================================================
+# CoreText MCP - Azure Deployment GitHub Action
+# ============================================================
+# Automated CI/CD pipeline that:
+# 1. Builds Docker image
+# 2. Pushes to Azure Container Registry
+# 3. Updates Azure Container App
+# ============================================================
+
+name: Deploy CoreText MCP to Azure
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'coretext-mcp/**'
+      - '.github/workflows/deploy-coretext-mcp.yml'
+  workflow_dispatch:  # Allow manual trigger
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+env:
+  RESOURCE_GROUP: context-engineering-rg
+  LOCATION: eastus
+  ACR_NAME: ${{ secrets.ACR_NAME }}
+  APP_NAME: ${{ secrets.CONTAINER_APP_NAME }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ============================================================
+      # Checkout Code
+      # ============================================================
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ============================================================
+      # Azure Login
+      # ============================================================
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # ============================================================
+      # Set up Docker Buildx (for better caching)
+      # ============================================================
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # ============================================================
+      # Login to Azure Container Registry
+      # ============================================================
+      - name: Login to ACR
+        run: |
+          az acr login --name ${{ env.ACR_NAME }}
+
+      # ============================================================
+      # Build and Push Docker Image
+      # ============================================================
+      - name: Build and push Docker image
+        working-directory: ./coretext-mcp
+        run: |
+          IMAGE_TAG=${{ github.sha }}
+          FULL_IMAGE="${{ env.ACR_NAME }}.azurecr.io/coretext-mcp:${IMAGE_TAG}"
+          LATEST_IMAGE="${{ env.ACR_NAME }}.azurecr.io/coretext-mcp:latest"
+
+          echo "Building image: $FULL_IMAGE"
+
+          docker build \
+            --tag $FULL_IMAGE \
+            --tag $LATEST_IMAGE \
+            --cache-from $LATEST_IMAGE \
+            --build-arg BUILDKIT_INLINE_CACHE=1 \
+            .
+
+          echo "Pushing images..."
+          docker push $FULL_IMAGE
+          docker push $LATEST_IMAGE
+
+          echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
+          echo "FULL_IMAGE=${FULL_IMAGE}" >> $GITHUB_ENV
+
+      # ============================================================
+      # Update Azure Container App
+      # ============================================================
+      - name: Deploy to Azure Container App
+        run: |
+          echo "Updating Container App: ${{ env.APP_NAME }}"
+
+          az containerapp update \
+            --name ${{ env.APP_NAME }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --image ${{ env.FULL_IMAGE }}
+
+          echo "Deployment complete!"
+
+      # ============================================================
+      # Health Check
+      # ============================================================
+      - name: Health Check
+        run: |
+          echo "Waiting 30 seconds for deployment to stabilize..."
+          sleep 30
+
+          APP_URL=$(az containerapp show \
+            --name ${{ env.APP_NAME }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --query properties.configuration.ingress.fqdn \
+            -o tsv)
+
+          echo "Testing health endpoint: https://${APP_URL}/health"
+
+          HEALTH_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://${APP_URL}/health)
+
+          if [ "$HEALTH_RESPONSE" = "200" ]; then
+            echo "✅ Health check passed (HTTP $HEALTH_RESPONSE)"
+          else
+            echo "❌ Health check failed (HTTP $HEALTH_RESPONSE)"
+            exit 1
+          fi
+
+      # ============================================================
+      # Create GitHub Deployment
+      # ============================================================
+      - name: Create deployment record
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const deployment = await github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.sha,
+              environment: '${{ inputs.environment || 'production' }}',
+              auto_merge: false,
+              required_contexts: []
+            });
+
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: deployment.data.id,
+              state: 'success',
+              description: 'CoreText MCP deployed successfully',
+              environment_url: 'https://${{ env.APP_NAME }}.eastus.azurecontainerapps.io'
+            });
+
+      # ============================================================
+      # Notify on Failure (Optional)
+      # ============================================================
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ Deployment failed! Check the logs above for details."
+          # Add Slack/Teams notification here if needed

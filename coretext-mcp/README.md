@@ -227,6 +227,23 @@ This server demonstrates all concepts from:
 - Storage: 100MB JSON limit (local)
 - Cosmos DB: Unlimited scale
 
+## ☁️ Azure Deployment
+
+**MVP Production Deployment (~$3-10/month)**
+
+Deploy to Azure with cost-optimized infrastructure:
+- Cosmos DB Free Tier (1000 RU/s, 25GB)
+- Container Apps (scales to zero)
+- Key Vault for secrets
+- Managed Identity authentication
+
+```bash
+cd azure
+./deploy.sh
+```
+
+**Full documentation**: See [azure/README.md](azure/README.md)
+
 ## 🔒 Security Considerations
 
 - API keys in environment variables
