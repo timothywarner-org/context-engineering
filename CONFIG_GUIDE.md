@@ -112,6 +112,7 @@ Copy the contents of this sample file to your Claude Desktop configuration locat
 The fictional API key in these samples is: `sk-1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p`
 
 **To get a real API key:**
+
 1. Visit https://platform.deepseek.com/
 2. Sign up for an account
 3. Navigate to API Keys section
@@ -120,6 +121,7 @@ The fictional API key in these samples is: `sk-1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p`
 
 **Alternative (for testing without API key):**
 Both servers support fallback modes:
+
 - **CoreText MCP**: Uses local keyword extraction instead of AI enrichment
 - **Stoic MCP**: Still provides quotes, but explanations will use fallback messages
 
@@ -251,6 +253,7 @@ Expected response: Quote text, author, source, and theme.
 ## Security Notes
 
 **IMPORTANT:**
+
 - Never commit real API keys to version control
 - The fictional key in these samples is for demonstration only
 - Use environment variables for production deployments
