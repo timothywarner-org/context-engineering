@@ -4,12 +4,11 @@
 
 Welcome to the training hub for mastering **Context Engineering with Model Context Protocol (MCP)**. Whether you're building AI applications or deepening your understanding of persistent AI memory, this guide provides everything you need to implement production-ready context systems.
 
-👉 **New to this repo?** Check out the [Getting Started Guide](GETTING-STARTED.md) for navigation help!
 📋 **Looking for the course plan?** View the [Context Engineering Course Plan](course-plan.md)!
 
 [![Build Status](https://github.com/timothywarner-org/coretext-mcp/actions/workflows/build.yml/badge.svg)](https://github.com/timothywarner-org/coretext-mcp/actions)
 
-*Last updated: January 29, 2025*
+*Last updated: October 30, 2025*
 
 ---
 
@@ -221,26 +220,6 @@ Install-Module -Name Az -Scope CurrentUser -Repository PSGallery -Force
 ## 💻 **Hands-on Labs & Practice**
 
 Learn through hands-on experience:
-
-### Course Repository Structure
-
-```
-context-engineering/
-├── labs/                 # Hands-on lab exercises
-│   ├── lab01-context/   # Understanding context and tokenization
-│   ├── lab02-local/     # Building local MCP servers
-│   ├── lab03-azure/     # Azure deployment
-│   └── lab04-advanced/  # Multi-agent architectures
-├── examples/            # Working code examples
-│   ├── filesystem/      # Basic file access server
-│   ├── github/          # GitHub integration
-│   ├── database/        # Database query tools
-│   └── memory/          # Memory persistence patterns
-├── deploy/              # Azure deployment templates
-│   ├── bicep/          # Infrastructure as Code
-│   └── scripts/        # Deployment automation
-└── docs/               # Additional documentation
-```
 
 ### Getting Started
 
