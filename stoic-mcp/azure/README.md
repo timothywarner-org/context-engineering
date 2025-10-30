@@ -15,6 +15,7 @@ This directory will contain the Azure-hosted version of the Stoic MCP server wit
 ## Architecture
 
 The Azure implementation will demonstrate:
+
 - Migration from JSON to Cosmos DB
 - RESTful API design patterns
 - Serverless deployment options

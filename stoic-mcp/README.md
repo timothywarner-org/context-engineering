@@ -23,6 +23,7 @@ stoic-mcp/
 ## Why Stoicism for Developers?
 
 Developer wellness matters. Stoic philosophy offers practical wisdom for handling:
+
 - High-pressure deployments
 - Difficult technical decisions  
 - Imposter syndrome and self-doubt
@@ -38,6 +39,7 @@ Choose your implementation:
 ## Learning Objectives
 
 This project teaches:
+
 - MCP server architecture per Anthropic specification
 - Tool implementation patterns in Node.js/TypeScript
 - External API integration (DeepSeek)

@@ -11,16 +11,18 @@ Use this checklist to get the MCP server running before your O'Reilly session.
 ### **Step 1: Verify Prerequisites (3 min)**
 
 - [ ] **Python 3.10+** installed
+
   ```bash
   python --version
   # Should show: Python 3.10.x or higher
   ```
 
 - [ ] **Claude Desktop** installed and running
-  - Download from: https://claude.ai/download
+  - Download from: <https://claude.ai/download>
   - Launch app at least once
 
 - [ ] **GitHub repo** created (optional but recommended)
+
   ```bash
   git init context-engineering
   cd context-engineering
@@ -29,6 +31,7 @@ Use this checklist to get the MCP server running before your O'Reilly session.
 ### **Step 2: Install Dependencies (2 min)**
 
 - [ ] Create project directory
+
   ```bash
   mkdir -p ~/context-journal-mcp
   cd ~/context-journal-mcp
@@ -44,6 +47,7 @@ Use this checklist to get the MCP server running before your O'Reilly session.
   - `ARCHITECTURE_DIAGRAMS.md`
 
 - [ ] Install Python packages
+
   ```bash
   pip install -r requirements.txt
   
@@ -52,6 +56,7 @@ Use this checklist to get the MCP server running before your O'Reilly session.
   ```
 
 - [ ] Verify server runs
+
   ```bash
   python context_journal_mcp.py --help
   # Should show help and exit immediately (not hang)
@@ -62,18 +67,21 @@ Use this checklist to get the MCP server running before your O'Reilly session.
 - [ ] **Find config file location:**
   
   **macOS:**
+
   ```bash
   open ~/Library/Application\ Support/Claude/
   # Look for: claude_desktop_config.json
   ```
   
   **Windows:**
+
   ```powershell
   explorer %APPDATA%\Claude\
   # Look for: claude_desktop_config.json
   ```
 
 - [ ] **Edit config file** (create if doesn't exist):
+
   ```json
   {
     "mcpServers": {
@@ -88,6 +96,7 @@ Use this checklist to get the MCP server running before your O'Reilly session.
   ⚠️ **CRITICAL:** Use absolute path, not relative!
   
   **Get absolute path:**
+
   ```bash
   # macOS/Linux
   pwd
@@ -122,6 +131,7 @@ Use this checklist to get the MCP server running before your O'Reilly session.
     - search_context_entries
 
 - [ ] **Test basic functionality** in Claude:
+
   ```
   Prompt: "Create a context entry titled 'Test Entry' with the context 
   'This is a test of the MCP server' and tag it with 'test' and 'demo'"
@@ -137,6 +147,7 @@ Use this checklist to get the MCP server running before your O'Reilly session.
 - [ ] Create sample entries for demos:
   
   **Entry 1: Architecture Decision**
+
   ```
   "Create a context entry titled 'FastAPI Architecture Decision' with context 
   'Team chose FastAPI over Flask for async support and automatic OpenAPI docs. 
@@ -145,6 +156,7 @@ Use this checklist to get the MCP server running before your O'Reilly session.
   ```
 
   **Entry 2: Database Choice**
+
   ```
   "Create a context entry titled 'Database Selection: PostgreSQL' with context 
   'Selected PostgreSQL 15 for ACID compliance and JSON support. Using async 
@@ -153,6 +165,7 @@ Use this checklist to get the MCP server running before your O'Reilly session.
   ```
 
   **Entry 3: Deployment Notes**
+
   ```
   "Create a context entry titled 'Azure Deployment Notes' with context 
   'Container Apps in West US 2. Managed identity for authentication. 
@@ -170,27 +183,32 @@ Use this checklist to get the MCP server running before your O'Reilly session.
 Run these tests to ensure everything works:
 
 ### **Test 1: Create and Read**
+
 - [ ] Create an entry (see Step 5 above)
 - [ ] Note the entry_id returned (e.g., "ctx_0001")
 - [ ] Read it back: "Read entry ctx_0001 in markdown format"
 - [ ] Verify content matches
 
 ### **Test 2: Search**
+
 - [ ] "Search for entries about 'azure'"
 - [ ] Should find Azure-related entries
 - [ ] Results show in markdown format
 
 ### **Test 3: List with Filters**
+
 - [ ] "List all entries tagged with 'python'"
 - [ ] Should filter to Python entries
 - [ ] Pagination info shown
 
 ### **Test 4: Update**
+
 - [ ] "Update entry ctx_0001 to add a note: 'Reviewed on 2025-10-20'"
 - [ ] Verify update successful
 - [ ] Read entry again to confirm note added
 
 ### **Test 5: Memory Persistence** ⭐ **KEY DEMO**
+
 - [ ] Close Claude Desktop completely
 - [ ] Reopen Claude Desktop
 - [ ] Ask: "What architecture decisions have we documented?"
@@ -206,7 +224,9 @@ Run these tests to ensure everything works:
 **Problem:** No 🔌 icon in Claude Desktop
 
 **Solutions:**
+
 1. Check config file location
+
    ```bash
    # macOS
    cat ~/Library/Application\ Support/Claude/claude_desktop_config.json
@@ -220,12 +240,14 @@ Run these tests to ensure everything works:
    - Check for missing commas, quotes
 
 3. Check Python path is absolute
+
    ```bash
    # Test: Should print full path
    python -c "import os; print(os.path.abspath('context_journal_mcp.py'))"
    ```
 
 4. Check Claude logs
+
    ```bash
    # macOS
    tail -f ~/Library/Logs/Claude/mcp*.log
@@ -239,6 +261,7 @@ Run these tests to ensure everything works:
 **Problem:** ModuleNotFoundError: No module named 'mcp'
 
 **Solution:**
+
 ```bash
 pip install --upgrade mcp pydantic httpx
 ```
@@ -250,6 +273,7 @@ pip install --upgrade mcp pydantic httpx
 **Why:** MCP servers are long-running processes waiting for input via stdio
 
 **Solution:** This is normal! Use `--help` flag to verify it works:
+
 ```bash
 python context_journal_mcp.py --help
 ```
@@ -259,6 +283,7 @@ python context_journal_mcp.py --help
 **Problem:** Claude doesn't use the tools
 
 **Solutions:**
+
 1. Check tool descriptions are clear
 2. Ask Claude explicitly: "Use the create_context_entry tool to..."
 3. Check annotations are set correctly
@@ -283,6 +308,7 @@ python context_journal_mcp.py --help
 ## 🎓 Pre-Course Final Checks
 
 **The Night Before:**
+
 - [ ] All files in course repo
 - [ ] Dependencies installed
 - [ ] Server tested and working
@@ -292,6 +318,7 @@ python context_journal_mcp.py --help
 - [ ] Backup plan prepared (pre-recorded demo if tech fails)
 
 **5 Minutes Before Class:**
+
 - [ ] Claude Desktop running with MCP connected
 - [ ] Demo data visible when listing entries
 - [ ] VS Code open with code file
@@ -299,6 +326,7 @@ python context_journal_mcp.py --help
 - [ ] GitHub repo URL ready to share
 
 **During Introduction:**
+
 - [ ] Share screen with Claude Desktop
 - [ ] Show the amnesia problem first
 - [ ] Then enable MCP and show the solution
@@ -309,6 +337,7 @@ python context_journal_mcp.py --help
 ## 🎯 Success Criteria
 
 **By end of setup, you should:**
+
 - ✅ See 🔌 icon in Claude Desktop
 - ✅ Have 6 tools listed under "context-journal"
 - ✅ Successfully create and read an entry
@@ -316,17 +345,19 @@ python context_journal_mcp.py --help
 - ✅ Have demo data ready to showcase
 
 **Students should be able to:**
+
 - ✅ Install and configure the server (15 min)
 - ✅ Create their first context entry (5 min)
 - ✅ Understand why MCP solves the amnesia problem (5 min)
 
 ---
 
-## 🚀 You're Ready!
+## 🚀 You're Ready
 
 If all checkboxes are checked, you're ready to teach Context Engineering with MCP!
 
 **Time to demo?** Start with:
+
 1. Show the problem (amnesia)
 2. Enable the solution (MCP)
 3. Prove it works (persistence)
@@ -338,6 +369,7 @@ If all checkboxes are checked, you're ready to teach Context Engineering with MC
 ---
 
 **Questions?** Check:
+
 - README.md for full documentation
 - INSTRUCTOR_GUIDE.md for teaching script
 - QUICK_REFERENCE.md for commands

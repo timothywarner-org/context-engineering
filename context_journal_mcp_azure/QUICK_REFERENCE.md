@@ -46,6 +46,7 @@ explorer %APPDATA%\Claude\
 ## 💬 Example Prompts for Claude
 
 ### **Creating Context**
+
 ```
 "Save a context entry titled 'Azure MCP Deployment' with the context 
 'Deployed to Container Apps in West US region. Connection string stored 
@@ -54,21 +55,25 @@ in Key Vault. Using managed identity for auth.' Tag it with 'azure',
 ```
 
 ### **Reading Context**
+
 ```
 "Show me entry ctx_0001 in markdown format"
 ```
 
 ### **Updating Context**
+
 ```
 "Update entry ctx_0001 to add a note: 'Scaled to 3 replicas on 2025-10-20'"
 ```
 
 ### **Listing with Filters**
+
 ```
 "List all context entries tagged with 'python' and 'azure'"
 ```
 
 ### **Searching**
+
 ```
 "Search for all entries mentioning 'FastAPI' or 'API design'"
 ```
@@ -76,6 +81,7 @@ in Key Vault. Using managed identity for auth.' Tag it with 'azure',
 ## 🎯 Tool Patterns
 
 ### **Basic Tool Structure**
+
 ```python
 from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel, Field
@@ -93,6 +99,7 @@ async def your_tool_name(params: YourInput) -> str:
 ```
 
 ### **Tool Annotations**
+
 ```python
 annotations={
     "title": "Human-Readable Title",
@@ -104,6 +111,7 @@ annotations={
 ```
 
 ### **Input Validation with Pydantic**
+
 ```python
 from pydantic import BaseModel, Field, field_validator
 
@@ -129,17 +137,20 @@ class CreateInput(BaseModel):
 ## 🐛 Debugging Tips
 
 ### **Check if server is running**
+
 ```bash
 # Should show help and exit immediately
 python context_journal_mcp.py --help
 ```
 
 ### **Test imports**
+
 ```bash
 python -c "from mcp.server.fastmcp import FastMCP; print('OK')"
 ```
 
 ### **View Claude logs**
+
 ```bash
 # macOS
 tail -f ~/Library/Logs/Claude/mcp*.log
@@ -151,17 +162,20 @@ Get-Content $env:APPDATA\Claude\logs\mcp*.log -Wait
 ### **Common Errors**
 
 **"ModuleNotFoundError: No module named 'mcp'"**
+
 ```bash
 pip install mcp
 ```
 
 **"Server not appearing in Claude Desktop"**
+
 1. Check config file location
 2. Use absolute path in config
 3. Restart Claude Desktop
 4. Check Python version (need 3.10+)
 
 **"Tool call failed"**
+
 - Check Pydantic model validation
 - Look at error message in Claude UI
 - Verify all required fields provided
@@ -169,6 +183,7 @@ pip install mcp
 ## 🔄 Local to Azure Migration
 
 ### **Phase 1: Local JSON**
+
 ```python
 def load_data():
     with open('data.json', 'r') as f:
@@ -176,6 +191,7 @@ def load_data():
 ```
 
 ### **Phase 2: Azure Cosmos DB**
+
 ```python
 async def load_data():
     async with CosmosClient(endpoint, key) as client:
@@ -185,6 +201,7 @@ async def load_data():
 ```
 
 ### **Azure Setup Commands**
+
 ```bash
 # Create Cosmos DB account
 az cosmosdb create \
@@ -207,6 +224,7 @@ az cosmosdb sql container create \
 ## 📊 Data Models
 
 ### **Entry Structure**
+
 ```json
 {
   "id": "ctx_0001",
@@ -220,6 +238,7 @@ az cosmosdb sql container create \
 ```
 
 ### **Response Format**
+
 ```json
 {
   "success": true,
@@ -230,6 +249,7 @@ az cosmosdb sql container create \
 ```
 
 ### **Error Format**
+
 ```json
 {
   "success": false,
@@ -240,24 +260,27 @@ az cosmosdb sql container create \
 
 ## 🎓 Learning Resources
 
-- **MCP Protocol**: https://modelcontextprotocol.io
-- **FastMCP SDK**: https://github.com/modelcontextprotocol/python-sdk
-- **Pydantic Docs**: https://docs.pydantic.dev
-- **Azure Cosmos DB**: https://docs.microsoft.com/azure/cosmos-db
+- **MCP Protocol**: <https://modelcontextprotocol.io>
+- **FastMCP SDK**: <https://github.com/modelcontextprotocol/python-sdk>
+- **Pydantic Docs**: <https://docs.pydantic.dev>
+- **Azure Cosmos DB**: <https://docs.microsoft.com/azure/cosmos-db>
 
 ## 🏆 Challenge Exercises
 
 ### **Beginner**
+
 1. Add a tool to count total entries
 2. Add a tool to get entry by title (not ID)
 3. Add validation to prevent duplicate titles
 
 ### **Intermediate**
+
 4. Add export tool (entries to JSON file)
 5. Add import tool (JSON file to entries)
 6. Add bulk tag operations (add/remove tags from multiple entries)
 
 ### **Advanced**
+
 7. Implement entry versioning (keep history of changes)
 8. Add related entries (link entries together)
 9. Implement tag hierarchies (parent/child tags)

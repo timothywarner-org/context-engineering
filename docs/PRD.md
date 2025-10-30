@@ -52,7 +52,7 @@ By the end of this live online course, you'll be able to:
 
 - **Deploy production context systems** combining MCP's tool-calling with advanced patterns like context pruning, memory hierarchies, and cross-agent state sharing
 
-### This live event is for you because...
+### This live event is for you because
 
 - **You're exhausted by AI amnesia** - tired of re-explaining context every conversation and want your AI to remember what matters across sessions
 
@@ -79,34 +79,41 @@ By the end of this live online course, you'll be able to:
 ### Course Set-up
 
 **AI Platform Access (Required)**
+
 - Active accounts with tool/plugin access: ChatGPT Plus/Team, Claude Pro, or GitHub Copilot
 - Enable beta features where available (especially Claude's MCP support)
 
 **Development Environment**
+
 - **Node.js 20+ or Python 3.11+** - for running MCP servers (installers provided in repo)
 - **Docker Desktop** - for containerized MCP deployments (optional but recommended)
 - **VS Code or similar editor** - with JSON syntax highlighting
 
 **GitHub Repository**
+
 - Clone before class: **github.com/timothywarner-org/mcp-context-engineering**
 - Contains: MCP server templates, vector DB configs, memory pattern examples, API connectors
 - Pre-configured servers for: filesystem access, database queries, API calls, memory storage
 
 **MCP Toolchain**
+
 - **MCP SDK**: Will install during class via `npm install @modelcontextprotocol/sdk`
 - **MCP Inspector**: Browser-based tool for testing MCP servers (link in repo)
 - **API Testing Tool**: Postman, Bruno, or similar for debugging MCP endpoints
 
 **Required Browser Extensions**
+
 - **Claude Desktop** (if available) or browser access to claude.ai
 - **JSON Viewer** for inspecting MCP protocol messages
 
 **Network Requirements**
+
 - Stable internet for API calls and tool discovery
 - Ability to run local servers on ports 3000-3100 (check firewall settings)
 - Access to GitHub, npm registry, and AI platform endpoints
 
 **Pre-class Checklist**
+
 1. Run `npm install` in the cloned repo to verify Node.js setup
 2. Test Docker with `docker run hello-world` (optional)
 3. Ensure you can access your AI platforms with tool/plugin features
@@ -114,22 +121,23 @@ By the end of this live online course, you'll be able to:
 
 ### Recommended Preparation
 
-- **Attend**: *The Elements of Prompt Engineering* by Tim Warner: https://www.oreilly.com/live-events/the-elements-of-prompt-engineering/0790145064170/
-- **Read**: *Quick Start Guide to Large Language Models: Strategies and Best Practices for Using ChatGPT and Other LLMs* by Sinan Ozdemir https://www.oreilly.com/library/view/quick-start-guide/9780138199425/
-- **Watch**: *How LLMs Understand & Generate Human Language* by Kate Harwood https://www.oreilly.com/videos/how-llms-understand/9780135414309/
+- **Attend**: *The Elements of Prompt Engineering* by Tim Warner: <https://www.oreilly.com/live-events/the-elements-of-prompt-engineering/0790145064170/>
+- **Read**: *Quick Start Guide to Large Language Models: Strategies and Best Practices for Using ChatGPT and Other LLMs* by Sinan Ozdemir <https://www.oreilly.com/library/view/quick-start-guide/9780138199425/>
+- **Watch**: *How LLMs Understand & Generate Human Language* by Kate Harwood <https://www.oreilly.com/videos/how-llms-understand/9780135414309/>
 
 ### Recommended Follow-up
 
-- **Watch**: *Generative AI Toolbox* by Shaun Wassell https://www.oreilly.com/library/view/generative-ai-toolbox/9780135421246/
-- **Read**: *AI for Everyone: A Beginner's Handbook for Artificial Intelligence (AI)* by Pearson https://www.oreilly.com/library/view/ai-for-everyone/9789361590832/
-- **Attend**: *LangChain for Generative AI Pipelines* by Bruno Gonçalves: https://www.oreilly.com/live-events/langchain-for-generative-ai-pipelines/0642572002267/
-- **Watch**: *Securing Generative AI* by Omar Santos https://www.oreilly.com/library/view/securing-generative-ai/9780135401804/
+- **Watch**: *Generative AI Toolbox* by Shaun Wassell <https://www.oreilly.com/library/view/generative-ai-toolbox/9780135421246/>
+- **Read**: *AI for Everyone: A Beginner's Handbook for Artificial Intelligence (AI)* by Pearson <https://www.oreilly.com/library/view/ai-for-everyone/9789361590832/>
+- **Attend**: *LangChain for Generative AI Pipelines* by Bruno Gonçalves: <https://www.oreilly.com/live-events/langchain-for-generative-ai-pipelines/0642572002267/>
+- **Watch**: *Securing Generative AI* by Omar Santos <https://www.oreilly.com/library/view/securing-generative-ai/9780135401804/>
 
 ### Schedule
 
 **[Keep for registration page:] Time for breaks and Q&A will be included throughout the course.**
 
 **Segment 1: Context Crisis Meets MCP Solution (55 minutes)**
+
 - Why prompts fail: the stateless AI problem demonstrated live
 - Introduction to MCP: the protocol enabling persistent memory and tool discovery
 - Live demo: Same workflow with and without MCP - watch AI gain memory and capabilities
@@ -140,6 +148,7 @@ By the end of this live online course, you'll be able to:
 Break (10 minutes)
 
 **Segment 2: Deploy Your First Stateful AI System (55 minutes)**
+
 - Live coding: Deploy a basic MCP server with memory capabilities
 - Connect MCP to ChatGPT and Claude - watch them discover tools automatically
 - Implement conversation memory: store, retrieve, and chain context
@@ -150,6 +159,7 @@ Break (10 minutes)
 Break (10 minutes)
 
 **Segment 3: Advanced Context Engineering with MCP (55 minutes)**
+
 - Vector database integration for semantic memory via MCP
 - Multi-agent orchestration: agents sharing context through MCP servers
 - Memory patterns: episodic, semantic, and working memory architectures
@@ -160,6 +170,7 @@ Break (10 minutes)
 Break (10 minutes)
 
 **Segment 4: Production Context Systems (45 minutes)**
+
 - Enterprise MCP patterns: authentication, rate limiting, audit trails
 - Context optimization: smart pruning, caching, and cost management
 - Security considerations: context isolation and data governance

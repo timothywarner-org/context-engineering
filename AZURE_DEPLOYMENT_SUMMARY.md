@@ -37,6 +37,7 @@ Cosmos DB Free Tier (1000 RU/s, 25GB storage)
 ```
 
 **Supporting Services:**
+
 - Azure Container Registry (Basic tier)
 - Log Analytics (30-day retention)
 - Managed Identity (no cost)
@@ -44,24 +45,28 @@ Cosmos DB Free Tier (1000 RU/s, 25GB storage)
 ## Key Features
 
 ### Cost Optimization
+
 - ✅ **Cosmos DB Free Tier**: $0/month for 1000 RU/s and 25GB
 - ✅ **Scale to Zero**: Container Apps scales to 0 replicas when idle
 - ✅ **Minimal Resources**: 0.25 CPU cores, 0.5Gi memory
 - ✅ **Serverless Billing**: Pay only for actual usage
 
 ### Security
+
 - ✅ **Managed Identity**: No passwords, uses Azure AD authentication
 - ✅ **Key Vault**: Encrypted secret storage (API keys, connection strings)
 - ✅ **RBAC**: Role-based access control throughout
 - ✅ **Non-root Container**: Runs as user ID 1001 (nodejs)
 
 ### Production Features
+
 - ✅ **Health Checks**: HTTP health endpoint on `/health`
 - ✅ **Logging**: Centralized logs via Log Analytics
 - ✅ **Auto-restart**: Container restarts on failures
 - ✅ **Zero-downtime Updates**: Rolling deployments
 
 ### CI/CD Integration
+
 - ✅ **GitHub Actions**: Automated deployment on push to main
 - ✅ **Azure Container Registry**: Stores Docker images
 - ✅ **Service Principal Auth**: Secure GitHub→Azure authentication
@@ -72,18 +77,21 @@ Cosmos DB Free Tier (1000 RU/s, 25GB storage)
 ### Method 1: Manual Script (Recommended for First Time)
 
 **Prerequisites:**
+
 1. Azure CLI installed and logged in
 2. Docker installed and running
 3. Resource group `context-engineering-rg` exists
 4. Managed Identity `context-msi` exists
 
 **One-Command Deploy:**
+
 ```bash
 cd context-engineering-2/coretext-mcp/azure
 ./deploy.sh
 ```
 
 **What it does:**
+
 - ✅ Creates Azure Container Registry (if needed)
 - ✅ Builds and pushes Docker image
 - ✅ Deploys all infrastructure with Bicep
@@ -95,8 +103,10 @@ cd context-engineering-2/coretext-mcp/azure
 **For automated deployments on every push to `main`.**
 
 **Setup Steps:**
+
 1. Deploy manually first (using deploy.sh above)
 2. Create Azure Service Principal:
+
    ```bash
    az ad sp create-for-rbac \
      --name "github-actions-coretext-mcp" \
@@ -104,6 +114,7 @@ cd context-engineering-2/coretext-mcp/azure
      --scopes /subscriptions/92fd53f2-c38e-461a-9f50-e1ef3382c54c/resourceGroups/context-engineering-rg \
      --sdk-auth
    ```
+
 3. Add GitHub Secrets:
    - `AZURE_CREDENTIALS` - JSON output from above
    - `ACR_NAME` - Your ACR name
@@ -128,6 +139,7 @@ cd context-engineering-2/coretext-mcp/azure
 ## What Each File Does
 
 ### `main.bicep`
+
 - Defines all Azure resources
 - Sets up Cosmos DB (free tier, serverless)
 - Creates Container App with environment
@@ -136,6 +148,7 @@ cd context-engineering-2/coretext-mcp/azure
 - **11KB, 200+ lines, fully documented**
 
 ### `deploy.sh`
+
 - Pre-flight checks (Azure CLI, Docker, login)
 - Verifies prerequisites (resource group, managed identity)
 - **Creates Azure Container Registry (ACR)** if it doesn't exist
@@ -149,6 +162,7 @@ cd context-engineering-2/coretext-mcp/azure
 **Important**: The ACR is created by the deploy script, NOT in the Bicep template. This is intentional - ACR needs to exist BEFORE we can build/push the Docker image, which happens BEFORE the Bicep deployment runs.
 
 ### `Dockerfile`
+
 - Multi-stage build for small image size
 - Security: runs as non-root user (nodejs)
 - Includes dumb-init for proper signal handling
@@ -157,6 +171,7 @@ cd context-engineering-2/coretext-mcp/azure
 - **2.7KB, fully documented**
 
 ### `README.md`
+
 - Complete deployment guide (16KB)
 - Architecture diagrams
 - Cost breakdown
@@ -167,12 +182,14 @@ cd context-engineering-2/coretext-mcp/azure
 - Security best practices
 
 ### `QUICKSTART.md`
+
 - TL;DR version (2.4KB)
 - 5-minute deployment
 - Essential commands only
 - Common issues with fixes
 
 ### `CHECKLIST.md`
+
 - Pre-deployment checklist (7.6KB)
 - During-deployment steps
 - Post-deployment verification
@@ -182,6 +199,7 @@ cd context-engineering-2/coretext-mcp/azure
 - **Print this before deploying!**
 
 ### `parameters.json`
+
 - Template for deployment parameters
 - Replace placeholders with actual values
 - Used in manual deployments
@@ -207,6 +225,7 @@ cd context-engineering-2/coretext-mcp/azure
 ## Testing Status
 
 ### Verified
+
 - ✅ Bicep template syntax is valid
 - ✅ Dockerfile builds successfully
 - ✅ All documentation is complete
@@ -214,6 +233,7 @@ cd context-engineering-2/coretext-mcp/azure
 - ✅ Files are in correct locations
 
 ### Not Yet Tested (Requires Azure Deployment)
+
 - ⏳ Actual deployment to Azure
 - ⏳ Container App runs successfully
 - ⏳ Cosmos DB connection works
@@ -225,6 +245,7 @@ cd context-engineering-2/coretext-mcp/azure
 ### Before First Deployment
 
 1. **Verify Prerequisites**
+
    ```bash
    # Check Azure CLI
    az --version  # Need 2.50+
@@ -238,6 +259,7 @@ cd context-engineering-2/coretext-mcp/azure
    ```
 
 2. **Check Resource Group**
+
    ```bash
    az group show --name context-engineering-rg
    # If doesn't exist:
@@ -245,6 +267,7 @@ cd context-engineering-2/coretext-mcp/azure
    ```
 
 3. **Check Managed Identity**
+
    ```bash
    az identity show --name context-msi --resource-group context-engineering-rg
    # If doesn't exist:
@@ -252,6 +275,7 @@ cd context-engineering-2/coretext-mcp/azure
    ```
 
 4. **Check Cosmos DB Free Tier**
+
    ```bash
    az cosmosdb list --query "[?properties.enableFreeTier].{name:name,rg:resourceGroup}"
    # If you already have one, edit main.bicep to remove enableFreeTier: true
@@ -265,6 +289,7 @@ cd context-engineering-2/coretext-mcp/azure
 ```
 
 **Follow the prompts:**
+
 - Script will guide you through each step
 - When asked for DeepSeek API key, you can:
   - Press Enter to use key from `../.env`
@@ -274,11 +299,13 @@ cd context-engineering-2/coretext-mcp/azure
 ### After Deployment
 
 1. **Test Health Endpoint**
+
    ```bash
    curl https://YOUR-APP-URL.eastus.azurecontainerapps.io/health
    ```
 
 2. **View Logs**
+
    ```bash
    az containerapp logs show \
      -n $(az containerapp list -g context-engineering-rg --query '[0].name' -o tsv) \
@@ -287,7 +314,7 @@ cd context-engineering-2/coretext-mcp/azure
    ```
 
 3. **Check Costs**
-   - Portal: https://portal.azure.com
+   - Portal: <https://portal.azure.com>
    - Navigate to: Cost Management + Billing
    - Set up budget alert for $20/month
 
@@ -301,11 +328,13 @@ cd context-engineering-2/coretext-mcp/azure
    - This will cost ~$25/month instead of $0
 
 2. **"Resource group not found"**
+
    ```bash
    az group create --name context-engineering-rg --location eastus
    ```
 
 3. **"Managed identity not found"**
+
    ```bash
    az identity create --name context-msi --resource-group context-engineering-rg
    ```
@@ -322,6 +351,7 @@ cd context-engineering-2/coretext-mcp/azure
 ## Documentation Quality
 
 All files include:
+
 - ✅ Clear structure with headers
 - ✅ Code examples with syntax highlighting
 - ✅ Step-by-step instructions

@@ -16,22 +16,26 @@ This MCP server showcases the core concepts from the "Context Engineering with M
 ## 🚀 Quick Start
 
 ### 1. Install Dependencies
+
 ```bash
 npm install
 ```
 
 ### 2. Configure Environment
+
 ```bash
 cp .env.example .env
 # Edit .env with your Deepseek API key (optional)
 ```
 
 ### 3. Test with MCP Inspector
+
 ```bash
 npm run inspector
 ```
 
 ### 4. Run Tests
+
 ```bash
 npm test
 ```
@@ -39,7 +43,9 @@ npm test
 ## 🔧 Available Tools
 
 ### `memory_create`
+
 Store new context with type and tags
+
 ```json
 {
   "content": "Important fact to remember",
@@ -50,34 +56,43 @@ Store new context with type and tags
 ```
 
 ### `memory_read`
+
 Retrieve specific memory by ID
 
 ### `memory_update`
+
 Modify existing memory content or metadata
 
 ### `memory_delete`
+
 Permanently remove a memory
 
 ### `memory_search`
+
 Full-text search across all memories
 
 ### `memory_list`
+
 List memories with optional type filter
 
 ### `memory_stats`
+
 Get system statistics and usage patterns
 
 ### `memory_enrich`
+
 Apply AI analysis to existing memory
 
 ## 📚 Memory Types
 
 ### Episodic Memory
+
 - **What**: Time-based, event-focused memories
 - **Example**: "Meeting with client on Oct 31, 2024"
 - **Use Case**: Conversation history, event tracking
 
 ### Semantic Memory
+
 - **What**: Fact-based, conceptual knowledge
 - **Example**: "MCP enables persistent AI context"
 - **Use Case**: Documentation, reference material
@@ -96,18 +111,21 @@ The Deepseek integration demonstrates production authentication:
 The server provides three resources that maintain context:
 
 ### `memory://overview`
+
 - Markdown dashboard with statistics
 - Recent activity and most accessed memories
 - Tag cloud visualization
 - System configuration status
 
 ### `memory://context-stream`
+
 - Real-time view of active context
 - Time-windowed memory groups (recent/today/earlier)
 - Active topics extraction
 - Perfect for maintaining conversation continuity
 
 ### `memory://knowledge-graph`
+
 - Semantic network of memory connections
 - Identifies knowledge clusters
 - Shows connection strength between memories
@@ -130,6 +148,7 @@ coretext-mcp/
 ## 🌐 Claude Desktop Integration
 
 ### Windows (claude_desktop_config.json)
+
 ```json
 {
   "mcpServers": {
@@ -144,6 +163,7 @@ coretext-mcp/
 Location: `%APPDATA%\Claude\claude_desktop_config.json`
 
 ### Mac/Linux
+
 ```json
 {
   "mcpServers": {
@@ -160,6 +180,7 @@ Location: `~/Library/Application Support/Claude/claude_desktop_config.json`
 ## 🚢 Production Deployment
 
 ### Azure Container Apps
+
 ```bash
 # Build container
 docker build -t coretext-mcp .
@@ -176,7 +197,9 @@ az containerapp create \
 ```
 
 ### Cosmos DB Integration
+
 Replace the file-based MemoryManager with:
+
 ```javascript
 // Use @azure/cosmos SDK
 const { CosmosClient } = require("@azure/cosmos");
@@ -186,21 +209,25 @@ const { CosmosClient } = require("@azure/cosmos");
 ## 📊 Teaching Points
 
 ### 1. Context Window Problems
+
 - Tokens are expensive and limited
 - Copy-paste doesn't scale
 - AI forgets between sessions
 
 ### 2. MCP Solution
+
 - Universal protocol for context
 - Tool-based memory access
 - Persistent across sessions
 
 ### 3. Enterprise Patterns
+
 - Authentication (API keys)
 - Structured data (CRUD)
 - Cloud-ready architecture
 
 ### 4. Memory Architecture
+
 - Episodic: Timeline-based
 - Semantic: Knowledge-based
 - Vector: Similarity-based (future)
@@ -208,6 +235,7 @@ const { CosmosClient } = require("@azure/cosmos");
 ## 🎓 Course Integration
 
 This server demonstrates all concepts from:
+
 - **Segment 1**: MCP basics and context loss
 - **Segment 2**: GitHub + MCP integration patterns
 - **Segment 3**: Multi-agent memory systems
@@ -232,6 +260,7 @@ This server demonstrates all concepts from:
 **MVP Production Deployment (~$3-10/month)**
 
 Deploy to Azure with cost-optimized infrastructure:
+
 - Cosmos DB Free Tier (1000 RU/s, 25GB)
 - Container Apps (scales to zero)
 - Key Vault for secrets

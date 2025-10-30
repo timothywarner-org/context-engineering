@@ -7,6 +7,7 @@
 **Yes!** You need ACR to store Docker images that Azure Container Apps will run.
 
 **Why?**
+
 - Container Apps needs a container image to deploy
 - That image must be stored somewhere Azure can access it
 - ACR (Azure Container Registry) is Azure's private Docker registry
@@ -16,6 +17,7 @@
 **Answer**: The `deploy.sh` script creates it for you!
 
 **See line 137 in deploy.sh:**
+
 ```bash
 az acr create \
     --resource-group "$RESOURCE_GROUP" \
@@ -26,6 +28,7 @@ az acr create \
 ```
 
 **Why not in Bicep?**
+
 - ACR must exist BEFORE we build/push the Docker image
 - Docker image must exist BEFORE Bicep deployment (Container App needs the image URL)
 - So the order is:
@@ -41,6 +44,7 @@ az acr create \
 **Two workflows:**
 
 #### Workflow 1: Manual Deployment (Good for Testing)
+
 ```bash
 # Every time you make changes:
 cd coretext-mcp/azure
@@ -48,15 +52,18 @@ cd coretext-mcp/azure
 ```
 
 **Pros:**
+
 - ✅ Simple, no GitHub setup needed
 - ✅ Good for learning and testing
 
 **Cons:**
+
 - ❌ Manual - you must run script every time
 - ❌ Can forget to deploy
 - ❌ Requires your laptop
 
 #### Workflow 2: GitHub Actions (Good for Production)
+
 ```bash
 # Once set up:
 git push origin main
@@ -64,12 +71,14 @@ git push origin main
 ```
 
 **Pros:**
+
 - ✅ Automatic deployment on every commit
 - ✅ No manual steps
 - ✅ Deployment history in GitHub
 - ✅ Can deploy from anywhere
 
 **Cons:**
+
 - ❌ Requires initial setup (service principal, secrets)
 - ❌ Slightly more complex
 
@@ -110,11 +119,13 @@ git push origin main
 ## Cost Implications
 
 ### Azure Container Registry
+
 - **Basic Tier**: $5/month
 - **Storage**: ~$0.10/GB/month
 - **Typical usage**: ~1-2GB = **~$5-6/month**
 
 ### GitHub Actions
+
 - **Public repos**: Free unlimited minutes
 - **Private repos**: 2,000 minutes/month free
 - **Typical usage**: 10 deployments/day × 3 minutes = 900 minutes/month = **$0** (under free tier)
@@ -122,19 +133,25 @@ git push origin main
 ## Recommended Setup
 
 ### For Course/Teaching
+
 **Use manual deployment:**
+
 - Run `deploy.sh` during demos
 - Show students the step-by-step process
 - Easy to understand and troubleshoot
 
 ### For Personal Projects
+
 **Use GitHub Actions:**
+
 - Set it up once
 - Never think about deployment again
 - Push code, it deploys automatically
 
 ### For Production Apps
+
 **Use GitHub Actions + Approval Gates:**
+
 - Automatic deployment to staging
 - Manual approval for production
 - Full deployment history
@@ -156,10 +173,11 @@ cd coretext-mcp/azure
 ```
 
 **Result:**
+
 - ✅ ACR created
 - ✅ Docker image built and pushed
 - ✅ All Azure resources deployed
-- ✅ App running at https://your-app.azurecontainerapps.io
+- ✅ App running at <https://your-app.azurecontainerapps.io>
 
 ### Optional: Add GitHub Actions (One Time)
 
@@ -179,6 +197,7 @@ az ad sp create-for-rbac \
 ```
 
 **Result:**
+
 - ✅ Every push to main deploys automatically
 - ✅ Deployment history in GitHub
 - ✅ Health checks verify deployment
@@ -226,10 +245,12 @@ Result: Container App has image ready!
 ### "Do I need to create ACR manually?"
 
 **No!** The `deploy.sh` script checks if ACR exists:
+
 - **If exists**: Uses it
 - **If doesn't exist**: Creates it
 
 See lines 124-148 in `deploy.sh`:
+
 ```bash
 # Look for existing ACR
 EXISTING_ACR=$(az acr list --resource-group "$RESOURCE_GROUP" --query "[0].name" -o tsv)
@@ -251,6 +272,7 @@ fi
 **No!** GitHub Actions assumes ACR already exists (from your initial manual deployment).
 
 **The workflow:**
+
 1. Manual deployment (first time) - creates ACR
 2. GitHub Actions (ongoing) - uses existing ACR
 
@@ -279,6 +301,7 @@ fi
 **Problem**: Service principal doesn't have ACR push permissions
 
 **Fix**:
+
 ```bash
 az role assignment create \
   --assignee YOUR_SP_ID \
@@ -289,16 +312,19 @@ az role assignment create \
 ## Summary
 
 **Yes, you need ACR:**
+
 - ✅ Created automatically by deploy.sh
 - ✅ Stores Docker images
 - ✅ ~$5-6/month
 
 **Yes, GitHub Actions are helpful (but optional):**
+
 - ✅ Automated CI/CD on every commit
 - ✅ Free for most use cases
 - ✅ Requires one-time setup
 
 **The deploy.sh script handles everything:**
+
 1. ✅ Creates ACR if needed
 2. ✅ Builds Docker image
 3. ✅ Pushes to ACR

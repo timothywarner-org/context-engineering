@@ -128,5 +128,3 @@ Tim Warner has been a Microsoft MVP in Azure AI and Cloud/Datacenter Management 
 ---
 
 *© 2025 Pearson Education, Inc. All rights reserved. This material is protected by copyright and may not be reproduced, distributed, or otherwise used without the express written permission of Pearson Education, Inc.*
-
-

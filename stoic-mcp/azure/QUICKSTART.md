@@ -7,7 +7,7 @@ Get the Stoic MCP server deployed to Azure in under 5 minutes.
 - [ ] Azure CLI installed (`az --version`)
 - [ ] Docker installed (`docker --version`)
 - [ ] Logged into Azure (`az login`)
-- [ ] DeepSeek API key (get from https://platform.deepseek.com/)
+- [ ] DeepSeek API key (get from <https://platform.deepseek.com/>)
 
 ## One-Time Setup (First Deployment Only)
 
@@ -37,6 +37,7 @@ cd stoic-mcp/azure
 ```
 
 That's it! The script will:
+
 1. Verify prerequisites
 2. Create/find Azure Container Registry
 3. Build Docker image
@@ -63,6 +64,7 @@ curl https://YOUR_APP_URL/health
 ## Troubleshooting
 
 ### Script fails at "az acr login"
+
 ```bash
 # Login manually
 az acr login --name YOUR_ACR_NAME
@@ -71,6 +73,7 @@ az acr login --name YOUR_ACR_NAME
 ```
 
 ### "Resource group not found"
+
 ```bash
 # Create it first
 az group create --name context-engineering-rg --location eastus
@@ -79,7 +82,9 @@ az group create --name context-engineering-rg --location eastus
 ```
 
 ### Health check returns 503
+
 Wait 2-3 minutes for container to start, then retry:
+
 ```bash
 curl https://YOUR_APP_URL/health
 ```

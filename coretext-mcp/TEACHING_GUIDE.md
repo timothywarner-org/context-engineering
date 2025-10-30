@@ -14,6 +14,7 @@
 ### SEGMENT 1: FROM PROMPTS TO PERSISTENT CONTEXT (55 min)
 
 #### Demo 1: The Amnesia Problem (10 min)
+
 ```bash
 # Show ChatGPT forgetting
 ChatGPT: "Remember my favorite color is blue"
@@ -25,6 +26,7 @@ ChatGPT: "What's my favorite color?"
 **TEACHING POINT**: Context windows are temporary. Tokens are expensive. Copy-paste doesn't scale.
 
 #### Demo 2: Deploy CoreText MCP (10 min)
+
 ```bash
 cd C:\github\coretext-mcp
 npm install
@@ -37,6 +39,7 @@ npm run inspector
 **TEACHING POINT**: MCP is a universal protocol. Works with Claude, ChatGPT (via plugins), Copilot.
 
 #### Demo 3: Create Your First Memory (10 min)
+
 ```javascript
 // In MCP Inspector, call memory_create
 {
@@ -55,6 +58,7 @@ npm run inspector
 **TEACHING POINT**: Semantic memory = facts. Episodic memory = events.
 
 #### Demo 4: Prove Persistence (10 min)
+
 ```bash
 # Stop the server (Ctrl+C)
 # Restart it
@@ -70,7 +74,9 @@ cat data/memory.json
 **TEACHING POINT**: Context survives restarts. This is the "aha!" moment.
 
 #### Exercise 1: Students Create Memories (10 min)
+
 Have students create:
+
 - One semantic memory (a fact)
 - One episodic memory (an event)
 - Search for their memories
@@ -80,6 +86,7 @@ Have students create:
 ### SEGMENT 2: BUILDING YOUR CONTEXT STACK (55 min)
 
 #### Demo 5: The Two Memory Types (15 min)
+
 ```javascript
 // Create episodic memory
 {
@@ -104,6 +111,7 @@ Have students create:
 **TEACHING POINT**: Episodic = timeline, Semantic = knowledge base. Humans use both!
 
 #### Demo 6: Search and Discovery (10 min)
+
 ```javascript
 // Search for "authentication"
 {
@@ -123,6 +131,7 @@ Have students create:
 **TEACHING POINT**: Tags and content are both searchable. This is how AI finds relevant context.
 
 #### Demo 7: Enrichment with Deepseek (15 min)
+
 ```javascript
 // Create and enrich in one step
 {
@@ -148,6 +157,7 @@ Have students create:
 **TEACHING POINT**: Enrichment adds AI analysis. Works WITH key (Deepseek) or WITHOUT (fallback).
 
 #### Demo 8: Resource Access (10 min)
+
 ```javascript
 // Access the overview resource
 Read resource: memory://overview
@@ -174,6 +184,7 @@ Read resource: memory://context-stream
 ### SEGMENT 3: ADVANCED PATTERNS - MULTI-AGENT MEMORY (55 min)
 
 #### Demo 9: The Knowledge Graph (15 min)
+
 ```javascript
 // Create interconnected memories
 1. "MCP enables persistent context for AI assistants"
@@ -198,6 +209,7 @@ Read resource: memory://knowledge-graph
 **TEACHING POINT**: Memories don't exist in isolation. They form semantic networks!
 
 #### Demo 10: Context Stream in Action (15 min)
+
 ```javascript
 // Rapid-fire memory creation to show stream
 - Create 5 memories quickly
@@ -212,6 +224,7 @@ Read resource: memory://knowledge-graph
 **TEACHING POINT**: Working memory (recent) vs long-term memory (earlier). Just like human cognition!
 
 #### Demo 11: CRUD Operations Deep Dive (10 min)
+
 ```javascript
 // Full CRUD cycle
 1. CREATE: memory_create
@@ -229,6 +242,7 @@ Read resource: memory://knowledge-graph
 **TEACHING POINT**: Every operation is tracked. This enables analytics and optimization.
 
 #### Demo 12: Multi-Agent Scenario (10 min)
+
 ```
 Scenario: Customer Service + Technical Support
 
@@ -254,6 +268,7 @@ Scenario: Customer Service + Technical Support
 ### SEGMENT 4: PRODUCTION REALITY (45 min)
 
 #### Demo 13: Security Patterns (10 min)
+
 ```bash
 # Show authentication hierarchy
 1. System environment variable (most secure)
@@ -271,6 +286,7 @@ Scenario: Customer Service + Technical Support
 **TEACHING POINT**: API keys follow hierarchy. Production uses Azure Key Vault.
 
 #### Demo 14: Azure Deployment Path (10 min)
+
 ```bash
 # Show Docker setup
 cat Dockerfile
@@ -289,6 +305,7 @@ cat Dockerfile
 **TEACHING POINT**: Architecture is cloud-ready. Minimal changes for production.
 
 #### Demo 15: Performance & Scale (10 min)
+
 ```javascript
 // Show stats
 memory_stats
@@ -309,6 +326,7 @@ memory_stats
 **TEACHING POINT**: MCP saves money by reducing token usage. Context is cached, not repeated.
 
 #### Demo 16: Real-World Integration (10 min)
+
 ```json
 // Show Claude Desktop config
 {
@@ -334,6 +352,7 @@ memory_stats
 ## 🎓 KEY TEACHING MOMENTS
 
 ### The "Aha!" Moments
+
 1. **Persistence Demo**: Stop/start server, memory survives
 2. **Knowledge Graph**: See memories connect automatically
 3. **Context Stream**: Watch conversation continuity in real-time
@@ -376,6 +395,7 @@ A: Yes! Cosmos DB for storage, Container Apps for compute, AI Search for vectors
 ## 📝 STUDENT EXERCISES
 
 ### Exercise 1: Basic CRUD (10 min)
+
 1. Create a semantic memory about yourself
 2. Create an episodic memory about today
 3. Search for one of your memories
@@ -383,12 +403,14 @@ A: Yes! Cosmos DB for storage, Container Apps for compute, AI Search for vectors
 5. Check the stats
 
 ### Exercise 2: Enrichment (10 min)
+
 1. Create a technical memory
 2. Enrich it (with or without API)
 3. Compare enriched vs non-enriched
 4. View the enrichment metadata
 
 ### Exercise 3: Knowledge Building (15 min)
+
 1. Create 5 related memories about a topic
 2. Use consistent tags
 3. View the knowledge graph
@@ -396,6 +418,7 @@ A: Yes! Cosmos DB for storage, Container Apps for compute, AI Search for vectors
 5. Find the strongest connections
 
 ### Exercise 4: Context Stream (10 min)
+
 1. Create memories at different times
 2. Access some memories (to update lastAccessed)
 3. View context stream
@@ -407,6 +430,7 @@ A: Yes! Cosmos DB for storage, Container Apps for compute, AI Search for vectors
 ## 🚀 TAKEAWAYS FOR STUDENTS
 
 ### What You've Learned
+
 ✅ MCP solves the context persistence problem
 ✅ CRUD operations enable structured memory management
 ✅ Episodic vs Semantic memory mirrors human cognition
@@ -415,6 +439,7 @@ A: Yes! Cosmos DB for storage, Container Apps for compute, AI Search for vectors
 ✅ Migration path from local to cloud
 
 ### What You Can Do Now
+
 ✅ Build MCP servers for your use cases
 ✅ Integrate with Claude, ChatGPT, Copilot
 ✅ Deploy to Azure Container Apps
@@ -422,6 +447,7 @@ A: Yes! Cosmos DB for storage, Container Apps for compute, AI Search for vectors
 ✅ Add vector search with Azure AI
 
 ### Next Steps
+
 1. **Today**: Install and run CoreText locally
 2. **This Week**: Build your own MCP server
 3. **This Month**: Deploy to production
@@ -432,16 +458,19 @@ A: Yes! Cosmos DB for storage, Container Apps for compute, AI Search for vectors
 ## 📚 ADDITIONAL RESOURCES
 
 ### Documentation
+
 - [MCP Specification](https://modelcontextprotocol.io)
 - [Azure Container Apps](https://learn.microsoft.com/azure/container-apps)
 - [Cosmos DB](https://learn.microsoft.com/azure/cosmos-db)
 - [Azure AI Search](https://learn.microsoft.com/azure/search)
 
 ### Code Samples
+
 - [CoreText MCP Server](https://github.com/timothywarner-org/context-engineering)
 - [MCP SDK Examples](https://github.com/modelcontextprotocol/sdk)
 
 ### Tim's Resources
+
 - [TechTrainerTim.com](https://techtrainertim.com)
 - [YouTube Channel](https://youtube.com/@techtrainertim)
 - [O'Reilly Courses](https://oreilly.com/instructors/tim-warner)

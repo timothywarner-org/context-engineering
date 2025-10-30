@@ -42,6 +42,7 @@ curl $APP_URL/health
 ```
 
 Expected:
+
 ```json
 {
   "status": "healthy",
@@ -78,10 +79,12 @@ az containerapp logs show \
 ## Common Issues
 
 **"Cosmos DB free tier already exists"**
+
 - You can only have ONE free tier per subscription
 - Solution: Remove `enableFreeTier: true` from main.bicep (costs ~$25/mo)
 
 **"Managed identity not found"**
+
 ```bash
 az identity create \
   --name context-msi \
@@ -89,6 +92,7 @@ az identity create \
 ```
 
 **"Resource group not found"**
+
 ```bash
 az group create \
   --name context-engineering-rg \
@@ -107,8 +111,8 @@ az group delete \
 ## Need More Help?
 
 - Full docs: [README.md](README.md)
-- Azure Portal: https://portal.azure.com
-- MCP Docs: https://modelcontextprotocol.io/docs
+- Azure Portal: <https://portal.azure.com>
+- MCP Docs: <https://modelcontextprotocol.io/docs>
 
 ---
 

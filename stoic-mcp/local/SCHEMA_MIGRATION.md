@@ -18,6 +18,7 @@ The Stoic MCP quotes.json schema has been refactored from v0 (implicit) to v1.0.
 ### Root Structure
 
 **Before:**
+
 ```json
 {
   "quotes": [...]
@@ -25,6 +26,7 @@ The Stoic MCP quotes.json schema has been refactored from v0 (implicit) to v1.0.
 ```
 
 **After:**
+
 ```json
 {
   "metadata": {
@@ -39,6 +41,7 @@ The Stoic MCP quotes.json schema has been refactored from v0 (implicit) to v1.0.
 ## Migration Path
 
 All existing quotes were automatically migrated:
+
 - IDs converted from strings to numbers (1-20)
 - Empty notes `""` → `null`
 - Added `createdAt` with current timestamp
@@ -48,20 +51,24 @@ All existing quotes were automatically migrated:
 ## Benefits
 
 ### 1. Better ID Management
+
 - Numeric IDs are more efficient
 - `metadata.lastId` provides O(1) ID generation
 - No need to scan all quotes to find max ID
 
 ### 2. Cleaner Data Model
+
 - `null` vs empty string distinction
 - Timestamps for auditing
 - Source tracking for imported vs user-added quotes
 
 ### 3. Schema Versioning
+
 - `metadata.version` enables future migrations
 - `lastModified` for sync and caching strategies
 
 ### 4. Bulk Operations
+
 - Import utility for adding multiple quotes
 - Atomic updates to metadata
 - Theme auto-detection
@@ -69,17 +76,20 @@ All existing quotes were automatically migrated:
 ## Code Changes
 
 ### types.ts
+
 - Updated `Quote` interface with new fields
 - Added `QuotesMetadata` interface
 - Changed `id` from `string` to `number`
 
 ### storage.ts
+
 - Modified `readQuotes()` to return full schema
 - Updated `writeQuotes()` to auto-update `lastModified`
 - Changed ID generation to use `metadata.lastId`
 - Changed method signatures to accept `number` IDs
 
 ### index.ts
+
 - Updated all ID lookups to use `Number(args.quote_id)`
 - Modified `addQuote` to include new fields
 - Changed notes check from `quote.notes ? ...` to `quote.notes !== null ? ...`
@@ -87,6 +97,7 @@ All existing quotes were automatically migrated:
 ## Testing
 
 All existing functionality verified:
+
 - ✅ Server starts successfully
 - ✅ Random quote retrieval
 - ✅ Search operations
@@ -99,6 +110,7 @@ All existing functionality verified:
 ## Backward Compatibility
 
 **Breaking Changes:**
+
 - Quote IDs are now numbers (API consumers must update)
 - Empty notes are `null` instead of `""`
 - Root structure requires `metadata` object
@@ -109,12 +121,15 @@ Existing quotes.json files must be migrated to new schema. This was done automat
 ## Future Considerations
 
 ### Azure Migration
+
 The schema is designed to map cleanly to Cosmos DB:
+
 - Numeric IDs work as partition keys
 - Metadata can be stored in separate container
 - Timestamps enable change tracking
 
 ### Potential Enhancements
+
 - `updatedAt` timestamp for tracking edits
 - `tags` array for multi-category classification
 - `userId` for multi-tenant scenarios

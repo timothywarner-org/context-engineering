@@ -13,11 +13,13 @@ Use this checklist before and during deployment.
 ### Resource Prerequisites
 
 - [ ] Resource group exists: `context-engineering-rg`
+
   ```bash
   az group show --name context-engineering-rg
   ```
 
 - [ ] Managed Identity exists: `context-msi`
+
   ```bash
   az identity show --name context-msi --resource-group context-engineering-rg
   ```
@@ -27,11 +29,13 @@ Use this checklist before and during deployment.
 ### Local Machine Setup
 
 - [ ] Azure CLI installed (version 2.50+)
+
   ```bash
   az --version
   ```
 
 - [ ] Docker installed and running
+
   ```bash
   docker --version
   docker ps  # Should not error
@@ -40,6 +44,7 @@ Use this checklist before and during deployment.
 - [ ] Git Bash or Bash shell available
 
 - [ ] Logged into Azure
+
   ```bash
   az login
   az account show  # Verify correct subscription
@@ -48,12 +53,13 @@ Use this checklist before and during deployment.
 ### API Keys
 
 - [ ] DeepSeek API key ready (or plan to skip)
-  - Get from: https://platform.deepseek.com/
+  - Get from: <https://platform.deepseek.com/>
   - Can skip - server works in fallback mode
 
 ### Cosmos DB Consideration
 
 - [ ] Check if you already have a Cosmos DB Free Tier account
+
   ```bash
   az cosmosdb list --query "[?properties.enableFreeTier].{name:name,rg:resourceGroup}"
   ```
@@ -67,16 +73,19 @@ Use this checklist before and during deployment.
 ### Script Execution
 
 - [ ] Navigate to azure directory
+
   ```bash
   cd context-engineering-2/coretext-mcp/azure
   ```
 
 - [ ] Make script executable
+
   ```bash
   chmod +x deploy.sh
   ```
 
 - [ ] Run deployment
+
   ```bash
   ./deploy.sh
   ```
@@ -97,20 +106,24 @@ Use this checklist before and during deployment.
 ### Common Errors During Deployment
 
 If you see: **"Resource group not found"**
+
 ```bash
 az group create --name context-engineering-rg --location eastus
 ```
 
 If you see: **"Managed identity not found"**
+
 ```bash
 az identity create --name context-msi --resource-group context-engineering-rg
 ```
 
 If you see: **"Free tier Cosmos DB already exists"**
+
 - Edit `main.bicep` and remove `enableFreeTier: true` line
 - Or update connection string to use existing free tier account
 
 If you see: **"Docker daemon not running"**
+
 - Start Docker Desktop
 - Wait for it to fully initialize
 
@@ -120,11 +133,13 @@ If you see: **"Docker daemon not running"**
 
 - [ ] Note Container App URL from output
 - [ ] Test health endpoint
+
   ```bash
   curl https://YOUR-APP-URL.eastus.azurecontainerapps.io/health
   ```
 
   Expected response:
+
   ```json
   {
     "status": "healthy",
@@ -135,7 +150,7 @@ If you see: **"Docker daemon not running"**
   ```
 
 - [ ] Check deployment in Azure Portal
-  - Navigate to: https://portal.azure.com
+  - Navigate to: <https://portal.azure.com>
   - Find resource group: `context-engineering-rg`
   - Verify resources exist:
     - Container App
@@ -147,6 +162,7 @@ If you see: **"Docker daemon not running"**
 ### Test Functionality
 
 - [ ] View logs
+
   ```bash
   az containerapp logs show \
     -n $(az containerapp list -g context-engineering-rg --query '[0].name' -o tsv) \
@@ -155,11 +171,13 @@ If you see: **"Docker daemon not running"**
   ```
 
 - [ ] Test with MCP Inspector (optional)
+
   ```bash
   npx @modelcontextprotocol/inspector https://YOUR-APP-URL
   ```
 
 - [ ] Check Cosmos DB has data
+
   ```bash
   # Should show "coretext" database
   az cosmosdb sql database list \
@@ -185,6 +203,7 @@ If you see: **"Docker daemon not running"**
 ### Verify Cost Configuration
 
 - [ ] Container App scales to zero (check min replicas = 0)
+
   ```bash
   az containerapp show \
     -n $(az containerapp list -g context-engineering-rg --query '[0].name' -o tsv) \
@@ -193,6 +212,7 @@ If you see: **"Docker daemon not running"**
   ```
 
 - [ ] Cosmos DB using Free Tier
+
   ```bash
   az cosmosdb show \
     -n $(az cosmosdb list -g context-engineering-rg --query '[0].name' -o tsv) \
@@ -240,11 +260,13 @@ az consumption budget create \
 ### When Done with Deployment
 
 **Option 1: Delete Everything**
+
 ```bash
 az group delete --name context-engineering-rg --yes
 ```
 
 **Option 2: Delete Specific Resources**
+
 ```bash
 # Container App only
 az containerapp delete -n YOUR_APP_NAME -g context-engineering-rg --yes
@@ -261,6 +283,7 @@ az acr delete -n YOUR_ACR_NAME --yes
 ### Get Help
 
 - [ ] Check deployment logs
+
   ```bash
   az deployment group show \
     --name YOUR_DEPLOYMENT_NAME \
@@ -268,6 +291,7 @@ az acr delete -n YOUR_ACR_NAME --yes
   ```
 
 - [ ] Check Container App logs
+
   ```bash
   az containerapp logs show \
     -n YOUR_APP_NAME \
@@ -276,7 +300,7 @@ az acr delete -n YOUR_ACR_NAME --yes
   ```
 
 - [ ] Review Azure Portal for error messages
-  - Portal: https://portal.azure.com
+  - Portal: <https://portal.azure.com>
   - Navigate to Activity Log in resource group
 
 ### Common Issues

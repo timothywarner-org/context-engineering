@@ -3,6 +3,7 @@
 ## 🎬 Pre-Demo Setup (5 minutes before class)
 
 ### **Environment Check**
+
 ```bash
 # Verify Python version
 python --version  # Should be 3.10+
@@ -19,6 +20,7 @@ python context_journal_mcp.py --help
 ```
 
 ### **Config File Content**
+
 ```json
 {
   "mcpServers": {
@@ -42,6 +44,7 @@ python context_journal_mcp.py --help
 > "Let me show you the fundamental problem we're solving. Watch this..."
 
 **DEMO:**
+
 1. Ask Claude: *"I'm building a FastAPI project for invoice processing. The key decision is to use PostgreSQL for storage and Redis for caching. Can you remember this?"*
 
 2. Claude responds: *"I'll remember that during this conversation..."*
@@ -67,12 +70,14 @@ python context_journal_mcp.py --help
 > "Now I'm going to restart Claude with our Context Journal MCP server enabled. Watch for the 🔌 icon..."
 
 **DEMO:**
+
 1. **Restart Claude Desktop**
 
-2. **Point to the 🔌 icon:** 
+2. **Point to the 🔌 icon:**
    > "See this plug icon? That means Claude now has access to external tools."
 
 3. **Click the 🔌 icon to show tools:**
+
    ```
    context-journal
    ├── create_context_entry
@@ -120,6 +125,7 @@ python context_journal_mcp.py --help
 #### **Component 1: Server Initialization**
 
 **SHOW CODE:**
+
 ```python
 from mcp.server.fastmcp import FastMCP
 
@@ -132,6 +138,7 @@ mcp = FastMCP("context_journal_mcp")
 #### **Component 2: Input Validation**
 
 **SHOW CODE:**
+
 ```python
 class CreateEntryInput(BaseModel):
     model_config = ConfigDict(
@@ -156,6 +163,7 @@ class CreateEntryInput(BaseModel):
 
 **SAY:**
 > "We use Pydantic models for **type-safe input validation**. This prevents errors before they happen. Notice:
+>
 > - Field constraints (min_length, max_length)
 > - Descriptions that Claude can read
 > - Automatic validation (whitespace stripping, extra field rejection)"
@@ -163,6 +171,7 @@ class CreateEntryInput(BaseModel):
 #### **Component 3: Tool Registration**
 
 **SHOW CODE:**
+
 ```python
 @mcp.tool(
     name="create_context_entry",
@@ -180,18 +189,20 @@ async def create_context_entry(params: CreateEntryInput) -> str:
 
 **SAY:**
 > "The `@mcp.tool` decorator does the magic:
+>
 > - **name**: How Claude refers to this tool
 > - **annotations**: Metadata about what this tool does
 >   - readOnlyHint: Doesn't modify external state
 >   - destructiveHint: Performs deletion/destructive operations
 >   - idempotentHint: Safe to call multiple times
 >   - openWorldHint: Interacts with external entities
-> 
+>
 > These hints help Claude decide **when** to use each tool."
 
 #### **Component 4: Business Logic**
 
 **SHOW CODE:**
+
 ```python
 async def create_context_entry(params: CreateEntryInput) -> str:
     try:
@@ -218,11 +229,12 @@ async def create_context_entry(params: CreateEntryInput) -> str:
 
 **SAY:**
 > "Notice the pattern:
+>
 > 1. Load data (from JSON file currently)
 > 2. Perform operation (add entry)
 > 3. Save data
 > 4. Return structured response
-> 
+>
 > The beauty is: **when we migrate to Azure, only steps 1 and 3 change!**"
 
 ---
@@ -237,6 +249,7 @@ async def create_context_entry(params: CreateEntryInput) -> str:
 > "Let's add a new tool together. We want to see which tags are most commonly used."
 
 **LIVE CODE:**
+
 ```python
 class TagStatsInput(BaseModel):
     """Input for tag statistics tool."""
@@ -296,7 +309,7 @@ async def get_tag_statistics(params: TagStatsInput) -> str:
 
 **SAY:**
 > "Now restart Claude Desktop and ask: 'Show me tag statistics for my context journal'
-> 
+>
 > **Students:** Try it! Claude will now call your new tool."
 
 ---
@@ -305,16 +318,18 @@ async def get_tag_statistics(params: TagStatsInput) -> str:
 
 **SAY:**
 > "Everything we've built runs locally on a JSON file. But what if you want:
+>
 > - Global access from any device
 > - Multi-user collaboration
 > - Enterprise-grade reliability
 > - Automatic backups
-> 
+>
 > That's where **Azure Cosmos DB** comes in. Let's see the migration path..."
 
 #### **Current Implementation**
 
 **SHOW CODE:**
+
 ```python
 def load_journal() -> Dict[str, Any]:
     """Load from JSON file."""
@@ -330,6 +345,7 @@ def save_journal(data: Dict[str, Any]) -> None:
 #### **Azure Implementation**
 
 **SHOW CODE:**
+
 ```python
 from azure.cosmos.aio import CosmosClient
 import os
@@ -358,10 +374,11 @@ async def save_entry(entry: Dict[str, Any]) -> None:
 
 **SAY:**
 > "Notice:
+>
 > - **Same data structures** - entries are still JSON
 > - **Same tool interfaces** - Claude uses tools the same way
 > - **Different backend** - Now globally distributed
-> 
+>
 > The beauty of this architecture: **refactor the storage layer without touching the tool definitions.**"
 
 #### **Azure Deployment**
@@ -395,6 +412,7 @@ async def save_entry(entry: Dict[str, Any]) -> None:
 ```
 
 > **Benefits:**
+>
 > - **Global distribution:** Low latency worldwide
 > - **Automatic scaling:** Handles traffic spikes
 > - **Built-in backups:** Point-in-time recovery
@@ -406,24 +424,28 @@ async def save_entry(entry: Dict[str, Any]) -> None:
 ## 🎯 Key Talking Points Throughout Demo
 
 ### **Why MCP Matters**
+
 - Solves the statelessness problem
 - Extends LLM capabilities without retraining
 - Production-ready protocol (Microsoft + Anthropic)
 - Works with any LLM (Claude, ChatGPT, Copilot)
 
 ### **Architecture Principles**
+
 - Tools are just functions with metadata
 - Input validation prevents errors early
 - Clear response formats (JSON/Markdown)
 - Error messages guide next actions
 
 ### **Design Patterns**
+
 - CRUD operations everyone understands
 - Pagination for large datasets
 - Search + filter for discoverability
 - Consistent naming conventions
 
 ### **Enterprise Considerations**
+
 - Authentication via environment variables
 - Secrets management (Azure Key Vault)
 - Rate limiting and throttling
@@ -445,22 +467,26 @@ async def save_entry(entry: Dict[str, Any]) -> None:
 ## 🚨 Common Issues & Solutions
 
 ### **"Server not showing in Claude Desktop"**
+
 - Check config file path
 - Verify Python path is absolute
 - Restart Claude Desktop
 - Check Claude logs
 
 ### **"Import errors"**
+
 ```bash
 pip install --upgrade mcp pydantic
 ```
 
 ### **"Tool not being called"**
+
 - Check tool name matches documentation
 - Verify annotations are correct
 - Look at Claude's reasoning (visible in UI)
 
 ### **"Azure deployment failing"**
+
 - Check connection string format
 - Verify firewall rules allow connections
 - Ensure managed identity has Cosmos DB permissions

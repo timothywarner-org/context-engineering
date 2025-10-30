@@ -13,7 +13,7 @@ MCP Inspector is a **browser-based debugging tool** for Model Context Protocol s
 - 🐛 Debug MCP protocol messages
 - 📝 Inspect server capabilities
 
-**Official Docs**: https://github.com/modelcontextprotocol/inspector
+**Official Docs**: <https://github.com/modelcontextprotocol/inspector>
 
 ---
 
@@ -27,12 +27,14 @@ npm run inspector
 ```
 
 **What happens:**
+
 1. Inspector starts your MCP server as a child process
-2. Opens a web interface at http://localhost:5173
+2. Opens a web interface at <http://localhost:5173>
 3. Connects to your server via stdio
 4. Shows "Connected" status in the UI
 
 **Expected output:**
+
 ```
 Starting MCP inspector...
 🔍 MCP Inspector is up and running at http://localhost:5173 🚀
@@ -41,6 +43,7 @@ Starting MCP inspector...
 ### Troubleshooting Startup
 
 **Issue**: Port 5173 already in use
+
 ```bash
 # Kill existing process
 lsof -ti:5173 | xargs kill -9  # Mac/Linux
@@ -48,6 +51,7 @@ netstat -ano | findstr :5173   # Windows (find PID, then taskkill)
 ```
 
 **Issue**: Server won't start
+
 - Check `src/index.js` has no syntax errors
 - Verify `npm install` completed successfully
 - Look for error messages in terminal
@@ -56,7 +60,7 @@ netstat -ano | findstr :5173   # Windows (find PID, then taskkill)
 
 ## Inspector Interface Overview
 
-When you open http://localhost:5173, you'll see 4 main sections:
+When you open <http://localhost:5173>, you'll see 4 main sections:
 
 ```
 ┌─────────────────────────────────────────────────┐
@@ -83,16 +87,19 @@ When you open http://localhost:5173, you'll see 4 main sections:
 ### What You See
 
 **Green Dot + "Connected"**
+
 - ✅ Server is running and responsive
 - ✅ Protocol messages flowing correctly
 - ✅ Ready to test
 
 **Red Dot + "Disconnected"**
+
 - ❌ Server crashed or exited
 - ❌ Check terminal for error messages
 - ❌ Restart inspector to reconnect
 
 **Server Info Button** (ℹ️ icon)
+
 - Click to see server metadata
 - Shows: name, version, protocol version
 - Useful for debugging version mismatches
@@ -101,6 +108,7 @@ When you open http://localhost:5173, you'll see 4 main sections:
 
 1. Click the **ℹ️ Server Info** button
 2. You should see:
+
    ```json
    {
      "name": "CoreText MCP Server",
@@ -152,6 +160,7 @@ A list of tool names with their descriptions:
    - "Execute" button
 
 3. **Fill in parameters:**
+
    ```json
    {
      "content": "MCP enables persistent AI memory across conversations",
@@ -164,6 +173,7 @@ A list of tool names with their descriptions:
 4. **Click "Execute"** button
 
 5. **Response appears below:**
+
    ```json
    {
      "success": true,
@@ -192,16 +202,19 @@ A list of tool names with their descriptions:
 1. **Click "memory_read"** in left sidebar
 
 2. **Fill in parameters:**
+
    ```json
    {
      "id": "550e8400-e29b-41d4-a716-446655440000"
    }
    ```
+
    (Use the ID from previous step)
 
 3. **Click "Execute"**
 
 4. **Response shows the memory details:**
+
    ```json
    {
      "memory": {
@@ -222,6 +235,7 @@ A list of tool names with their descriptions:
 3. **Click "Execute"**
 
 4. **Response shows array of memories:**
+
    ```json
    {
      "memories": [
@@ -243,6 +257,7 @@ A list of tool names with their descriptions:
 ### Understanding Tool Parameters
 
 **Input Schema Box** shows:
+
 - **type**: Data type (string, number, boolean, object, array)
 - **required**: Must provide this parameter
 - **optional**: Can omit this parameter
@@ -250,6 +265,7 @@ A list of tool names with their descriptions:
 - **enum**: Limited set of allowed values
 
 **Example schema:**
+
 ```json
 {
   "type": "object",
@@ -274,6 +290,7 @@ A list of tool names with their descriptions:
 ```
 
 **How to read this:**
+
 - `content` is required (string)
 - `type` is required (must be "semantic" or "episodic")
 - `tags` is optional (array of strings)
@@ -281,6 +298,7 @@ A list of tool names with their descriptions:
 ### Common Tool Testing Patterns
 
 **Pattern 1: CRUD Operations**
+
 ```
 1. Create → memory_create
 2. Read → memory_read (use ID from step 1)
@@ -290,6 +308,7 @@ A list of tool names with their descriptions:
 ```
 
 **Pattern 2: Search and Filter**
+
 ```
 1. Create multiple memories
 2. Use memory_search with different queries
@@ -298,6 +317,7 @@ A list of tool names with their descriptions:
 ```
 
 **Pattern 3: Enrichment Testing**
+
 ```
 1. Create memory with enrich: true
 2. Check response for enrichment data
@@ -339,6 +359,7 @@ A list of resource URIs:
 3. **Click "Read"** button
 
 4. **Response shows markdown content:**
+
    ```markdown
    # Memory Overview
 
@@ -370,6 +391,7 @@ A list of resource URIs:
 2. **Click "Read"**
 
 3. **Response shows JSON with time-grouped memories:**
+
    ```json
    {
      "contextStream": {
@@ -407,6 +429,7 @@ A list of resource URIs:
 2. **Click "Read"**
 
 3. **Response shows graph structure:**
+
    ```json
    {
      "nodes": [
@@ -451,12 +474,14 @@ A list of resource URIs:
 | **Speed** | Very fast | Depends on operation |
 
 **When to use Resources:**
+
 - Get current status without modifying
 - Dashboard displays
 - Context for AI prompts
 - Always-available information
 
 **When to use Tools:**
+
 - Create/Update/Delete data
 - Perform searches
 - Execute operations
@@ -471,6 +496,7 @@ A list of resource URIs:
 ### What You See
 
 For CoreText MCP:
+
 ```
 📝 Prompts
   (No prompts defined)
@@ -483,6 +509,7 @@ For CoreText MCP:
 Prompts are **reusable templates** with **variable placeholders**:
 
 **Example prompt** (from another server):
+
 ```json
 {
   "name": "summarize_memory",
@@ -503,6 +530,7 @@ Prompts are **reusable templates** with **variable placeholders**:
 ```
 
 **When used by AI**:
+
 ```
 User: "Summarize memory 550e8400..."
 AI calls prompt: summarize_memory(memory_id="550e8400...")
@@ -510,6 +538,7 @@ Server returns: "Based on memory 550e8400, here's a summary: ..."
 ```
 
 **Use cases:**
+
 - Standardized prompt patterns
 - Few-shot examples
 - System prompts with context injection
@@ -529,11 +558,13 @@ Server returns: "Based on memory 550e8400, here's a summary: ..."
 ```
 
 **What is Sampling?**
+
 - **Server** can ask the **client** (Claude Desktop, Inspector, etc.) to generate text
 - Reverse of normal flow: Server → Client → LLM → Server
 - Useful for servers that need AI reasoning
 
 **Example use case:**
+
 ```
 1. User asks: "What's the best memory about MCP?"
 2. Tool: memory_list returns 10 memories
@@ -569,6 +600,7 @@ A scrolling log of JSON-RPC messages:
 ### Log Entry Details
 
 **Request Log:**
+
 ```json
 {
   "type": "request",
@@ -586,6 +618,7 @@ A scrolling log of JSON-RPC messages:
 ```
 
 **Response Log:**
+
 ```json
 {
   "type": "response",
@@ -603,6 +636,7 @@ A scrolling log of JSON-RPC messages:
 **Scenario 1: Tool Call Failed**
 
 **Log shows:**
+
 ```json
 {
   "type": "error",
@@ -615,6 +649,7 @@ A scrolling log of JSON-RPC messages:
 ```
 
 **What to do:**
+
 1. Check the error message
 2. Review tool schema
 3. Ensure all required parameters provided
@@ -623,12 +658,14 @@ A scrolling log of JSON-RPC messages:
 **Scenario 2: Slow Response**
 
 **Log shows:**
+
 ```
 ↓ Request: 19:30:00.000Z
 ↑ Response: 19:30:05.000Z  (5 second delay!)
 ```
 
 **What to check:**
+
 1. Is enrichment enabled? (API calls add latency)
 2. Large dataset? (search across many memories)
 3. Database slow? (check Cosmos DB connection)
@@ -636,6 +673,7 @@ A scrolling log of JSON-RPC messages:
 **Scenario 3: Unexpected Response**
 
 **Log comparison:**
+
 ```
 Expected:
 { "success": true, "memory": {...} }
@@ -645,6 +683,7 @@ Actual:
 ```
 
 **What to do:**
+
 1. Verify memory ID exists
 2. Check if memory was deleted
 3. Ensure database has data
@@ -652,12 +691,14 @@ Actual:
 ### Log Filters
 
 **Filter by type:**
+
 - ☑️ Requests
 - ☑️ Responses
 - ☑️ Errors
 - ☑️ Notifications
 
 **Filter by method:**
+
 - `tools/list`
 - `tools/call`
 - `resources/list`
@@ -673,7 +714,7 @@ Let's walk through a **complete testing session**:
 
 #### Step 1: Check Server Status
 
-1. **Open Inspector**: http://localhost:5173
+1. **Open Inspector**: <http://localhost:5173>
 2. **Verify**: Green "Connected" dot
 3. **Click**: ℹ️ Server Info
 4. **Confirm**: Server name is "CoreText MCP Server"
@@ -694,6 +735,7 @@ Let's walk through a **complete testing session**:
 
 1. **Click**: "memory_create" tool
 2. **Enter parameters**:
+
    ```json
    {
      "content": "MCP Inspector is a powerful debugging tool for testing MCP servers",
@@ -702,6 +744,7 @@ Let's walk through a **complete testing session**:
      "enrich": false
    }
    ```
+
 3. **Click**: "Execute"
 4. **Copy**: The `id` from response
 
@@ -709,11 +752,13 @@ Let's walk through a **complete testing session**:
 
 1. **Click**: "memory_read" tool
 2. **Enter parameters**:
+
    ```json
    {
      "id": "YOUR_ID_FROM_STEP_4"
    }
    ```
+
 3. **Click**: "Execute"
 4. **Verify**: Content matches what you created
 
@@ -721,6 +766,7 @@ Let's walk through a **complete testing session**:
 
 1. **Click**: "memory_update" tool
 2. **Enter parameters**:
+
    ```json
    {
      "id": "YOUR_ID_FROM_STEP_4",
@@ -728,6 +774,7 @@ Let's walk through a **complete testing session**:
      "tags": ["mcp", "tools", "debugging", "essential"]
    }
    ```
+
 3. **Click**: "Execute"
 4. **Note**: Updated timestamp changed
 
@@ -735,11 +782,13 @@ Let's walk through a **complete testing session**:
 
 1. **Click**: "memory_search" tool
 2. **Enter parameters**:
+
    ```json
    {
      "query": "debugging"
    }
    ```
+
 3. **Click**: "Execute"
 4. **Verify**: Your memory appears in results
 
@@ -761,11 +810,13 @@ Let's walk through a **complete testing session**:
 1. **Click**: Tools tab
 2. **Click**: "memory_delete" tool
 3. **Enter parameters**:
+
    ```json
    {
      "id": "YOUR_ID_FROM_STEP_4"
    }
    ```
+
 4. **Click**: "Execute"
 5. **Verify**: Success message
 
@@ -773,11 +824,13 @@ Let's walk through a **complete testing session**:
 
 1. **Click**: "memory_read" tool
 2. **Enter parameters**:
+
    ```json
    {
      "id": "YOUR_ID_FROM_STEP_4"
    }
    ```
+
 3. **Click**: "Execute"
 4. **Expect**: "Memory not found" error
 
@@ -804,6 +857,7 @@ Let's walk through a **complete testing session**:
 ### JSON Editing Tips
 
 **Auto-format JSON:**
+
 ```json
 // Paste this messy JSON:
 {"content":"test","type":"semantic","tags":["a","b"]}
@@ -817,6 +871,7 @@ Let's walk through a **complete testing session**:
 ```
 
 **Copy from previous response:**
+
 1. Execute a tool
 2. Click "Copy" button on response
 3. Paste into next tool's parameters
@@ -825,21 +880,25 @@ Let's walk through a **complete testing session**:
 ### Testing Patterns
 
 **Pattern 1: Rapid prototyping**
+
 - Quickly test tool variations
 - Try different parameter combinations
 - See immediate results
 
 **Pattern 2: Error discovery**
+
 - Intentionally send invalid params
 - See error messages
 - Improve error handling
 
 **Pattern 3: Performance testing**
+
 - Create many memories
 - Time search operations
 - Check enrichment latency
 
 **Pattern 4: Integration testing**
+
 - Test full workflows
 - Verify state changes
 - Check resource updates
@@ -853,11 +912,13 @@ Let's walk through a **complete testing session**:
 **Symptoms**: Red dot, no tools visible
 
 **Causes**:
+
 - Server crashed
 - Syntax error in `src/index.js`
 - Port conflict
 
 **Solution**:
+
 1. Check terminal for error messages
 2. Fix any syntax errors
 3. Restart inspector: `Ctrl+C`, then `npm run inspector`
@@ -867,11 +928,13 @@ Let's walk through a **complete testing session**:
 **Symptoms**: Error response after clicking Execute
 
 **Causes**:
+
 - Missing required parameter
 - Wrong parameter type
 - Server logic error
 
 **Solution**:
+
 1. Check Logs tab for detailed error
 2. Review tool schema
 3. Verify parameter types match
@@ -881,11 +944,13 @@ Let's walk through a **complete testing session**:
 **Symptoms**: Infinite loading after Execute
 
 **Causes**:
+
 - Server hung/frozen
 - Long-running operation (enrichment with AI)
 - Database timeout
 
 **Solution**:
+
 1. Wait 30 seconds (API calls can be slow)
 2. Check terminal for logs
 3. Restart if truly frozen
@@ -895,11 +960,13 @@ Let's walk through a **complete testing session**:
 **Symptoms**: Success but no data returned
 
 **Causes**:
+
 - Database empty (no memories)
 - Search returned no results
 - Resource not yet populated
 
 **Solution**:
+
 1. Create test data first
 2. Check search query
 3. Verify database has content
@@ -927,6 +994,7 @@ Want to see raw MCP protocol?
 4. **See**: JSON-RPC 2.0 messages
 
 **Example request:**
+
 ```json
 {
   "jsonrpc": "2.0",
@@ -943,6 +1011,7 @@ Want to see raw MCP protocol?
 ```
 
 **Example response:**
+
 ```json
 {
   "jsonrpc": "2.0",
@@ -959,6 +1028,7 @@ Want to see raw MCP protocol?
 **Import JSON data:**
 
 1. Prepare test memories in JSON file:
+
    ```json
    [
      {
@@ -975,6 +1045,7 @@ Want to see raw MCP protocol?
    ```
 
 2. Use a script to bulk-create:
+
    ```bash
    # Call memory_create for each entry
    ```
@@ -988,21 +1059,25 @@ Want to see raw MCP protocol?
 ### Lesson Plan Ideas
 
 **Lesson 1: Introduction to MCP**
+
 - Show the 4 main concepts (Tools, Resources, Prompts, Sampling)
 - Live demo: Create and read a memory
 - Explain request/response flow
 
 **Lesson 2: Tool Development**
+
 - Show how tool schema becomes UI
 - Test parameter validation
 - Demonstrate error handling
 
 **Lesson 3: Resource Patterns**
+
 - Compare static vs. dynamic resources
 - Show dashboard use case (overview)
 - Explain context streams for AI
 
 **Lesson 4: Debugging Techniques**
+
 - Use Logs tab to trace issues
 - Find and fix parameter errors
 - Optimize slow operations
@@ -1010,6 +1085,7 @@ Want to see raw MCP protocol?
 ### Student Exercises
 
 **Exercise 1: Basic CRUD**
+
 ```
 1. Create 3 memories (2 semantic, 1 episodic)
 2. Read each one back
@@ -1019,6 +1095,7 @@ Want to see raw MCP protocol?
 ```
 
 **Exercise 2: Search & Filter**
+
 ```
 1. Create 5 memories with different tags
 2. Search for tag "mcp"
@@ -1028,6 +1105,7 @@ Want to see raw MCP protocol?
 ```
 
 **Exercise 3: Error Handling**
+
 ```
 1. Try to create memory without 'content'
 2. Try to read non-existent ID
@@ -1037,6 +1115,7 @@ Want to see raw MCP protocol?
 ```
 
 **Exercise 4: Resource Monitoring**
+
 ```
 1. Read memory://overview
 2. Create 2 new memories
@@ -1116,7 +1195,7 @@ npm run dev
 
 ### URL Endpoints
 
-- **Inspector UI**: http://localhost:5173
+- **Inspector UI**: <http://localhost:5173>
 - **WebSocket**: ws://localhost:5173/mcp (internal)
 
 ### MCP Concepts

@@ -62,6 +62,7 @@ npm run demo:segment1
 ```
 
 **Benefits**:
+
 - ✅ You control the pace
 - ✅ Can explain each step
 - ✅ Students can read output
@@ -78,6 +79,7 @@ npm run demo:all
 ```
 
 **Benefits**:
+
 - ✅ Students can run at home
 - ✅ No manual intervention needed
 - ✅ Great for review/practice
@@ -100,6 +102,7 @@ npm run demo:all
    - **Point**: It forgot! AI has amnesia.
 
 2. **Show the Solution** (10 min)
+
    ```bash
    # Start server in one terminal
    npm run dev
@@ -108,19 +111,23 @@ npm run demo:all
    npm run inspector
    # Browser opens to http://localhost:5173
    ```
+
    - Show 8 tools in Inspector
    - Show 3 resources
    - **Point**: MCP provides persistent memory
 
 3. **Run Segment 1 Demos** (25 min)
+
    ```bash
    npm run demo:segment1
    ```
+
    - Press Enter after each demo
    - Explain what happened
    - Answer student questions
 
 4. **Prove Persistence** (10 min)
+
    ```bash
    # In the server terminal, press Ctrl+C to stop
 
@@ -133,16 +140,19 @@ npm run demo:all
    # Call memory_list tool
    # Show that all memories are still there!
    ```
+
    - **Point**: This is the "aha!" moment
 
 #### Student Exercise (10 min)
 
 Have students run on their own machines:
+
 ```bash
 npm run demo:segment1 -- --auto
 ```
 
 Then ask them to:
+
 1. Create one semantic memory about themselves
 2. Create one episodic memory about today
 3. Search for their memories
@@ -162,9 +172,11 @@ Then ask them to:
    - Like human memory!
 
 2. **Run Segment 2 Demos** (35 min)
+
    ```bash
    npm run demo:segment2
    ```
+
    - Press Enter after each demo
    - Highlight the enrichment demo (with/without API key)
    - Show resources (overview, context-stream)
@@ -177,6 +189,7 @@ Then ask them to:
 #### Student Exercise (10 min)
 
 Have students:
+
 1. Create 3 memories on same topic
 2. Make them related (use same tags)
 3. Try enrichment with `enrich: true`
@@ -191,18 +204,22 @@ Have students:
 #### Teaching Flow
 
 1. **Run Segment 3 Demos** (45 min)
+
    ```bash
    npm run demo:segment3
    ```
+
    - Pause after knowledge graph demo
    - Show how tags create connections
    - Explain clusters
    - Demo multi-agent scenario
 
 2. **Visualize the Graph** (10 min)
+
    ```bash
    # In Inspector, read resource: memory://knowledge-graph
    ```
+
    - Show JSON structure
    - Explain nodes, edges, clusters
    - **Point**: AI can navigate this network
@@ -210,6 +227,7 @@ Have students:
 #### Student Exercise (15 min)
 
 Challenge students to:
+
 1. Create 5 related memories
 2. Use consistent tags
 3. View knowledge graph
@@ -279,13 +297,16 @@ npm test
 ### Teaching Flow
 
 1. **Show Dockerfile** (5 min)
+
    ```bash
    cat Dockerfile
    ```
+
    - Point out health check
    - Explain production settings
 
 2. **Health Endpoint** (5 min)
+
    ```bash
    # Start server in background
    npm run dev
@@ -293,6 +314,7 @@ npm test
    # In another terminal, check health
    curl http://localhost:3000/health
    ```
+
    - Show JSON response
    - Explain Azure uses this
 
@@ -369,6 +391,7 @@ npm run inspector        # Visual exploration
 ## 📝 Instructor Checklist
 
 ### Day Before Class
+
 - [ ] `npm install` completed successfully
 - [ ] `npm test` shows 14/14 passing
 - [ ] Deepseek API key in `.env` (optional)
@@ -376,18 +399,21 @@ npm run inspector        # Visual exploration
 - [ ] Print quick reference card
 
 ### 1 Hour Before Class
+
 - [ ] `npm run demo:reset` for clean start
 - [ ] `npm run demo:populate` for examples
 - [ ] Test Inspector opens: `npm run inspector`
 - [ ] Verify health endpoint: `curl http://localhost:3000/health`
 
 ### During Each Segment
+
 - [ ] Terminal 1: `npm run dev` (server)
 - [ ] Terminal 2: `npm run inspector` (UI)
 - [ ] Terminal 3: `npm run demo:segmentN` (demos)
 - [ ] Browser: Inspector at localhost:5173
 
 ### After Class
+
 - [ ] Share student handout
 - [ ] Share GitHub repo link
 - [ ] Recommend: Students run `npm run demo:all` at home
@@ -407,6 +433,7 @@ npm run inspector        # Visual exploration
 > [Run demo:segment1]
 
 **Key Phrases to Use**:
+
 - "Press Enter when you're ready for the next demo"
 - "Notice what just happened..."
 - "This is the 'aha!' moment"

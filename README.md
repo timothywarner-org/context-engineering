@@ -67,6 +67,7 @@ This hands-on course is structured into 4 segments, each approximately 50 minute
 You mastered prompting—now stop your AI from forgetting everything. This hands-on course teaches you **Context Engineering** using MCP—the production-ready protocol adopted by Microsoft and Anthropic. You'll build persistent AI memory using MCP servers, Azure AI Service, GitHub, and VS Code, eliminating tedious context resets forever.
 
 **By the end of this course, you will have:**
+
 - ✅ Built a working MCP server that gives AI access to your GitHub repositories
 - ✅ Deployed production MCP infrastructure to Azure with authentication and monitoring
 - ✅ Implemented multi-agent memory systems that persist across sessions
@@ -166,16 +167,19 @@ Essential tools to follow along and practice efficiently:
 ### Required Setup
 
 **GitHub Account**
+
 - Ability to create repositories
 - Generate personal access tokens
 - Fork and clone repositories
 
 **AI Platform Access**
+
 - [Claude Desktop](https://claude.ai/download) (Windows/Mac) - Native MCP support
 - [VS Code](https://code.visualstudio.com/) with [GitHub Copilot](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot)
 - [ChatGPT Plus or Team](https://openai.com/chatgpt/pricing/) (optional for multi-agent)
 
 **Development Environment**
+
 - [Node.js 20 LTS](https://nodejs.org/) or [Python 3.10+](https://www.python.org/downloads/)
 - [Git](https://git-scm.com/downloads)
 - [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
@@ -266,25 +270,30 @@ Detailed setup instructions are available in [labs/LAB-SETUP.md](labs/LAB-SETUP.
 ### Before the Course
 
 **Essential Reading:**
+
 - [MCP Specification](https://spec.modelcontextprotocol.io/) - Official protocol documentation (30 min)
 - [MCP Quickstart Guide](https://modelcontextprotocol.io/docs/quickstart/user) - Basic setup (15 min)
 
 **Recommended Videos:**
+
 - *How LLMs Understand & Generate Human Language* by Kate Harwood (O'Reilly)
 - *Introduction to Azure AI Services* (Microsoft Learn)
 
 **Optional Books:**
+
 - *Quick Start Guide to Large Language Models* by Sinan Ozdemir
 - *AI for Everyone: A Beginner's Handbook for Artificial Intelligence* by Pearson
 
 ### Recommended Follow-up
 
 **Advanced Learning:**
+
 - *Generative AI Toolbox* by Shaun Wassell (O'Reilly)
 - *Securing Generative AI* by Omar Santos (O'Reilly)
 - *Building LLM Applications* (O'Reilly, 2024)
 
 **Related Topics:**
+
 - Vector databases and embeddings
 - Prompt engineering advanced techniques
 - Multi-agent orchestration patterns
@@ -299,12 +308,14 @@ Detailed setup instructions are available in [labs/LAB-SETUP.md](labs/LAB-SETUP.
 ### Segment 1: Understanding Context - Why Your AI Has Amnesia (50 minutes)
 
 **Learning Objectives:**
+
 - Understand token budgets and context windows in modern LLMs
 - Experience context loss firsthand in ChatGPT vs. context persistence in Claude
 - Learn how MCP solves the context problem architecturally
 - Use MCP in Claude Desktop and VS Code GitHub Copilot
 
 **Topics Covered:**
+
 - The anatomy of context loss: tokens, windows, and limitations
 - Live demo: Watch ChatGPT forget, Claude remember - the MCP difference
 - Introduction to Model Context Protocol: architecture and capabilities
@@ -314,6 +325,7 @@ Detailed setup instructions are available in [labs/LAB-SETUP.md](labs/LAB-SETUP.
 **Exercise:** Configure Claude Desktop to use the filesystem MCP server and maintain context across conversations (10 min)
 
 **Key Takeaways:**
+
 - Context windows are measured in tokens (words ≈ 1.3 tokens)
 - Copy-paste workflows don't scale for professional development
 - MCP provides tools, resources, prompts, and sampling capabilities
@@ -324,12 +336,14 @@ Detailed setup instructions are available in [labs/LAB-SETUP.md](labs/LAB-SETUP.
 ### Segment 2: Building Local MCP Servers - Your First Context System (50 minutes)
 
 **Learning Objectives:**
+
 - Build a working MCP server using the official TypeScript SDK
 - Implement tools that AI can discover and invoke
 - Create resources for AI to access persistent data
 - Test your MCP server with MCP Inspector and Claude Desktop
 
 **Topics Covered:**
+
 - MCP server architecture: tools, resources, prompts, and sampling
 - Setting up the TypeScript SDK project structure
 - Implementing your first tool: GitHub repository access
@@ -337,6 +351,7 @@ Detailed setup instructions are available in [labs/LAB-SETUP.md](labs/LAB-SETUP.
 - Testing with MCP Inspector browser tool
 
 **Live Coding:**
+
 ```typescript
 // Build an MCP server that gives Claude access to GitHub repos
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
@@ -373,6 +388,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
 **Exercise:** Extend the GitHub MCP server to access your own repository and read specific files (10 min)
 
 **Key Takeaways:**
+
 - MCP servers are simple Node.js/Python applications
 - The SDK handles protocol details; you focus on tool logic
 - Tools define schemas for AI to understand parameters
@@ -383,12 +399,14 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
 ### Segment 3: Azure Deployment - From Local to Cloud-Scale Memory (50 minutes)
 
 **Learning Objectives:**
+
 - Deploy MCP servers to Azure App Service
 - Configure authentication and environment variables securely
 - Connect Claude Desktop to remote MCP servers
 - Implement persistent memory using Azure Storage
 
 **Topics Covered:**
+
 - Azure deployment strategies for MCP servers
 - Environment configuration and secrets management
 - Authentication: API keys and Azure AD integration
@@ -396,6 +414,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
 - Monitoring and logging with Application Insights
 
 **Live Deployment:**
+
 ```bash
 # Deploy MCP server to Azure App Service
 az webapp up --name coretext-mcp --runtime "NODE:20-lts"
@@ -409,6 +428,7 @@ az monitor app-insights component create --app coretext-mcp
 ```
 
 **Architecture:**
+
 ```
 Claude Desktop → HTTPS → Azure App Service (MCP Server)
                               ↓
@@ -422,6 +442,7 @@ Claude Desktop → HTTPS → Azure App Service (MCP Server)
 **Exercise:** Deploy your GitHub MCP server to Azure and connect Claude Desktop to the remote endpoint (10 min)
 
 **Key Takeaways:**
+
 - Azure App Service provides easy MCP server hosting
 - Key Vault keeps secrets secure
 - Cosmos DB enables globally distributed memory
@@ -432,12 +453,14 @@ Claude Desktop → HTTPS → Azure App Service (MCP Server)
 ### Segment 4: Advanced Patterns - Multi-Agent Memory Architectures (50 minutes)
 
 **Learning Objectives:**
+
 - Design memory architectures: episodic, semantic, and working memory
 - Implement vector-based semantic search with Azure AI Search
 - Orchestrate multiple AI agents sharing context through MCP
 - Build a production customer service bot with persistent memory
 
 **Topics Covered:**
+
 - Memory architecture patterns in AI systems
 - Vector databases: embeddings and similarity search
 - Multi-agent orchestration: ChatGPT ↔ Claude via shared MCP context
@@ -445,6 +468,7 @@ Claude Desktop → HTTPS → Azure App Service (MCP Server)
 - Cost optimization and caching techniques
 
 **Live Build: Customer Service Bot**
+
 ```typescript
 // Multi-agent memory system
 class CustomerServiceMemory {
@@ -470,6 +494,7 @@ class CustomerServiceMemory {
 ```
 
 **Architecture Patterns:**
+
 1. **Episodic Memory**: Time-ordered conversation storage
 2. **Semantic Memory**: Vector embeddings for similarity retrieval
 3. **Working Memory**: Current task context (4K tokens)
@@ -478,12 +503,14 @@ class CustomerServiceMemory {
 **Exercise:** Design a memory architecture for your specific use case (e.g., code review bot, documentation assistant, data analyst) (10 min)
 
 **Production Considerations:**
+
 - Security: Authentication, authorization, audit logging
 - Scale: Horizontal scaling, caching, rate limiting
 - Cost: Token budgets, pruning strategies, smart retrieval
 - Future: MCP on Windows, expanding platform support
 
 **Key Takeaways:**
+
 - Memory architectures mirror human cognition patterns
 - Vector search enables semantic understanding at scale
 - Multi-agent systems require shared context coordination
@@ -529,6 +556,7 @@ Expand your AI and cloud engineering skills:
 ### Estimated Course Costs
 
 Running labs with Azure free tier:
+
 - App Service (Free tier): $0
 - Cosmos DB (Free tier): $0
 - Azure AI Search (Free tier): $0
@@ -561,16 +589,19 @@ Running labs with Azure free tier:
 ### Emerging Patterns
 
 #### Persistent AI Memory
+
 - Long-term conversation storage beyond session limits
 - Vector-based semantic retrieval across conversations
 - User preference learning and adaptation
 
 #### Multi-Modal Context
+
 - Text, code, images, and structured data in unified context
 - Cross-modal retrieval and reasoning
 - Context compression for efficient token usage
 
 #### Enterprise Integration
+
 - GitHub as organizational knowledge base
 - Database query tools for business intelligence
 - API integration for external systems
@@ -579,18 +610,21 @@ Running labs with Azure free tier:
 ### Production Considerations
 
 #### Security & Privacy
+
 - [Authentication and authorization for MCP servers](https://modelcontextprotocol.io/docs/concepts/security)
 - Data encryption at rest and in transit
 - Audit logging and compliance tracking
 - GDPR and data residency requirements
 
 #### Scalability & Performance
+
 - Horizontal scaling with load balancers
 - Caching strategies for frequently accessed context
 - Rate limiting and quota management
 - Connection pooling and resource optimization
 
 #### Observability & Monitoring
+
 - Application Insights integration
 - Custom metrics and dashboards
 - Alerting on errors and performance degradation
@@ -678,6 +712,7 @@ context-engineering/
 Tim Warner specializes in cloud computing, DevOps, and AI engineering with a focus on practical, production-ready solutions. His O'Reilly Live Training courses emphasize hands-on learning and real-world implementation patterns.
 
 **Expertise:**
+
 - Azure AI Services and OpenAI integration
 - Cloud-native application architecture
 - DevOps automation and CI/CD
@@ -685,6 +720,7 @@ Tim Warner specializes in cloud computing, DevOps, and AI engineering with a foc
 - Technical training and content creation
 
 **Connect with Tim:**
+
 - 🌐 Website: [techtrainertim.com](https://techtrainertim.com)
 - 💼 LinkedIn: [linkedin.com/in/timothywarner](https://www.linkedin.com/in/timothywarner/)
 - 🐦 Bluesky: [@techtrainertim.bsky.social](https://bsky.app/profile/techtrainertim.bsky.social)
@@ -697,14 +733,18 @@ Tim Warner specializes in cloud computing, DevOps, and AI engineering with a foc
 © 2025 Timothy Warner. Course materials provided for educational purposes.
 
 ### Course Materials
+
 This repository and its contents are available for:
+
 - ✅ Personal learning and education
 - ✅ Reference during and after the course
 - ✅ Modification for your own projects
 - ✅ Sharing with attribution
 
 ### MCP Protocol
+
 Model Context Protocol is an open standard:
+
 - [MCP Specification License](https://github.com/modelcontextprotocol/specification/blob/main/LICENSE)
 - Free to implement in commercial and open-source projects
 - Community contributions welcome

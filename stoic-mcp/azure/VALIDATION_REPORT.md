@@ -20,9 +20,11 @@ This document details all validation checks performed on the deployment files to
 ## Bicep Template Validation
 
 ### ✅ Syntax Check
+
 ```bash
 az bicep build --file main.bicep
 ```
+
 **Result**: No syntax errors found
 
 ### ✅ Cosmos DB Configuration
@@ -30,6 +32,7 @@ az bicep build --file main.bicep
 **Issue Checked**: Cosmos DB free tier vs serverless conflict
 
 **Finding**: Configuration is correct
+
 ```bicep
 properties: {
   enableFreeTier: true  // FREE TIER
@@ -41,6 +44,7 @@ properties: {
 **Why This Matters**: In the coretext-mcp deployment, we initially had both `enableFreeTier: true` AND `capabilities: EnableServerless` which are mutually exclusive. This would cause deployment failure. The stoic-mcp template was built correctly from the start.
 
 **Student Note**: Cosmos DB offers two pricing models:
+
 - **Free Tier**: 1000 RU/s provisioned throughput, 25GB storage, one per subscription
 - **Serverless**: Pay-per-use, no provisioned throughput
 - You CANNOT combine them - it's either/or
@@ -50,6 +54,7 @@ properties: {
 **Issue Checked**: Missing explicit throughput allocation
 
 **Finding**: Configuration is correct
+
 ```bicep
 resource cosmosDatabase 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2023-11-15' = {
   parent: cosmosAccount
@@ -72,6 +77,7 @@ resource cosmosDatabase 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2023
 ### ✅ Container Partition Keys
 
 **Finding**: Both containers have appropriate partition keys
+
 ```bicep
 // Quotes container
 partitionKey: {
@@ -87,6 +93,7 @@ partitionKey: {
 ```
 
 **Why This Matters**: Partition key selection affects query performance and scaling:
+
 - `/id` for quotes: Optimal for point reads (get quote by ID)
 - `/type` for metadata: Optimal for grouping system metadata
 
@@ -95,6 +102,7 @@ partitionKey: {
 ### ✅ Indexing Policy
 
 **Finding**: Appropriate indexing for both containers
+
 ```bicep
 indexingPolicy: {
   indexingMode: 'consistent'
@@ -116,6 +124,7 @@ indexingPolicy: {
 ### ✅ Container App Scaling
 
 **Finding**: Correct scale-to-zero configuration
+
 ```bicep
 scale: {
   minReplicas: 0  // Scale to zero when idle
@@ -138,6 +147,7 @@ scale: {
 ### ✅ Resource Sizing
 
 **Finding**: Minimal resource allocation
+
 ```bicep
 resources: {
   cpu: json('0.25')     // Minimum CPU (0.25 cores)
@@ -148,12 +158,14 @@ resources: {
 **Why This Matters**: These are the minimum allowed values for Container Apps. Sufficient for MVP MCP server with moderate request volume.
 
 **Performance Note**: If experiencing slowness under load, increase to:
+
 - CPU: `json('0.5')` (0.5 cores)
 - Memory: `'1Gi'` (1GB RAM)
 
 ### ✅ Key Vault Configuration
 
 **Finding**: Correct RBAC and secret configuration
+
 ```bicep
 properties: {
   enableRbacAuthorization: true  // Use RBAC instead of access policies
@@ -167,6 +179,7 @@ properties: {
 ### ✅ Managed Identity Access
 
 **Finding**: Correct role assignment
+
 ```bicep
 var keyVaultSecretsUserRoleId = '4633458b-17de-408a-b874-0445c86b69e6'
 
@@ -186,6 +199,7 @@ resource keyVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04
 ### ✅ Secret References
 
 **Finding**: Correct Key Vault references in Container App
+
 ```bicep
 secrets: [
   {
@@ -206,6 +220,7 @@ secrets: [
 ### ✅ Health Probes
 
 **Finding**: Correct liveness and readiness probes
+
 ```bicep
 probes: [
   {
@@ -230,6 +245,7 @@ probes: [
 ```
 
 **Why This Matters**:
+
 - **Liveness**: Restarts container if unhealthy
 - **Readiness**: Removes from load balancer if not ready
 
@@ -242,6 +258,7 @@ probes: [
 ### ✅ Multi-Stage Build
 
 **Finding**: Correct multi-stage build pattern
+
 ```dockerfile
 # Stage 1: Build TypeScript
 FROM node:20-alpine AS builder
@@ -253,17 +270,20 @@ COPY --from=builder /app/dist ./dist
 ```
 
 **Why This Matters**: Multi-stage builds:
+
 - Reduce final image size (no dev dependencies)
 - Improve security (no build tools in production)
 - Faster deployment (smaller images)
 
 **Size Comparison**:
+
 - Single-stage build: ~500MB (includes TypeScript, dev tools)
 - Multi-stage build: ~150MB (only Node.js runtime and compiled JS)
 
 ### ✅ Security Hardening
 
 **Finding**: Correct security practices
+
 ```dockerfile
 # Non-root user
 RUN addgroup -g 1001 -S nodejs && \
@@ -276,12 +296,14 @@ ENTRYPOINT ["dumb-init", "--"]
 ```
 
 **Why This Matters**:
+
 - **Non-root user**: Container runs as `nodejs` user, not `root`
 - **dumb-init**: Properly handles signals (SIGTERM) for graceful shutdown
 
 ### ✅ Health Check
 
 **Finding**: Correct health check implementation
+
 ```dockerfile
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
@@ -292,6 +314,7 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 ### ✅ TypeScript Compilation
 
 **Finding**: Correct build process
+
 ```dockerfile
 # Copy package files
 COPY package*.json ./
@@ -317,6 +340,7 @@ RUN npm run build
 ### ✅ Pre-flight Checks
 
 **Finding**: All necessary checks implemented
+
 ```bash
 # Check Azure CLI
 if ! command -v az &> /dev/null; then
@@ -342,6 +366,7 @@ fi
 ### ✅ ACR Creation/Discovery
 
 **Finding**: Correct ACR handling
+
 ```bash
 # Look for existing ACR
 EXISTING_ACR=$(az acr list --resource-group "$RESOURCE_GROUP" --query "[0].name" -o tsv 2>/dev/null || echo "")
@@ -360,6 +385,7 @@ fi
 ### ✅ Docker Build Context
 
 **Finding**: Correct directory navigation
+
 ```bash
 # Change to local directory (where Dockerfile is)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -374,6 +400,7 @@ docker build -t "$FULL_IMAGE_NAME" .
 ### ✅ DeepSeek API Key Handling
 
 **Finding**: Correct key discovery and prompting
+
 ```bash
 if [ -f "../../.env" ]; then
     # Try to read from root .env
@@ -390,6 +417,7 @@ fi
 ### ✅ Deployment Output
 
 **Finding**: All necessary outputs displayed
+
 ```bash
 CONTAINER_APP_URL=$(az deployment group show \
     --name "$DEPLOYMENT_NAME" \
@@ -410,6 +438,7 @@ log_info "Health Check: ${CONTAINER_APP_URL}/health"
 ### ✅ Excluded Files
 
 **Finding**: Correct exclusions
+
 ```
 node_modules/
 .env
@@ -421,6 +450,7 @@ test/
 ```
 
 **Why This Matters**:
+
 - `node_modules/`: Reinstalled in Docker (ensures correct platform binaries)
 - `.env`: Security - never include env files in images
 - `src/`: Only `dist/` is needed (compiled JS)
@@ -435,6 +465,7 @@ test/
 **Issue**: Only ONE Cosmos DB free tier per subscription
 
 **Solution**:
+
 ```bash
 # Check if free tier already exists
 az cosmosdb list --query "[?properties.enableFreeTier].name" -o table
@@ -449,6 +480,7 @@ az cosmosdb list --query "[?properties.enableFreeTier].name" -o table
 **Issue**: ACR names must be globally unique (no hyphens, lowercase only)
 
 **Solution**: Script auto-generates unique names with timestamp:
+
 ```bash
 ACR_NAME="stoicacr$(date +%s | tail -c 6)"  # e.g., stoicacr123456
 ```
@@ -458,6 +490,7 @@ ACR_NAME="stoicacr$(date +%s | tail -c 6)"  # e.g., stoicacr123456
 **Issue**: Health check may fail immediately after deployment
 
 **Solution**: Wait 2-3 minutes for container to start:
+
 ```bash
 sleep 120
 curl https://YOUR_APP_URL/health
@@ -468,11 +501,13 @@ curl https://YOUR_APP_URL/health
 **Issue**: Docker build fails at `npm run build` step
 
 **Common Causes**:
+
 - Missing `tsconfig.json`
 - TypeScript syntax errors in `src/`
 - Missing dependencies in `package.json`
 
 **Solution**: Test build locally first:
+
 ```bash
 cd stoic-mcp/local
 npm install
@@ -486,6 +521,7 @@ npm run build
 **Symptom**: Logs show "Access denied" errors
 
 **Solution**: Verify role assignment:
+
 ```bash
 az role assignment list \
   --assignee YOUR_MSI_PRINCIPAL_ID \
@@ -499,6 +535,7 @@ Should show "Key Vault Secrets User" role.
 ## Validation Checklist for Students
 
 Before running deployment:
+
 - [ ] Azure CLI installed and logged in
 - [ ] Docker installed and running
 - [ ] Resource group exists
@@ -507,6 +544,7 @@ Before running deployment:
 - [ ] Check Cosmos DB free tier availability
 
 After deployment:
+
 - [ ] Health endpoint returns 200
 - [ ] Container logs show "Server running"
 - [ ] Cosmos DB containers exist (quotes, metadata)

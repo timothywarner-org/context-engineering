@@ -22,28 +22,31 @@ azure-deployment/
 ### **Prerequisites**
 
 1. **Azure Account** with active subscription
-   - Create free account: https://azure.microsoft.com/free/
+   - Create free account: <https://azure.microsoft.com/free/>
 
 2. **Azure CLI** installed and configured
-   - Install: https://docs.microsoft.com/cli/azure/install-azure-cli
+   - Install: <https://docs.microsoft.com/cli/azure/install-azure-cli>
    - Test: `az --version`
 
 3. **Docker** (optional - for local testing)
-   - Install: https://docs.docker.com/get-docker/
+   - Install: <https://docs.docker.com/get-docker/>
 
 ### **One-Command Deployment**
 
 **macOS/Linux:**
+
 ```bash
 ./deploy.sh
 ```
 
 **Windows:**
+
 ```powershell
 .\deploy.ps1
 ```
 
 The script will:
+
 - ✅ Create Azure Resource Group
 - ✅ Provision Cosmos DB account, database, and container
 - ✅ Create Azure Container Registry
@@ -398,6 +401,7 @@ Based on minimal usage (development/testing):
 ### **Cost Reduction Tips**
 
 1. **Use serverless Cosmos DB** for development:
+
    ```bash
    az cosmosdb create \
      --name $COSMOS_ACCOUNT_NAME \
@@ -406,6 +410,7 @@ Based on minimal usage (development/testing):
    ```
 
 2. **Scale down during non-business hours:**
+
    ```bash
    # Stop (scale to 0)
    az containerapp update \
@@ -415,6 +420,7 @@ Based on minimal usage (development/testing):
    ```
 
 3. **Use consumption-based Container Apps:**
+
    ```bash
    # Already using consumption plan if --min-replicas can be 0
    ```
@@ -475,12 +481,14 @@ az containerapp secret set \
 ### **Problem: Deployment Script Fails**
 
 **Check Azure CLI version:**
+
 ```bash
 az version
 # Update if needed: https://docs.microsoft.com/cli/azure/update-azure-cli
 ```
 
 **Check subscription:**
+
 ```bash
 az account show
 az account list --output table
@@ -489,6 +497,7 @@ az account list --output table
 ### **Problem: Container App Won't Start**
 
 **Check logs:**
+
 ```bash
 az containerapp logs show \
   --name context-journal-mcp \
@@ -497,6 +506,7 @@ az containerapp logs show \
 ```
 
 **Common issues:**
+
 - Missing environment variables
 - Incorrect Cosmos DB connection string
 - Image failed to pull from ACR
@@ -504,6 +514,7 @@ az containerapp logs show \
 ### **Problem: Can't Connect to Cosmos DB**
 
 **Verify firewall rules:**
+
 ```bash
 az cosmosdb firewall-rules list \
   --account-name $COSMOS_ACCOUNT_NAME \
@@ -511,6 +522,7 @@ az cosmosdb firewall-rules list \
 ```
 
 **Add Container App IP:**
+
 ```bash
 # Get Container App outbound IP
 az containerapp show \
@@ -528,6 +540,7 @@ az cosmosdb update \
 ### **Problem: 429 (Too Many Requests) from Cosmos DB**
 
 **Increase throughput:**
+
 ```bash
 az cosmosdb sql container throughput update \
   --account-name $COSMOS_ACCOUNT_NAME \
@@ -573,10 +586,10 @@ az acr delete \
 
 ## 📚 Additional Resources
 
-- **Azure Container Apps:** https://docs.microsoft.com/azure/container-apps/
-- **Azure Cosmos DB:** https://docs.microsoft.com/azure/cosmos-db/
-- **MCP Protocol:** https://modelcontextprotocol.io
-- **FastMCP SDK:** https://github.com/modelcontextprotocol/python-sdk
+- **Azure Container Apps:** <https://docs.microsoft.com/azure/container-apps/>
+- **Azure Cosmos DB:** <https://docs.microsoft.com/azure/cosmos-db/>
+- **MCP Protocol:** <https://modelcontextprotocol.io>
+- **FastMCP SDK:** <https://github.com/modelcontextprotocol/python-sdk>
 
 ---
 
@@ -596,6 +609,7 @@ az acr delete \
 **Timing:** 35-45 minutes including Q&A
 
 **Pre-demo checklist:**
+
 - [ ] Azure CLI installed and logged in
 - [ ] Subscription has available quota
 - [ ] Deployment script tested beforehand

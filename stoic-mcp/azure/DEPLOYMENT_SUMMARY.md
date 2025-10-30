@@ -10,6 +10,7 @@ Complete overview of the Azure deployment infrastructure created for stoic-mcp.
 ## Files Created
 
 ### Infrastructure (Bicep)
+
 - **`stoic-mcp/azure/main.bicep`** (12KB)
   - Complete infrastructure template
   - Cosmos DB with 2 containers (quotes, metadata)
@@ -23,6 +24,7 @@ Complete overview of the Azure deployment infrastructure created for stoic-mcp.
   - Contains placeholder values
 
 ### Deployment Scripts
+
 - **`stoic-mcp/azure/deploy.sh`** (9.5KB)
   - Automated deployment script
   - Pre-flight checks (Azure CLI, Docker, login)
@@ -33,6 +35,7 @@ Complete overview of the Azure deployment infrastructure created for stoic-mcp.
   - Deployment validation
 
 ### Docker Configuration
+
 - **`stoic-mcp/local/Dockerfile`** (2.7KB)
   - Multi-stage build (builder + runtime)
   - TypeScript compilation stage
@@ -47,6 +50,7 @@ Complete overview of the Azure deployment infrastructure created for stoic-mcp.
   - Improves build performance
 
 ### Documentation
+
 - **`stoic-mcp/azure/README.md`** (17KB)
   - Complete deployment guide
   - Architecture diagram
@@ -82,6 +86,7 @@ Complete overview of the Azure deployment infrastructure created for stoic-mcp.
   - Recommendations for students and instructors
 
 ### CI/CD Configuration
+
 - **`.github/workflows/deploy-stoic-mcp.yml`** (4KB)
   - GitHub Actions workflow
   - Automated deployment on push to main
@@ -100,6 +105,7 @@ Complete overview of the Azure deployment infrastructure created for stoic-mcp.
   - Monitoring and troubleshooting
 
 ### Main Runbook Update
+
 - **`context-engineering-2/RUNBOOK.md`** (updated)
   - Added "Bonus: Deploy MCP Servers to Azure" section
   - Covers both CoreText MCP and Stoic MCP
@@ -136,6 +142,7 @@ Azure Deployment
 ## Key Features
 
 ### Cost Optimization
+
 - ✅ Cosmos DB Free Tier: $0/month (1000 RU/s, 25GB)
 - ✅ Scale to zero: $0 when idle
 - ✅ Minimal resources: 0.25 CPU, 0.5Gi RAM
@@ -143,6 +150,7 @@ Azure Deployment
 - **Total**: ~$8-15/month
 
 ### Security
+
 - ✅ Secrets in Key Vault (never in code)
 - ✅ Managed Identity (no passwords)
 - ✅ RBAC authorization
@@ -151,6 +159,7 @@ Azure Deployment
 - ✅ HTTPS only
 
 ### Production Ready
+
 - ✅ Health checks (liveness + readiness)
 - ✅ Auto-scaling (0-3 replicas)
 - ✅ Logging (30 days)
@@ -159,6 +168,7 @@ Azure Deployment
 - ✅ Multi-stage Docker build
 
 ### Student Friendly
+
 - ✅ Complete documentation (47KB total)
 - ✅ Pre-flight checks in script
 - ✅ Clear error messages
@@ -171,6 +181,7 @@ Azure Deployment
 ## Deployment Steps
 
 ### Prerequisites (One-Time)
+
 1. Azure subscription
 2. Resource group: `context-engineering-rg`
 3. Managed identity: `context-msi`
@@ -179,12 +190,14 @@ Azure Deployment
 6. DeepSeek API key
 
 ### Deploy
+
 ```bash
 cd stoic-mcp/azure
 ./deploy.sh
 ```
 
 ### Verify
+
 ```bash
 curl https://YOUR_APP_URL/health
 az containerapp logs show -n YOUR_APP_NAME -g context-engineering-rg
@@ -198,6 +211,7 @@ az containerapp logs show -n YOUR_APP_NAME -g context-engineering-rg
 ## Infrastructure Components
 
 ### Cosmos DB Configuration
+
 ```bicep
 enableFreeTier: true              // FREE TIER (one per subscription)
 databaseAccountOfferType: Standard
@@ -214,6 +228,7 @@ Container 2: metadata
 ```
 
 ### Container App Configuration
+
 ```bicep
 scale:
   minReplicas: 0                  // Scale to zero
@@ -230,6 +245,7 @@ probes:
 ```
 
 ### Key Vault Configuration
+
 ```bicep
 sku: Standard
 enableRbacAuthorization: true     // Use RBAC not access policies
@@ -291,6 +307,7 @@ All deployment files have been thoroughly validated. No known issues at this tim
 ## Next Steps
 
 ### For Students
+
 1. Complete pre-deployment checklist
 2. Run `./deploy.sh`
 3. Verify with health check
@@ -298,6 +315,7 @@ All deployment files have been thoroughly validated. No known issues at this tim
 5. Set up CI/CD (optional)
 
 ### For Instructors
+
 1. Review documentation
 2. Test deployment in sandbox subscription
 3. Prepare cost monitoring alerts
@@ -309,17 +327,20 @@ All deployment files have been thoroughly validated. No known issues at this tim
 ## Resources
 
 ### Deployment Files
+
 - All files located in `stoic-mcp/azure/`
 - Docker files in `stoic-mcp/local/`
 - CI/CD in `.github/workflows/`
 
 ### External Resources
+
 - [Azure Container Apps Docs](https://learn.microsoft.com/en-us/azure/container-apps/)
 - [Cosmos DB Free Tier](https://learn.microsoft.com/en-us/azure/cosmos-db/free-tier)
 - [Bicep Documentation](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/)
 - [MCP Specification](https://modelcontextprotocol.io/)
 
 ### Support
+
 - Check `CHECKLIST.md` for common issues
 - Review `VALIDATION_REPORT.md` for gotchas
 - Consult `README.md` for troubleshooting

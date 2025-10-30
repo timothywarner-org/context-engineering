@@ -8,15 +8,18 @@
 ### 🔴 CRITICAL: Cosmos DB Configuration Conflict
 
 **Issue**: Bicep template had mutually exclusive Cosmos DB settings
+
 - **Line 75**: `enableFreeTier: true`
 - **Line 89**: `capabilities: [{ name: 'EnableServerless' }]`
 
 **Problem**:
+
 - Free Tier uses **provisioned throughput** (1000 RU/s shared)
 - Serverless uses **pay-per-request** billing
 - **Cannot have both!** Deployment would fail with error
 
 **Fix Applied**:
+
 ```bicep
 // BEFORE (BROKEN):
 properties: {
@@ -35,6 +38,7 @@ properties: {
 ```
 
 **Impact**:
+
 - ✅ Deployment will now succeed
 - ✅ Still uses Free Tier ($0/month)
 - ✅ Provides 1000 RU/s shared throughput
@@ -46,10 +50,12 @@ properties: {
 **Issue**: Database creation lacked throughput settings
 
 **Problem**:
+
 - Free tier requires explicit throughput configuration
 - Without it, deployment might fail or use default (higher cost)
 
 **Fix Applied**:
+
 ```bicep
 // BEFORE (INCOMPLETE):
 resource cosmosDatabase = {
@@ -75,6 +81,7 @@ resource cosmosDatabase = {
 ```
 
 **Impact**:
+
 - ✅ Explicit control over RU/s allocation
 - ✅ Uses minimum provisioned throughput (cost-effective)
 - ✅ Still within free tier limits (1000 RU/s total)
@@ -156,18 +163,21 @@ resource cosmosDatabase = {
 ### Before First Deployment
 
 1. **Verify Azure Subscription**
+
    ```bash
    az account show
    # Confirm: subscriptionId = 92fd53f2-c38e-461a-9f50-e1ef3382c54c
    ```
 
 2. **Check Free Tier Availability**
+
    ```bash
    az cosmosdb list --query "[?properties.enableFreeTier].{name:name,rg:resourceGroup}"
    # If you already have one, edit main.bicep line 75
    ```
 
 3. **Validate Bicep Template** (if Azure CLI works)
+
    ```bash
    cd coretext-mcp/azure
    az bicep build --file main.bicep
@@ -175,6 +185,7 @@ resource cosmosDatabase = {
    ```
 
 4. **Test Docker Build Locally**
+
    ```bash
    cd coretext-mcp
    docker build -t coretext-mcp:test .
@@ -190,6 +201,7 @@ resource cosmosDatabase = {
    - Key Vault access denied (check managed identity)
 
 2. **Monitor Progress**
+
    ```bash
    # In separate terminal, watch deployments
    watch -n 5 'az deployment group list -g context-engineering-rg --query "[0].{name:name,state:properties.provisioningState}" -o table'
@@ -198,24 +210,28 @@ resource cosmosDatabase = {
 ### After Deployment
 
 1. **Health Check**
+
    ```bash
    curl https://YOUR_APP_URL/health
    # Expect: {"status":"healthy",...}
    ```
 
 2. **Check Logs**
+
    ```bash
    az containerapp logs show -n YOUR_APP -g context-engineering-rg --tail 50
    # Look for startup messages
    ```
 
 3. **Verify Cosmos DB**
+
    ```bash
    az cosmosdb sql database show -g context-engineering-rg -a YOUR_COSMOS -n coretext
    # Should show database details
    ```
 
 4. **Test Key Vault**
+
    ```bash
    az keyvault secret list --vault-name YOUR_VAULT
    # Should show 2 secrets
@@ -250,6 +266,7 @@ resource cosmosDatabase = {
 **Symptom**: Deployment fails with "Free tier already in use"
 
 **Fix**:
+
 ```bicep
 // Edit main.bicep line 75
 enableFreeTier: false  // Change to false
@@ -258,6 +275,7 @@ enableFreeTier: false  // Change to false
 ```
 
 **Better Fix**: Use existing free tier Cosmos DB
+
 ```bicep
 // Create new database in existing account instead
 ```
@@ -267,6 +285,7 @@ enableFreeTier: false  // Change to false
 **Symptom**: Deployment fails immediately
 
 **Fix**:
+
 ```bash
 az identity create --name context-msi --resource-group context-engineering-rg
 ```
@@ -276,6 +295,7 @@ az identity create --name context-msi --resource-group context-engineering-rg
 **Symptom**: Script exits early
 
 **Fix**:
+
 ```bash
 az group create --name context-engineering-rg --location eastus
 ```
@@ -291,6 +311,7 @@ az group create --name context-engineering-rg --location eastus
 **Symptom**: "Registry name already exists"
 
 **Fix**: Script auto-generates unique names, but if manual:
+
 ```bash
 # Add random suffix
 ACR_NAME="coretextacr$(date +%s | tail -c 6)"
@@ -301,10 +322,12 @@ ACR_NAME="coretextacr$(date +%s | tail -c 6)"
 **Symptom**: Container App runs but health check returns 503
 
 **Cause**:
+
 - App hasn't finished starting (cold start)
 - Health endpoint not implemented
 
 **Fix**:
+
 - Wait 30-60 seconds
 - Check logs for errors
 - Verify `/health` endpoint exists in code
@@ -314,6 +337,7 @@ ACR_NAME="coretextacr$(date +%s | tail -c 6)"
 **Symptom**: GitHub Actions fails with "Invalid credentials"
 
 **Fix**: Ensure `AZURE_CREDENTIALS` is the ENTIRE JSON from:
+
 ```bash
 az ad sp create-for-rbac --sdk-auth
 # Copy EVERYTHING from { to }
@@ -324,6 +348,7 @@ az ad sp create-for-rbac --sdk-auth
 **Symptom**: Various errors about resources not found
 
 **Reminder**:
+
 - Azure is case-sensitive for some properties
 - ACR names must be lowercase
 - Resource Group names are case-insensitive but stored as-given

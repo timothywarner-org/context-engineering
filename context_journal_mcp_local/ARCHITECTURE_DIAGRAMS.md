@@ -310,21 +310,25 @@ graph LR
 ## Using These Diagrams
 
 ### **In Presentations**
+
 1. Copy the mermaid code block
 2. Paste into any markdown renderer (GitHub, GitLab, VS Code with extensions)
-3. Or use https://mermaid.live to generate PNG/SVG
+3. Or use <https://mermaid.live> to generate PNG/SVG
 
 ### **In Claude**
+
 - Claude can render mermaid diagrams directly
 - Just paste the code blocks in conversation
 
 ### **In Documentation**
+
 - GitHub and many platforms render mermaid automatically
 - No need to generate static images
 
 ---
 
 **All diagrams use consistent color scheme:**
+
 - 🟣 Purple: User interfaces / Claude
 - 🔵 Blue: MCP servers / Logic
 - 🟢 Green: Storage / Success

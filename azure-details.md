@@ -9,6 +9,3 @@ resource group: context-engineering-rg
 region: eastus
 
 managed identity: context-msi
-
-
-

@@ -3,6 +3,7 @@
 This Node.js project demonstrates **context window utilization** for DeepSeek models with a colorful, animated terminal demo.
 
 ## 🧩 Features
+
 - Token counting with `gpt-tokenizer`
 - Dynamic CLI progress bar showing percentage of context window used
 - Real API call to DeepSeek at the end

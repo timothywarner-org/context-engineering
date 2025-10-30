@@ -31,15 +31,19 @@ npm install
 The server reads `DEEPSEEK_API_KEY` from your system environment variables. You have two options:
 
 **Option A: System Environment Variable (Recommended for production/teaching)**
+
 - Set `DEEPSEEK_API_KEY` in your system environment variables
 - The MCP server will automatically inherit this value
 - No secrets in config files
 
 **Option B: Local .env file (Development only)**
+
 - Create a `.env` file in the `local/` directory:
+
   ```bash
   DEEPSEEK_API_KEY=your_key_here
   ```
+
 - Useful for local development
 - **DO NOT** commit `.env` to version control
 
@@ -53,6 +57,7 @@ npm start
 ### 4. Configure in Claude Desktop
 
 Add to your Claude Desktop config:
+
 - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
 - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 
@@ -70,6 +75,7 @@ Add to your Claude Desktop config:
 ```
 
 **Important Notes:**
+
 - Update the path to match your installation location
 - Use double backslashes on Windows (e.g., `C:\\github\\...`)
 - **API Key Security**: The server automatically reads `DEEPSEEK_API_KEY` from your system environment variables - do NOT add it to this config file
@@ -79,14 +85,17 @@ Add to your Claude Desktop config:
 ## Available Tools
 
 ### `get_random_quote`
+
 Get a random Stoic quote for inspiration.
 
 **Example:** "I need some motivation"
 
 ### `search_quotes`
+
 Search by author, theme, or keyword.
 
 **Parameters:**
+
 - `query` (optional): Keyword search
 - `author` (optional): Filter by author
 - `theme` (optional): Filter by theme
@@ -94,48 +103,61 @@ Search by author, theme, or keyword.
 **Example:** "Find quotes about courage by Marcus Aurelius"
 
 ### `add_quote`
+
 Add a new quote to the collection.
 
 **Parameters:**
+
 - `text`: The quote text
 - `author`: Quote author
 - `source`: Source book/work
 - `theme`: Main theme
 
 ### `get_quote_explanation`
+
 Get AI-powered practical explanation.
 
 **Parameters:**
+
 - `quote_id`: ID of the quote
 
 **Example:** "Explain quote 5 in terms of handling production incidents"
 
 ### `toggle_favorite`
+
 Mark or unmark as favorite.
 
 **Parameters:**
+
 - `quote_id`: ID of the quote
 
 ### `get_favorites`
+
 Retrieve all favorite quotes.
 
 ### `update_quote_notes`
+
 Add personal notes to a quote.
 
 **Parameters:**
+
 - `quote_id`: ID of the quote
 - `notes`: Your reflection
 
 ### `delete_quote`
+
 Remove a quote from the collection.
 
 **Parameters:**
+
 - `quote_id`: ID of the quote
 
 ### `generate_quote`
+
 Use AI to generate new Stoic-style quote.
 
 **Parameters:**
+
 - `theme`: Theme for generation (e.g., "debugging", "code review")
 
 ## Data Structure
@@ -168,11 +190,13 @@ Quotes are stored in `quotes.json` with metadata tracking:
 ### Schema Details
 
 **Metadata:**
+
 - `lastId`: Auto-incrementing ID counter for new quotes
 - `version`: Schema version (currently "1.0.0")
 - `lastModified`: ISO timestamp of last modification
 
 **Quote Properties:**
+
 - `id`: Numeric ID (auto-generated from metadata.lastId)
 - `text`: Quote text
 - `author`: Author name
@@ -199,6 +223,7 @@ npm run import <filename.txt>
 ```
 
 **Features:**
+
 - Automatic theme detection from 18 predefined categories
 - Atomic file operations (all or nothing)
 - Metadata auto-updates (lastId and lastModified)
@@ -223,12 +248,14 @@ npm run clean
 This implementation follows the official MCP specification:
 
 **Core Components:**
+
 - `src/index.ts` - MCP server entry point with tool registration
 - `src/storage.ts` - File-based storage layer with CRUD operations
 - `src/deepseek.ts` - AI integration for explanations and generation
 - `src/types.ts` - TypeScript interfaces for type safety
 
 **Communication:**
+
 - Uses `StdioServerTransport` for Claude Desktop integration
 - Handles `ListToolsRequestSchema` for tool discovery
 - Handles `CallToolRequestSchema` for tool execution
@@ -248,6 +275,7 @@ This implementation follows the official MCP specification:
 **Issue:** Server not appearing in Claude Desktop
 
 **Solution:**
+
 - Verify the path in `claude_desktop_config.json` points to `dist/index.js`
 - Ensure you've run `npm run build` first
 - Restart Claude Desktop after config changes

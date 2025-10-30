@@ -42,10 +42,12 @@ npm run import my-quotes.txt
 ## Features
 
 ### Automatic ID Generation
+
 - IDs are generated sequentially starting from `metadata.lastId + 1`
 - The `lastId` metadata is automatically updated after import
 
 ### Theme Detection
+
 The utility automatically detects themes based on keywords in the quote text:
 
 | Theme | Keywords |
@@ -72,7 +74,9 @@ The utility automatically detects themes based on keywords in the quote text:
 If no keywords match, the default theme is **wisdom**.
 
 ### Metadata Fields
+
 All imported quotes receive:
+
 - **id**: Auto-generated numeric ID
 - **favorite**: `false`
 - **notes**: `null`
@@ -84,6 +88,7 @@ All imported quotes receive:
 ### 1. Create Import File
 
 Create `local/quotes-source/my-quotes.txt`:
+
 ```text
 "The best time to plant a tree was 20 years ago. The second best time is now." - Chinese Proverb, Traditional Wisdom
 "A journey of a thousand miles begins with a single step." - Lao Tzu, Tao Te Ching
@@ -110,7 +115,9 @@ Successfully parsed 2 quotes
 ## Error Handling
 
 ### Invalid Format
+
 If a line doesn't match the expected format, you'll see a warning:
+
 ```
 Warning: Could not parse line: This is not a valid quote format
 ```
@@ -118,11 +125,13 @@ Warning: Could not parse line: This is not a valid quote format
 The import continues with other lines.
 
 ### File Not Found
+
 ```
 Error: ENOENT: no such file or directory, open 'nonexistent.txt'
 ```
 
 ### Empty File
+
 ```
 No valid quotes found in file
 ```
@@ -157,6 +166,7 @@ After import, quotes.json will have this structure:
 ## Atomic Operations
 
 The import process is atomic:
+
 - All quotes are validated before writing
 - If validation fails, no changes are made to quotes.json
 - The file is written in a single operation
@@ -173,12 +183,15 @@ The import process is atomic:
 ## Troubleshooting
 
 ### Wrong Theme Detected
+
 Edit quotes.json manually to fix the theme, or modify the quote text to include better keywords.
 
 ### Duplicate Quotes
+
 The utility doesn't check for duplicates. Review your import file before running.
 
 ### Line Breaks in Quotes
+
 The parser expects one quote per line. Multi-line quotes are not supported. Use `\n` in the text if needed, or combine into a single line.
 
 ## Related

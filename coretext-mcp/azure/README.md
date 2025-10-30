@@ -51,6 +51,7 @@ This deployment uses Azure's most cost-effective services:
 | **Total** | | **~$8-15/month** |
 
 **Cost Optimization Features:**
+
 - Container Apps scale to **zero replicas** when idle
 - Cosmos DB Free Tier provides 1000 RU/s (good for MVP)
 - Log retention limited to 30 days
@@ -61,12 +62,14 @@ This deployment uses Azure's most cost-effective services:
 ### Local Machine Requirements
 
 1. **Azure CLI** (version 2.50+)
+
    ```bash
    az --version
    # Install: https://aka.ms/azure-cli
    ```
 
 2. **Docker** (for building container images)
+
    ```bash
    docker --version
    # Install: https://docs.docker.com/get-docker/
@@ -80,6 +83,7 @@ This deployment uses Azure's most cost-effective services:
    - Subscription ID: `92fd53f2-c38e-461a-9f50-e1ef3382c54c`
 
 2. **Resource Group** (must exist before deployment)
+
    ```bash
    az group create \
      --name context-engineering-rg \
@@ -87,6 +91,7 @@ This deployment uses Azure's most cost-effective services:
    ```
 
 3. **Managed Identity** (must exist before deployment)
+
    ```bash
    az identity create \
      --name context-msi \
@@ -94,7 +99,7 @@ This deployment uses Azure's most cost-effective services:
    ```
 
 4. **DeepSeek API Key** (optional - server works without it)
-   - Get one from: https://platform.deepseek.com/
+   - Get one from: <https://platform.deepseek.com/>
 
 ## Deployment Options
 
@@ -121,6 +126,7 @@ chmod +x deploy.sh
 ```
 
 The script will:
+
 1. ✅ Verify Azure CLI and Docker installation
 2. ✅ Check Azure login status
 3. ✅ Verify resource group and managed identity exist
@@ -131,6 +137,7 @@ The script will:
 8. ✅ Display deployment outputs and next steps
 
 **Expected output:**
+
 ```
 [INFO] Starting CoreText MCP Azure Deployment
 [SUCCESS] Azure CLI found: 2.55.0
@@ -149,6 +156,7 @@ Health Check: https://coretext-app-abc123.eastus.azurecontainerapps.io/health
 ```
 
 **What the script does:**
+
 1. ✅ Creates Azure Container Registry (if needed)
 2. ✅ Builds and pushes Docker image
 3. ✅ Deploys infrastructure with Bicep
@@ -169,6 +177,7 @@ See detailed setup guide: **[.github/GITHUB_ACTIONS_SETUP.md](../../.github/GITH
 
 1. **Deploy manually first** (using deploy.sh above)
 2. **Create Azure Service Principal**:
+
    ```bash
    az ad sp create-for-rbac \
      --name "github-actions-coretext-mcp" \
@@ -176,6 +185,7 @@ See detailed setup guide: **[.github/GITHUB_ACTIONS_SETUP.md](../../.github/GITH
      --scopes /subscriptions/92fd53f2-c38e-461a-9f50-e1ef3382c54c/resourceGroups/context-engineering-rg \
      --sdk-auth
    ```
+
 3. **Add GitHub Secrets**:
    - `AZURE_CREDENTIALS` - JSON output from above
    - `ACR_NAME` - Your ACR name (e.g., coretextacr123456)
@@ -183,6 +193,7 @@ See detailed setup guide: **[.github/GITHUB_ACTIONS_SETUP.md](../../.github/GITH
 4. **Push to main** - Deployment happens automatically!
 
 **What GitHub Actions does:**
+
 1. ✅ Triggers on push to `main` (when coretext-mcp/ changes)
 2. ✅ Builds Docker image with caching
 3. ✅ Pushes to ACR
@@ -307,6 +318,7 @@ az containerapp logs show \
 The Container App exposes the MCP server via HTTPS. You can connect to it using:
 
 **MCP Inspector (local testing):**
+
 ```bash
 # Forward the remote server locally
 npx @modelcontextprotocol/inspector https://${APP_URL}
@@ -395,6 +407,7 @@ az monitor metrics list \
 ### Common Issues
 
 **Issue: Container App won't start**
+
 ```bash
 # Check logs for errors
 az containerapp logs show \
@@ -409,6 +422,7 @@ az containerapp revision list \
 ```
 
 **Issue: Health check failing**
+
 ```bash
 # Test health endpoint directly
 curl -v https://${APP_URL}/health
@@ -417,6 +431,7 @@ curl -v https://${APP_URL}/health
 ```
 
 **Issue: Cosmos DB free tier already used**
+
 ```bash
 # Check if you already have a free tier account
 az cosmosdb list --query "[?properties.enableFreeTier].{name:name,rg:resourceGroup}"
@@ -427,6 +442,7 @@ az cosmosdb list --query "[?properties.enableFreeTier].{name:name,rg:resourceGro
 ```
 
 **Issue: Managed Identity permission errors**
+
 ```bash
 # Verify managed identity has Key Vault access
 az role assignment list \
@@ -566,16 +582,19 @@ coretext-mcp/
 ## Support
 
 **Deployment Issues:**
+
 - Check the deployment logs: `az deployment group show`
 - Review troubleshooting section above
 
 **Azure Support:**
-- https://portal.azure.com -> Help + Support
+
+- <https://portal.azure.com> -> Help + Support
 - Or file ticket via Azure CLI: `az support tickets create`
 
 **MCP Protocol Issues:**
-- MCP Specification: https://spec.modelcontextprotocol.io/
-- MCP Inspector: https://github.com/modelcontextprotocol/inspector
+
+- MCP Specification: <https://spec.modelcontextprotocol.io/>
+- MCP Inspector: <https://github.com/modelcontextprotocol/inspector>
 
 ---
 

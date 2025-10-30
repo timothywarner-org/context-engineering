@@ -11,6 +11,7 @@ CoreText MCP Server is a teaching-focused implementation of the Model Context Pr
 ## Development Commands
 
 ### Local Development
+
 ```bash
 # Install dependencies (Node.js >=18 required)
 npm install
@@ -32,6 +33,7 @@ npm test-api
 ```
 
 ### Environment Setup
+
 ```bash
 # Copy example configuration
 cp .env.example .env
@@ -48,6 +50,7 @@ cp .env.example .env
 **Mac/Linux**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 
 **Without API key** (uses fallback enrichment):
+
 ```json
 {
   "mcpServers": {
@@ -60,6 +63,7 @@ cp .env.example .env
 ```
 
 **With Deepseek API key** (enables AI enrichment):
+
 ```json
 {
   "mcpServers": {
@@ -79,6 +83,7 @@ cp .env.example .env
 Create `.vscode/mcp.json` in your workspace:
 
 **Without API key** (uses fallback enrichment):
+
 ```json
 {
   "mcpServers": {
@@ -91,6 +96,7 @@ Create `.vscode/mcp.json` in your workspace:
 ```
 
 **With Deepseek API key** (enables AI enrichment):
+
 ```json
 {
   "mcpServers": {
@@ -112,6 +118,7 @@ Create `.vscode/mcp.json` in your workspace:
 ### Core Classes (src/index.js)
 
 **MemoryEntry**: Represents a single memory unit with:
+
 - `id` (UUID)
 - `content` (the actual memory text)
 - `type` (episodic vs semantic)
@@ -120,18 +127,21 @@ Create `.vscode/mcp.json` in your workspace:
 - `enrichment` (AI analysis data)
 
 **MemoryManager**: Handles all CRUD operations
+
 - Persists to `data/memory.json` for local development
 - Auto-creates 3 demo memories on first run
 - Tracks access patterns (accessCount, lastAccessed) for context stream
 - Builds knowledge graph clusters based on shared tags/keywords
 
 **DeepseekEnrichmentService**: AI analysis layer
+
 - Primary mode: Deepseek API (when `DEEPSEEK_API_KEY` set)
 - Fallback mode: Local keyword extraction + sentiment analysis (always works)
 - Extracts: summary, keywords, sentiment, category, related topics
 - Graceful degradation pattern for production resilience
 
 **CoreTextServer**: Main MCP server implementation
+
 - 8 Tools: memory_create, memory_read, memory_update, memory_delete, memory_search, memory_list, memory_stats, memory_enrich
 - 3 Resources: memory://overview (markdown dashboard), memory://context-stream (working memory view), memory://knowledge-graph (semantic connections)
 - Uses @modelcontextprotocol/sdk with stdio transport
@@ -139,10 +149,12 @@ Create `.vscode/mcp.json` in your workspace:
 ### Memory Types (Teaching Concept)
 
 **Semantic Memory**: Fact-based, conceptual knowledge
+
 - Example: "MCP enables persistent AI context"
 - Use for: Documentation, preferences, knowledge base
 
 **Episodic Memory**: Time-based, event-focused memories
+
 - Example: "Meeting with client on Oct 31, 2024 at 2pm"
 - Use for: Conversation history, event tracking, timeline
 
@@ -166,22 +178,27 @@ Resources provide **always-available context** (unlike tools that must be called
 ## Key Implementation Patterns
 
 ### Authentication Hierarchy
+
 1. Environment variable: `DEEPSEEK_API_KEY` (production via Azure Key Vault)
 2. .env file: Development convenience
 3. Fallback mode: No API key required, uses local enrichment
 
 ### Graceful Degradation
+
 - Enrichment works WITH or WITHOUT API key
 - Demo memories auto-created if `data/memory.json` missing
 - Fallback enrichment uses basic NLP (stopwords, sentiment keywords, category patterns)
 
 ### Production Migration Path
+
 **Current** (Local Development):
+
 - Storage: `data/memory.json` (100MB limit)
 - Compute: Local Node.js process
 - Enrichment: Optional Deepseek API
 
 **Future** (Azure Production):
+
 - Storage: Azure Cosmos DB (unlimited scale)
 - Compute: Azure Container Apps (serverless containers)
 - Enrichment: Azure OpenAI Service or Deepseek
@@ -202,6 +219,7 @@ npm run inspector
 ```
 
 **Common debugging scenarios**:
+
 - Tool not appearing: Check `ListToolsRequestSchema` handler
 - Resource not found: Check URI string in `ReadResourceRequestSchema`
 - Enrichment failing: Check console.error logs (all logged to stderr)
@@ -228,25 +246,31 @@ coretext-mcp/
 ## Common Modifications
 
 ### Adding a new tool
+
 1. Add tool definition to `ListToolsRequestSchema` handler (line ~417)
 2. Add case to `CallToolRequestSchema` switch statement (line ~547)
 3. Implement logic using MemoryManager methods
 4. Return `{ content: [{ type: 'text', text: JSON.stringify(...) }] }`
 
 ### Adding a new resource
+
 1. Add resource to `ListResourcesRequestSchema` handler (line ~765)
 2. Add URI check to `ReadResourceRequestSchema` handler (line ~789)
 3. Generate content (markdown or JSON)
 4. Return `{ contents: [{ uri, mimeType, text }] }`
 
 ### Changing storage backend
+
 Replace MemoryManager methods:
+
 - `initialize()`: Connect to DB instead of reading file
 - `persist()`: Write to DB instead of file
 - `create/read/update/delete`: Use DB SDK
 
 ### Adding new enrichment provider
+
 Modify DeepseekEnrichmentService:
+
 - Change `baseUrl` and `model` properties
 - Update `makeAPICall()` request format
 - Parse response in `enrich()` method
@@ -255,6 +279,7 @@ Modify DeepseekEnrichmentService:
 ## Testing Workflow
 
 ### Automated Testing (Recommended Before Class)
+
 ```bash
 # Run full test suite - validates all 8 tools and 3 resources
 npm test
@@ -269,6 +294,7 @@ npm test
 ```
 
 **What the test client validates**:
+
 - Tool availability (all 8 tools present)
 - Resource availability (all 3 resources present)
 - CRUD operations (create, read, update, delete)
@@ -278,6 +304,7 @@ npm test
 - Resource content integrity
 
 ### Manual Testing (During Class Demos)
+
 ```bash
 # Start Inspector for visual demos
 npm run inspector
@@ -300,6 +327,7 @@ npm run inspector
 ```
 
 ### Health Endpoint (Azure Deployment)
+
 ```bash
 # Check server health (runs automatically on port 3000)
 curl http://localhost:3000/health
@@ -315,6 +343,7 @@ curl http://localhost:3000/health
 ```
 
 This endpoint is used by:
+
 - Docker HEALTHCHECK in Dockerfile
 - Azure Container Apps health probes
 - Load balancers and monitoring systems
@@ -328,6 +357,7 @@ This server is intentionally simple for educational purposes:
 **What's excluded**: Authentication, multi-user, rate limiting, full vector search (Azure AI Search needed)
 
 **Design decisions**:
+
 - Single file architecture for teaching clarity
 - Console.error for all logging (stderr keeps stdout clean for MCP protocol)
 - Demo memories auto-created (students see working examples)
@@ -337,22 +367,27 @@ This server is intentionally simple for educational purposes:
 ## Integration Patterns
 
 ### Claude Desktop
+
 Primary use case - native MCP support. Memories persist across Claude conversations.
 
 ### VS Code
+
 Via MCP extensions. Memories shared across workspace sessions.
 
 ### Custom Applications
+
 Import `@modelcontextprotocol/sdk` and connect via stdio transport.
 
 ## Security Considerations
 
 **Current** (Teaching/Local):
+
 - API keys in .env (gitignored)
 - No authentication on tools
 - Local file system storage
 
 **Production** (Azure):
+
 - Azure Key Vault for secrets
 - Managed Identity for service-to-service auth
 - Cosmos DB with RBAC

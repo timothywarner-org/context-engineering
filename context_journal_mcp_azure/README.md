@@ -15,11 +15,13 @@ This MCP server is designed to teach:
 ## 🏗️ Architecture
 
 ### **Local Development (Phase 1)**
+
 ```
 Claude Desktop ←→ MCP Server ←→ context_journal.json
 ```
 
 ### **Azure Production (Phase 2)**
+
 ```
 Claude Desktop ←→ MCP Server (Azure Container App) ←→ Azure Cosmos DB
 ```
@@ -35,11 +37,13 @@ Claude Desktop ←→ MCP Server (Azure Container App) ←→ Azure Cosmos DB
 ### **Installation**
 
 1. **Install dependencies:**
+
 ```bash
 pip install mcp anthropic-sdk pydantic
 ```
 
 2. **Test the server:**
+
 ```bash
 python context_journal_mcp.py --help
 ```
@@ -76,6 +80,7 @@ Add this configuration:
 ### **Segment 1: MCP Basics (15 minutes)**
 
 **Demonstration:**
+
 1. Show the "amnesia problem" - ask Claude something, close app, reopen
 2. Enable the Context Journal MCP server
 3. Create a context entry about the current conversation
@@ -83,6 +88,7 @@ Add this configuration:
 5. Read the context entry back - **memory restored!**
 
 **Key Teaching Points:**
+
 - MCP tools extend LLM capabilities
 - Tools = functions the LLM can call
 - Server = collection of related tools
@@ -90,6 +96,7 @@ Add this configuration:
 
 **Live Coding:**
 Show students the `@mcp.tool` decorator:
+
 ```python
 @mcp.tool(name="create_context_entry", annotations={...})
 async def create_context_entry(params: CreateEntryInput) -> str:
@@ -109,6 +116,7 @@ async def create_context_entry(params: CreateEntryInput) -> str:
 6. **search_context_entries** - Full-text search
 
 **Key Teaching Points:**
+
 - Tool annotations guide LLM behavior
 - Input validation with Pydantic prevents errors
 - Consistent response formats (JSON/Markdown)
@@ -127,6 +135,7 @@ async def tag_statistics() -> str:
 ```
 
 **Solution walks them through:**
+
 - Loading the journal
 - Counting tag occurrences
 - Formatting output (markdown/json)
@@ -137,6 +146,7 @@ async def tag_statistics() -> str:
 **Show the progression:**
 
 **Phase 1 (Current):** Local JSON file
+
 ```python
 def load_journal():
     with open(JOURNAL_FILE, 'r') as f:
@@ -144,6 +154,7 @@ def load_journal():
 ```
 
 **Phase 2 (Azure):** Cosmos DB
+
 ```python
 async def load_journal():
     container = cosmos_client.get_database_client("context_db")
@@ -153,6 +164,7 @@ async def load_journal():
 ```
 
 **Key Teaching Points:**
+
 - Same tool interfaces, different backends
 - Azure Cosmos DB = globally distributed JSON database
 - Connection strings and authentication
@@ -161,6 +173,7 @@ async def load_journal():
 ## 🔧 Tool Reference
 
 ### **create_context_entry**
+
 ```python
 {
     "title": "Project Decision: FastAPI",
@@ -171,6 +184,7 @@ async def load_journal():
 ```
 
 ### **read_context_entry**
+
 ```python
 {
     "entry_id": "ctx_0001",
@@ -179,6 +193,7 @@ async def load_journal():
 ```
 
 ### **update_context_entry**
+
 ```python
 {
     "entry_id": "ctx_0001",
@@ -188,6 +203,7 @@ async def load_journal():
 ```
 
 ### **delete_context_entry**
+
 ```python
 {
     "entry_id": "ctx_0001"
@@ -195,6 +211,7 @@ async def load_journal():
 ```
 
 ### **list_context_entries**
+
 ```python
 {
     "tags": ["python"],
@@ -206,6 +223,7 @@ async def load_journal():
 ```
 
 ### **search_context_entries**
+
 ```python
 {
     "query": "azure deployment",
@@ -330,6 +348,7 @@ az containerapp create \
 ## 📊 Data Model
 
 ### **Entry Structure**
+
 ```json
 {
   "id": "ctx_0001",
@@ -343,6 +362,7 @@ az containerapp create \
 ```
 
 ### **Journal Structure**
+
 ```json
 {
   "entries": [...],
@@ -371,6 +391,7 @@ az containerapp create \
 ## 🤝 Contributing
 
 Students can extend this server with:
+
 - Export/import functionality
 - Tag management tools
 - Search with fuzzy matching

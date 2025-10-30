@@ -9,22 +9,25 @@ This repository contains training materials and code examples for "MCP in Practi
 ## MCP (Model Context Protocol) Resources
 
 ### Official Specification & Documentation
-- **MCP Specification**: https://spec.modelcontextprotocol.io/
-- **MCP Documentation**: https://modelcontextprotocol.io/docs
-- **Protocol Overview**: https://modelcontextprotocol.io/docs/concepts/overview
-- **Architecture Guide**: https://modelcontextprotocol.io/docs/concepts/architecture
+
+- **MCP Specification**: <https://spec.modelcontextprotocol.io/>
+- **MCP Documentation**: <https://modelcontextprotocol.io/docs>
+- **Protocol Overview**: <https://modelcontextprotocol.io/docs/concepts/overview>
+- **Architecture Guide**: <https://modelcontextprotocol.io/docs/concepts/architecture>
 
 ### Official SDKs
-- **TypeScript/JavaScript SDK**: https://github.com/modelcontextprotocol/typescript-sdk
+
+- **TypeScript/JavaScript SDK**: <https://github.com/modelcontextprotocol/typescript-sdk>
   - npm: `@modelcontextprotocol/sdk`
   - Full async/await support with TypeScript types
-- **Python SDK**: https://github.com/modelcontextprotocol/python-sdk
+- **Python SDK**: <https://github.com/modelcontextprotocol/python-sdk>
   - pip: `mcp-sdk`
   - Async Python implementation with type hints
-- **MCP Inspector**: https://github.com/modelcontextprotocol/inspector
+- **MCP Inspector**: <https://github.com/modelcontextprotocol/inspector>
   - Browser-based debugging tool for MCP servers
 
 ### MCP Core Concepts
+
 1. **Tools**: Functions that AI can discover and invoke (database queries, API calls, file operations)
 2. **Resources**: Data sources AI can access (files, URLs, dynamic content)
 3. **Prompts**: Reusable prompt templates with variables
@@ -33,18 +36,21 @@ This repository contains training materials and code examples for "MCP in Practi
 ## Context Engineering Principles
 
 ### Context Window Optimization
+
 - **Token budgeting**: Allocate context space strategically between system prompts, conversation history, and retrieved data
 - **Dynamic pruning**: Remove redundant information while preserving semantic coherence
 - **Hierarchical summarization**: Compress older context into increasingly abstract summaries
 - **Relevance scoring**: Use embedding similarity to prioritize context inclusion
 
 ### Memory Architecture Patterns
+
 1. **Episodic Memory**: Sequential conversation storage with temporal indexing
 2. **Semantic Memory**: Vector-indexed knowledge base for similarity retrieval
 3. **Working Memory**: Active context for current task execution
 4. **Procedural Memory**: Cached tool usage patterns and successful workflows
 
 ### Context Persistence Strategies
+
 ```javascript
 // Example: Implementing context layers with MCP
 const contextLayers = {
@@ -58,7 +64,9 @@ const contextLayers = {
 ## Prompt Engineering for MCP
 
 ### MCP-Aware Prompt Design
+
 1. **Tool Discovery Prompts**: Help AI understand available capabilities
+
    ```
    You have access to the following tools via MCP:
    - database_query: Execute SQL queries on the user's database
@@ -69,6 +77,7 @@ const contextLayers = {
    ```
 
 2. **Stateful Conversation Prompts**: Maintain context across tool calls
+
    ```
    Previous context from MCP memory:
    {retrieved_context}
@@ -79,6 +88,7 @@ const contextLayers = {
    ```
 
 3. **Multi-Agent Coordination**: Orchestrate between different MCP servers
+
    ```
    You are coordinating between multiple MCP servers:
    - Memory Server: Stores and retrieves conversation context
@@ -89,6 +99,7 @@ const contextLayers = {
    ```
 
 ### Prompt Chaining with MCP
+
 ```javascript
 // Example: Progressive enhancement pattern
 const promptChain = [
@@ -100,6 +111,7 @@ const promptChain = [
 ```
 
 ### Dynamic Prompt Construction
+
 - **Variable injection**: Use MCP resources to populate prompt templates
 - **Conditional sections**: Include/exclude prompt parts based on available tools
 - **Feedback loops**: Adjust prompts based on tool execution results
@@ -107,6 +119,7 @@ const promptChain = [
 ## Development Commands
 
 ### Setup
+
 ```bash
 # Install dependencies (when package.json exists)
 npm install
@@ -119,6 +132,7 @@ docker run hello-world
 ```
 
 ### Development
+
 ```bash
 # Run MCP server (once implemented)
 npm start
@@ -133,6 +147,7 @@ node examples/[server-name]/index.js
 ## Architecture
 
 ### Expected Project Structure
+
 ```
 context-engineering/
 ├── examples/              # MCP server implementation examples
@@ -149,6 +164,7 @@ context-engineering/
 ```
 
 ### Key Technologies
+
 - **MCP (Model Context Protocol)**: Core protocol for AI tool-calling and memory
 - **Node.js 20+**: Primary runtime for MCP servers
 - **Docker**: For containerized deployments
@@ -181,12 +197,14 @@ When implementing MCP servers in this repository:
 ## Advanced MCP Implementation Patterns
 
 ### Server Connection Strategies
+
 1. **Direct stdio**: Fast, secure, ideal for local tools
 2. **HTTP/SSE**: Network-accessible, supports remote deployment
 3. **WebSocket**: Bidirectional, real-time updates
 4. **Named pipes**: OS-level IPC for high-performance scenarios
 
 ### State Management in MCP
+
 ```typescript
 // Example: Implementing stateful MCP server
 class StatefulMCPServer {
@@ -209,6 +227,7 @@ class StatefulMCPServer {
 ```
 
 ### MCP Security Best Practices
+
 1. **Authentication**: Implement bearer tokens or API keys for server access
 2. **Authorization**: Use capability-based security for tool permissions
 3. **Input validation**: Sanitize all tool arguments against injection attacks
@@ -216,6 +235,7 @@ class StatefulMCPServer {
 5. **Audit logging**: Track all tool invocations for compliance
 
 ### Performance Optimization
+
 - **Connection pooling**: Reuse MCP connections across requests
 - **Response streaming**: Use SSE for large responses
 - **Caching strategies**: Cache tool results based on input parameters
@@ -224,6 +244,7 @@ class StatefulMCPServer {
 ## Context Engineering Advanced Topics
 
 ### Semantic Context Compression
+
 ```javascript
 // Example: Intelligent context compression
 async function compressContext(messages, targetTokens) {
@@ -247,12 +268,14 @@ async function compressContext(messages, targetTokens) {
 ```
 
 ### Multi-Modal Context Handling
+
 - **Text**: Traditional conversation and document context
 - **Code**: Syntax-aware context for programming tasks
 - **Structured data**: JSON, CSV, database schemas
 - **Embeddings**: Vector representations for semantic search
 
 ### Context Conflict Resolution
+
 1. **Temporal priority**: Recent context overrides older information
 2. **Source authority**: Rank context sources by reliability
 3. **Semantic coherence**: Ensure context consistency
@@ -261,12 +284,14 @@ async function compressContext(messages, targetTokens) {
 ## Production Deployment Considerations
 
 ### Scaling MCP Servers
+
 - **Horizontal scaling**: Deploy multiple server instances with load balancing
 - **Vertical scaling**: Optimize single-instance performance
 - **Edge deployment**: Run MCP servers close to users
 - **Serverless**: Use functions-as-a-service for stateless tools
 
 ### Monitoring and Observability
+
 ```javascript
 // Example: OpenTelemetry integration
 const { trace } = require('@opentelemetry/api');
@@ -295,6 +320,7 @@ async function instrumentedToolCall(name, args) {
 ```
 
 ### Integration Patterns
+
 1. **AI Platform Integration**
    - Claude Desktop: Native MCP support
    - ChatGPT: Via custom GPTs and actions
@@ -310,12 +336,14 @@ async function instrumentedToolCall(name, args) {
 ## Course-Specific Notes
 
 This repository serves as both teaching material and reference implementation. Code should be:
+
 - Clear and well-commented for educational purposes
 - Production-ready to demonstrate real-world patterns
 - Modular to allow students to experiment with individual components
 - Progressive in complexity from basic to advanced examples
 
 ### Learning Path
+
 1. **Basic**: Simple MCP server with single tool
 2. **Intermediate**: Stateful server with memory persistence
 3. **Advanced**: Multi-agent orchestration with vector stores
@@ -324,6 +352,7 @@ This repository serves as both teaching material and reference implementation. C
 ## Cutting-Edge Prompt Engineering Techniques
 
 ### Chain-of-Thought (CoT) with MCP Tools
+
 ```javascript
 // Example: Structured reasoning with tool access
 const cotPrompt = `
@@ -342,6 +371,7 @@ My reasoning:
 ```
 
 ### Few-Shot Learning with MCP Examples
+
 ```javascript
 // Example: Teaching AI how to use MCP tools effectively
 const fewShotExamples = [
@@ -361,6 +391,7 @@ const fewShotExamples = [
 ```
 
 ### Self-Reflection and Error Correction
+
 ```javascript
 // Example: AI self-evaluation pattern
 const reflectionPrompt = `
@@ -376,6 +407,7 @@ Expected outcome: {expected_outcome}
 ```
 
 ### Adaptive Prompting Based on Tool Availability
+
 ```javascript
 // Example: Dynamic prompt adjustment
 async function generateAdaptivePrompt(availableTools, userIntent) {
@@ -401,24 +433,28 @@ async function generateAdaptivePrompt(availableTools, userIntent) {
 ## Future Directions and Research Areas
 
 ### Emerging MCP Capabilities
+
 1. **Multi-modal tools**: Image generation, audio processing, video analysis
 2. **Recursive tool calling**: Tools that can invoke other tools
 3. **Conditional execution**: Tool calls based on previous results
 4. **Parallel execution**: Concurrent tool invocations for performance
 
 ### Advanced Context Engineering Research
+
 - **Neuromorphic memory**: Brain-inspired storage patterns
 - **Quantum context**: Superposition of multiple context states
 - **Federated context**: Distributed memory across multiple servers
 - **Causal context graphs**: Understanding cause-effect relationships
 
 ### Next-Generation Prompt Techniques
+
 1. **Constitutional prompting**: Self-governing AI behavior through principles
 2. **Recursive prompt optimization**: Prompts that improve themselves
 3. **Emergent tool discovery**: AI learning new tool combinations
 4. **Semantic prompt compilation**: High-level intents to low-level operations
 
 ### Integration with Emerging AI Standards
+
 - **OpenAI Assistants API**: MCP adapter patterns
 - **Google Vertex AI**: MCP compatibility layer
 - **AWS Bedrock**: MCP deployment templates
@@ -427,17 +463,20 @@ async function generateAdaptivePrompt(availableTools, userIntent) {
 ## Resources for Continued Learning
 
 ### MCP Community
-- **Discord**: https://discord.gg/modelcontextprotocol
-- **GitHub Discussions**: https://github.com/modelcontextprotocol/discussions
+
+- **Discord**: <https://discord.gg/modelcontextprotocol>
+- **GitHub Discussions**: <https://github.com/modelcontextprotocol/discussions>
 - **Stack Overflow**: Tag `model-context-protocol`
 
 ### Related Specifications
-- **JSON-RPC 2.0**: https://www.jsonrpc.org/specification (MCP transport layer)
+
+- **JSON-RPC 2.0**: <https://www.jsonrpc.org/specification> (MCP transport layer)
 - **OpenAPI/Swagger**: For documenting MCP tool interfaces
 - **AsyncAPI**: For event-driven MCP patterns
 - **GraphQL**: For complex data querying via MCP
 
 ### Academic Papers and Research
+
 - "Augmenting Language Models with Tools" (Schick et al., 2023)
 - "Constitutional AI: Harmlessness from AI Feedback" (Anthropic, 2022)
 - "Toolformer: Language Models Can Teach Themselves to Use Tools" (Meta, 2023)

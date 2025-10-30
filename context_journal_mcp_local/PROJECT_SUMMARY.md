@@ -9,6 +9,7 @@ A **production-ready, pedagogically-designed MCP server** that teaches context e
 ## 📦 Deliverables
 
 ### **1. Core MCP Server** (`context_journal_mcp.py`)
+
 - **650 lines** of well-documented, production-grade Python
 - **6 CRUD tools** for context management
 - **Pydantic validation** throughout
@@ -20,6 +21,7 @@ A **production-ready, pedagogically-designed MCP server** that teaches context e
 ### **2. Documentation Suite**
 
 **README.md** (9.6KB)
+
 - Complete setup instructions
 - Architecture diagrams
 - Tool reference with examples
@@ -27,6 +29,7 @@ A **production-ready, pedagogically-designed MCP server** that teaches context e
 - Troubleshooting guide
 
 **INSTRUCTOR_GUIDE.md** (14KB)
+
 - Complete teaching script with timing
 - Live demo walkthrough
 - Code explanation talking points
@@ -34,12 +37,14 @@ A **production-ready, pedagogically-designed MCP server** that teaches context e
 - Common Q&A responses
 
 **QUICK_REFERENCE.md** (6.4KB)
+
 - Student cheat sheet
 - Command reference
 - Common patterns
 - Challenge exercises
 
 **requirements.txt**
+
 - Minimal dependencies
 - Ready for pip install
 
@@ -50,10 +55,12 @@ A **production-ready, pedagogically-designed MCP server** that teaches context e
 ### **Why This Works for Teaching**
 
 **1. Clear Problem Statement**
+
 - Everyone experiences LLM amnesia
 - Immediate "aha!" moment when MCP solves it
 
 **2. Progressive Complexity**
+
 ```
 Simple JSON file → Azure Cosmos DB
 Local testing → Cloud deployment
@@ -61,16 +68,19 @@ Single user → Enterprise scale
 ```
 
 **3. Familiar Patterns**
+
 - CRUD operations everyone knows
 - No exotic concepts required
 - Natural mental model (journal = memory)
 
 **4. Real Utility**
+
 - Students actually want this tool
 - They'll use it after the class
 - Real-world problem solved
 
 **5. Clear Migration Path**
+
 ```python
 # Phase 1: Local
 def load_journal():
@@ -90,6 +100,7 @@ async def load_journal():
 ## 🏗️ Architecture Highlights
 
 ### **Local Development (Weeks 1-2)**
+
 ```
 ┌──────────────┐
 │ Claude       │
@@ -109,6 +120,7 @@ async def load_journal():
 ```
 
 ### **Azure Production (Weeks 3-4)**
+
 ```
 ┌──────────────┐
 │ Claude       │
@@ -138,11 +150,13 @@ async def load_journal():
 ## 🎬 Your Course Flow
 
 ### **Segment 1: The Problem (10 min)**
+
 - Demo LLM amnesia
 - Introduce MCP as solution
 - Show Context Journal solving it
 
 ### **Segment 2: Building Blocks (45 min)**
+
 - MCP protocol fundamentals
 - Tool registration with `@mcp.tool`
 - Pydantic input validation
@@ -150,6 +164,7 @@ async def load_journal():
 - **Live coding:** Students add a new tool
 
 ### **Segment 3: Advanced Patterns (35 min)**
+
 - Pagination strategies
 - Search implementation
 - Error handling
@@ -157,6 +172,7 @@ async def load_journal():
 - Testing strategies
 
 ### **Segment 4: Azure Production (45 min)**
+
 - Cosmos DB setup
 - Container Apps deployment
 - Managed identity
@@ -170,6 +186,7 @@ async def load_journal():
 ### **Pre-Course Prep (15 minutes)**
 
 **1. Test Environment**
+
 ```bash
 # Clone to course repo
 git clone [your-repo] context-engineering
@@ -183,6 +200,7 @@ python context_journal_mcp.py --help
 ```
 
 **2. Configure Claude Desktop**
+
 ```json
 {
   "mcpServers": {
@@ -195,6 +213,7 @@ python context_journal_mcp.py --help
 ```
 
 **3. Create Demo Data**
+
 ```bash
 # Run these commands in Claude after enabling MCP:
 "Create a context entry about Python best practices..."
@@ -205,6 +224,7 @@ python context_journal_mcp.py --help
 ### **During Course**
 
 **Demo Order:**
+
 1. **Show the amnesia** (no MCP)
 2. **Enable MCP** (restart Claude)
 3. **Create context** (tool calls visible)
@@ -218,30 +238,35 @@ python context_journal_mcp.py --help
 ### **What Makes This Production-Ready**
 
 **✅ Input Validation**
+
 - Pydantic models with constraints
 - Field-level validators
 - Automatic type coercion
 - Clear error messages
 
 **✅ Error Handling**
+
 - Try-except blocks throughout
 - Structured error responses
 - Actionable guidance for users
 - No silent failures
 
 **✅ Response Formats**
+
 - Markdown (human-readable)
 - JSON (machine-readable)
 - Consistent structure
 - Character limits enforced
 
 **✅ Scalability Features**
+
 - Pagination (offset/limit)
 - Search optimization
 - Tag indexing ready
 - Azure-ready architecture
 
 **✅ Code Quality**
+
 - Type hints throughout
 - DRY principle (shared utilities)
 - Docstrings on all tools
@@ -252,24 +277,28 @@ python context_journal_mcp.py --help
 ## 🎯 Learning Outcomes (Your Students Will)
 
 **1. Understand MCP Protocol**
+
 - How tools extend LLM capabilities
 - Tool registration mechanics
 - Input/output contracts
 - Transport mechanisms (stdio/HTTP)
 
 **2. Build Production Tools**
+
 - Input validation with Pydantic
 - Error handling patterns
 - Response formatting
 - Testing strategies
 
 **3. Deploy to Azure**
+
 - Cosmos DB integration
 - Container Apps deployment
 - Managed identity auth
 - Secrets management
 
 **4. Design for Scale**
+
 - Pagination strategies
 - Search optimization
 - Character limits
@@ -282,17 +311,20 @@ python context_journal_mcp.py --help
 ### **For Different Audiences**
 
 **Python Developers**
+
 - Add async/await deep dive
 - Show Pydantic v1 → v2 migration
 - Demonstrate FastMCP vs. low-level SDK
 
 **Azure Architects**
+
 - Focus on Cosmos DB partitioning
 - Show multi-region deployment
 - Discuss cost optimization
 - Demonstrate monitoring setup
 
 **AI Engineers**
+
 - Emphasize context engineering patterns
 - Show integration with other LLMs
 - Discuss vector embeddings addition
@@ -303,12 +335,14 @@ python context_journal_mcp.py --help
 ## 📊 What's Next
 
 ### **Phase 1: Local Development (Weeks 1-2)**
+
 - ✅ JSON file storage
 - ✅ All CRUD operations
 - ✅ Search and pagination
 - ✅ Claude Desktop integration
 
 ### **Phase 2: Azure Migration (Weeks 3-4)**
+
 ```bash
 # 1. Create Cosmos DB
 az cosmosdb create --name context-db --resource-group mcp-rg
@@ -324,6 +358,7 @@ az containerapp create --name context-mcp --image context-mcp:latest
 ```
 
 ### **Phase 3: Enterprise Features (Optional)**
+
 - Multi-user support
 - Vector embeddings for semantic search
 - Context versioning
@@ -336,6 +371,7 @@ az containerapp create --name context-mcp --image context-mcp:latest
 ## 🏆 Success Metrics
 
 **Students Should Be Able To:**
+
 - [ ] Install and run the MCP server locally
 - [ ] Add a new tool to the server
 - [ ] Explain the `@mcp.tool` decorator
@@ -349,21 +385,25 @@ az containerapp create --name context-mcp --image context-mcp:latest
 ## 📚 Additional Resources for Students
 
 **MCP Protocol**
-- https://modelcontextprotocol.io
-- https://github.com/modelcontextprotocol/specification
+
+- <https://modelcontextprotocol.io>
+- <https://github.com/modelcontextprotocol/specification>
 
 **FastMCP Python SDK**
-- https://github.com/modelcontextprotocol/python-sdk
-- https://pypi.org/project/mcp/
+
+- <https://github.com/modelcontextprotocol/python-sdk>
+- <https://pypi.org/project/mcp/>
 
 **Pydantic Documentation**
-- https://docs.pydantic.dev
-- https://github.com/pydantic/pydantic
+
+- <https://docs.pydantic.dev>
+- <https://github.com/pydantic/pydantic>
 
 **Azure Resources**
-- Cosmos DB: https://docs.microsoft.com/azure/cosmos-db/
-- Container Apps: https://docs.microsoft.com/azure/container-apps/
-- Python SDK: https://docs.microsoft.com/python/azure/
+
+- Cosmos DB: <https://docs.microsoft.com/azure/cosmos-db/>
+- Container Apps: <https://docs.microsoft.com/azure/container-apps/>
+- Python SDK: <https://docs.microsoft.com/python/azure/>
 
 ---
 
@@ -392,6 +432,7 @@ Azure, Cosmos DB, Container Apps = résumé builders.
 ## 🚀 Final Thoughts
 
 **You've got a complete, production-ready MCP server that:**
+
 - ✅ Teaches core concepts clearly
 - ✅ Solves a real problem students care about
 - ✅ Scales from local JSON to Azure Cosmos DB
@@ -406,6 +447,7 @@ Azure, Cosmos DB, Container Apps = résumé builders.
 ## 📞 Support During Course
 
 **Common Issues:**
+
 1. **"Server not showing"** → Check config path, restart Claude
 2. **"Import errors"** → `pip install mcp pydantic`
 3. **"Tool not called"** → Check annotations, verify input schema

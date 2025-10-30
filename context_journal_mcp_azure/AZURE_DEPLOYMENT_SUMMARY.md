@@ -1,6 +1,6 @@
 # Azure Deployment Package - Summary
 
-## 🎉 Complete Azure Deployment Package Ready!
+## 🎉 Complete Azure Deployment Package Ready
 
 [**Download Azure Deployment Package**](computer:///mnt/user-data/outputs/azure-deployment.zip) (18KB)
 
@@ -11,6 +11,7 @@
 ### **Complete Azure-Ready MCP Server**
 
 **1. context_journal_mcp_azure.py** (32KB)
+
 - ✅ Full Cosmos DB integration with async Azure SDK
 - ✅ Managed identity support (no keys in code)
 - ✅ Connection pooling and lifecycle management
@@ -21,6 +22,7 @@
 ### **2. Deployment Scripts**
 
 **deploy.sh** (Bash for macOS/Linux)
+
 - Complete automated deployment
 - Resource creation with validation
 - Idempotent (safe to run multiple times)
@@ -28,6 +30,7 @@
 - Error handling
 
 **deploy.ps1** (PowerShell for Windows)
+
 - Same functionality as bash version
 - Windows-optimized commands
 - PowerShell conventions
@@ -35,12 +38,14 @@
 ### **3. Docker Configuration**
 
 **Dockerfile**
+
 - Optimized multi-stage build
 - Non-root user for security
 - Health checks
 - Small image size (~150MB)
 
 **.dockerignore**
+
 - Excludes unnecessary files
 - Faster builds
 - Smaller images
@@ -48,11 +53,13 @@
 ### **4. Configuration Files**
 
 **requirements-azure.txt**
+
 - All Azure SDK dependencies
 - Pinned versions for stability
 - Includes: azure-cosmos, azure-identity
 
 **.env.example**
+
 - Template for environment variables
 - Documents all required settings
 - Security best practices
@@ -60,6 +67,7 @@
 ### **5. Documentation**
 
 **README.md** (20KB)
+
 - Complete deployment guide
 - Manual step-by-step instructions
 - Troubleshooting section
@@ -71,6 +79,7 @@
 ## 🚀 Quick Start (3 Commands)
 
 ### **macOS/Linux:**
+
 ```bash
 unzip azure-deployment.zip
 cd azure-deployment
@@ -78,6 +87,7 @@ cd azure-deployment
 ```
 
 ### **Windows:**
+
 ```powershell
 Expand-Archive azure-deployment.zip
 cd azure-deployment
@@ -87,6 +97,7 @@ cd azure-deployment
 **Deployment Time:** 10-15 minutes
 
 **What It Creates:**
+
 - ✅ Resource Group
 - ✅ Cosmos DB Account (global scale ready)
 - ✅ Database + Container
@@ -146,6 +157,7 @@ cd azure-deployment
 ### **Course Segment 4: Azure Migration (45 minutes)**
 
 **Minute 0-5: Setup & Context**
+
 - Show local version working
 - Explain why we need cloud deployment
 - Introduce Azure architecture
@@ -172,23 +184,27 @@ async def load_all_entries():
 
 **Minute 10-25: Live Deployment**
 Run the deployment script:
+
 ```bash
 ./deploy.sh
 ```
 
 While it runs, explain:
+
 - Resource Group organization
 - Cosmos DB features (global distribution, consistency levels)
 - Container Apps auto-scaling
 - Managed identity benefits
 
 **Minute 25-35: Testing**
+
 - Get deployed URL
 - Test from Claude Desktop
 - Show Azure Portal (resources, metrics, logs)
 - Demonstrate it works identically to local version
 
 **Minute 35-40: Production Considerations**
+
 - Security (managed identity, private endpoints)
 - Monitoring (Application Insights, logs)
 - Scaling (horizontal, vertical)
@@ -203,19 +219,23 @@ While it runs, explain:
 ### **Monthly Costs (Minimal Usage)**
 
 **Cosmos DB:**
+
 - Base: $24/month (400 RU/s)
 - Storage: $0.25/GB/month
 - **Optimization:** Use serverless for dev (~$10/month)
 
 **Container Apps:**
+
 - Compute: $15/month (0.5 vCPU, 1GB RAM, 1 replica)
 - **Optimization:** Scale to 0 when not in use (consumption pricing)
 
 **Container Registry:**
+
 - Basic tier: $5/month
 - Storage: First 10GB included
 
 **Total:**
+
 - Development: ~$25-30/month
 - Production: ~$40-50/month
 
@@ -331,6 +351,7 @@ az cosmosdb show \
 ### **Scaling Strategies**
 
 **Horizontal (more replicas):**
+
 ```bash
 az containerapp update \
   --min-replicas 2 \
@@ -338,6 +359,7 @@ az containerapp update \
 ```
 
 **Vertical (more resources):**
+
 ```bash
 az containerapp update \
   --cpu 1.0 \
@@ -345,6 +367,7 @@ az containerapp update \
 ```
 
 **Auto-scale rules:**
+
 ```bash
 az containerapp update \
   --scale-rule-name http-scaling \
@@ -372,16 +395,19 @@ az cosmosdb show \
 ### **Issue: Container Won't Start**
 
 **Check logs:**
+
 ```bash
 az containerapp logs show --follow
 ```
 
 **Common causes:**
+
 - Missing environment variables
 - Invalid Cosmos DB connection
 - Image pull errors
 
 **Fix:**
+
 ```bash
 # Verify environment variables
 az containerapp show --query properties.template.containers[0].env
@@ -396,6 +422,7 @@ az containerapp update \
 **Cause:** Invalid or expired Cosmos DB key
 
 **Solution:**
+
 ```bash
 # Regenerate key
 NEW_KEY=$(az cosmosdb keys regenerate \
@@ -432,19 +459,20 @@ az group delete \
 
 ### **Azure Documentation**
 
-- Container Apps: https://docs.microsoft.com/azure/container-apps/
-- Cosmos DB: https://docs.microsoft.com/azure/cosmos-db/
-- Container Registry: https://docs.microsoft.com/azure/container-registry/
+- Container Apps: <https://docs.microsoft.com/azure/container-apps/>
+- Cosmos DB: <https://docs.microsoft.com/azure/cosmos-db/>
+- Container Registry: <https://docs.microsoft.com/azure/container-registry/>
 
 ### **MCP Resources**
 
-- Protocol Spec: https://modelcontextprotocol.io
-- Python SDK: https://github.com/modelcontextprotocol/python-sdk
-- Community: https://github.com/modelcontextprotocol/servers
+- Protocol Spec: <https://modelcontextprotocol.io>
+- Python SDK: <https://github.com/modelcontextprotocol/python-sdk>
+- Community: <https://github.com/modelcontextprotocol/servers>
 
 ### **Course Materials**
 
 All course materials available in main package:
+
 - README.md - Local setup
 - INSTRUCTOR_GUIDE.md - Teaching script
 - QUICK_REFERENCE.md - Student cheat sheet
@@ -532,7 +560,7 @@ A: Yes! Just add: monitoring, alerts, backup strategy, multi-region if needed.
 
 ---
 
-## 🚀 You're Ready to Deploy!
+## 🚀 You're Ready to Deploy
 
 1. **Download:** [azure-deployment.zip](computer:///mnt/user-data/outputs/azure-deployment.zip)
 2. **Extract:** `unzip azure-deployment.zip`
