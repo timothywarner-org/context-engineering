@@ -71,12 +71,8 @@ if ! command -v az &> /dev/null; then
 fi
 log_success "Azure CLI found: $(az version --query '"azure-cli"' -o tsv)"
 
-# Check Docker
-if ! command -v docker &> /dev/null; then
-    log_error "Docker not found. Install from: https://docs.docker.com/get-docker/"
-    exit 1
-fi
-log_success "Docker found: $(docker --version | cut -d' ' -f3 | tr -d ',')"
+# Docker not required - using 'az acr build' instead
+log_info "Skipping Docker check (using Azure ACR build)"
 
 # Check Azure login
 if ! az account show &> /dev/null; then
@@ -143,33 +139,33 @@ else
     log_success "ACR created: $ACR_NAME"
 fi
 
-# Login to ACR
-log_info "Logging into ACR: $ACR_NAME"
-az acr login --name "$ACR_NAME"
-log_success "Logged into ACR"
+# ACR login not required for 'az acr build'
+log_info "ACR ready: $ACR_NAME (no login needed for 'az acr build')"
 
 echo ""
 
 # ============================================================
-# Step 3: Build and Push Docker Image
+# Step 3: Build and Push Docker Image (using Azure ACR Build)
 # ============================================================
 
 FULL_IMAGE_NAME="${ACR_NAME}.azurecr.io/${IMAGE_NAME}:${IMAGE_TAG}"
 
-log_info "Building Docker image: $FULL_IMAGE_NAME"
+log_info "Building Docker image in Azure: $FULL_IMAGE_NAME"
+log_info "Using 'az acr build' (no local Docker required)"
 log_info "This may take a few minutes..."
 
 # Change to local directory (where Dockerfile is)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR/../local"
 
-# Build image
-docker build -t "$FULL_IMAGE_NAME" .
-log_success "Docker image built successfully"
+# Build and push image directly in Azure
+az acr build \
+    --registry "$ACR_NAME" \
+    --image "${IMAGE_NAME}:${IMAGE_TAG}" \
+    --file Dockerfile \
+    .
 
-log_info "Pushing image to ACR: $FULL_IMAGE_NAME"
-docker push "$FULL_IMAGE_NAME"
-log_success "Image pushed to ACR"
+log_success "Image built and pushed to ACR"
 
 echo ""
 

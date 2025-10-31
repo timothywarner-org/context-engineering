@@ -32,12 +32,14 @@ git status
 **Purpose**: Demonstrate the AI amnesia problem before introducing MCP as the solution
 
 ### Setup
+
 ```bash
 cd deepseek-context-demo
 npm install
 ```
 
 ### Run Demo
+
 ```bash
 npm start
 ```
@@ -45,6 +47,7 @@ npm start
 ### What to Show
 
 **Script demonstrates**:
+
 - Token counting in real-time with visual progress bar
 - Growing conversation consuming context window (128K tokens)
 - 10 simulated conversation turns
@@ -52,12 +55,14 @@ npm start
 - Actual DeepSeek API call at the end
 
 **Key Teaching Points**:
+
 - Context window limits cause AI to "forget" earlier conversation
 - Token usage grows as conversation history expands
 - This is the **AI amnesia problem** MCP solves
 - Visual progress bar shows consumption (green → yellow → red)
 
 ### Demo Flow
+
 1. Show the code (`contextDemo.js`) briefly
 2. Run `npm start` and let it execute
 3. Point out the progress bar filling up
@@ -70,6 +75,7 @@ npm start
 ## 📦 Part 1: CoreText MCP Local (60 min)
 
 ### Start Inspector
+
 ```bash
 cd coretext-mcp
 npm run inspector
@@ -79,28 +85,41 @@ npm run inspector
 ### Test Tools in Inspector
 
 **Create Memory**:
+
 ```json
-{"content": "MCP enables persistent AI memory", "type": "semantic", "tags": ["mcp", "demo"]}
+{
+  "content": "MCP enables persistent AI context across conversations",
+  "type": "semantic"
+}
 ```
 
 **Read Memory** (use returned UUID):
+
 ```json
 {"id": "uuid-here"}
 ```
 
 **Search**:
+
 ```json
-{"query": "mcp"}
+{"query": "MCP"}
+```
+
+**Enrich** (if API key):
+
+```json
 ```
 
 **Stats** (no args)
 
 **Enrich** (if API key):
+
 ```json
 {"id": "uuid-here"}
 ```
 
 ### View File
+
 ```bash
 cat data/memory.json | jq
 ```
@@ -110,6 +129,7 @@ cat data/memory.json | jq
 ## 🏛️ Part 2: Stoic MCP Local (60 min)
 
 ### Build TypeScript
+
 ```bash
 cd stoic-mcp/local
 npm run build
@@ -117,6 +137,7 @@ ls dist/
 ```
 
 ### Start Inspector
+
 ```bash
 npx @modelcontextprotocol/inspector node dist/index.js
 ```
@@ -126,16 +147,19 @@ npx @modelcontextprotocol/inspector node dist/index.js
 **Random Quote** (no args)
 
 **Search by Author**:
+
 ```json
 {"author": "Marcus Aurelius"}
 ```
 
 **Search by Theme**:
+
 ```json
-{"theme": "courage"}
+{"theme": "stoicism"}
 ```
 
 **Add Quote**:
+
 ```json
 {
   "text": "The best revenge is not to be like your enemy.",
@@ -146,6 +170,7 @@ npx @modelcontextprotocol/inspector node dist/index.js
 ```
 
 **Toggle Favorite** (use quote ID):
+
 ```json
 {"quote_id": "15"}
 ```
@@ -153,21 +178,25 @@ npx @modelcontextprotocol/inspector node dist/index.js
 **Get Favorites** (no args)
 
 **Update Notes**:
+
 ```json
 {"quote_id": "15", "notes": "Remember during debugging!"}
 ```
 
 **Get Explanation** (if API key):
+
 ```json
 {"quote_id": "15"}
 ```
 
 **Generate Quote**:
+
 ```json
 {"theme": "debugging"}
 ```
 
 ### Bulk Import
+
 ```bash
 cat > quotes-source/demo.txt << 'EOF'
 "First, say to yourself what you would be; then do what you have to do." - Epictetus, Discourses
@@ -183,10 +212,12 @@ npm run import demo.txt
 ### Claude Desktop Config
 
 **Location**:
+
 - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
 - Mac: `~/Library/Application Support/Claude/claude_desktop_config.json`
 
 **Config**:
+
 ```json
 {
   "mcpServers": {
@@ -205,6 +236,7 @@ npm run import demo.txt
 ```
 
 **Restart Claude**:
+
 ```bash
 # Windows
 taskkill /IM "Claude.exe" /F
@@ -216,11 +248,13 @@ killall Claude
 ### Test in Claude Desktop
 
 **CoreText**:
+
 ```
 Create a semantic memory: "MCP revolutionizes AI context management"
 ```
 
 **Stoic**:
+
 ```
 Give me a Stoic quote about courage
 ```
@@ -228,6 +262,8 @@ Give me a Stoic quote about courage
 ### VS Code Config
 
 **Location**: `.vscode/mcp.json` in workspace
+
+```json
 
 ```json
 {
@@ -249,11 +285,13 @@ Give me a Stoic quote about courage
 ## ☁️ Part 4: Azure Deployment (60 min)
 
 ### Create Resource Group
+
 ```bash
 az group create --name stoic-rg-demo --location eastus
 ```
 
 ### Create Managed Identity
+
 ```bash
 az identity create --name stoic-msi-demo --resource-group stoic-rg-demo
 
@@ -262,6 +300,7 @@ echo $MSI_PRINCIPAL_ID
 ```
 
 ### Build Docker Image
+
 ```bash
 cd stoic-mcp
 docker build -t stoic-mcp:demo -f Dockerfile .
@@ -269,6 +308,7 @@ docker images | grep stoic
 ```
 
 ### Push to ACR
+
 ```bash
 # Create ACR
 az acr create --name timwarneracr --resource-group stoic-rg-demo --sku Basic
@@ -282,6 +322,7 @@ docker push timwarneracr.azurecr.io/stoic-mcp:v1
 ```
 
 ### Deploy Bicep
+
 ```bash
 az deployment group create \
   --resource-group stoic-rg-demo \
@@ -295,6 +336,7 @@ az deployment group create \
 **Watch in Portal**: Navigate to `stoic-rg-demo` resource group
 
 ### Get Container App URL
+
 ```bash
 STOIC_URL=$(az containerapp show \
   --name stoic-app-* \
@@ -308,6 +350,7 @@ curl https://$STOIC_URL/health
 ```
 
 ### View Logs
+
 ```bash
 az containerapp logs show \
   --name stoic-app-* \
@@ -332,11 +375,13 @@ ContainerAppConsoleLogs_CL
 ## 🧹 Cleanup
 
 ### Delete Azure Resources
+
 ```bash
 az group delete --name stoic-rg-demo --yes --no-wait
 ```
 
 ### Reset Local Data
+
 ```bash
 # CoreText
 cd coretext-mcp
@@ -352,11 +397,13 @@ cp quotes.json quotes-backup.json
 ## 🐛 Quick Troubleshooting
 
 ### Inspector Won't Start
+
 ```bash
 lsof -ti:5173 | xargs kill -9
 ```
 
 ### Claude Desktop Not Loading Servers
+
 1. Check config file location
 2. Validate JSON: `jq . config.json`
 3. Use absolute paths with `\\` on Windows
@@ -364,17 +411,20 @@ lsof -ti:5173 | xargs kill -9
 5. Completely restart Claude (kill process)
 
 ### TypeScript Build Errors
+
 ```bash
 npm install --save-dev @types/node
 npm run build
 ```
 
 ### Azure Deployment Fails (Free Tier)
+
 - Only 1 Cosmos DB free tier per subscription
 - Change `enableFreeTier: false` in Bicep
 - Or use existing free tier account
 
 ### Container App Not Starting
+
 ```bash
 # Check logs
 az containerapp logs show --name stoic-app-* --resource-group stoic-rg-demo --tail 100
@@ -389,18 +439,21 @@ curl http://localhost:3000/health
 ## 📊 Key Stats to Mention
 
 **CoreText MCP**:
+
 - 8 tools (memory CRUD)
 - 3 resources (overview, context-stream, knowledge-graph)
 - 2 memory types (episodic, semantic)
 - JSON storage (~100MB limit)
 
 **Stoic MCP**:
+
 - 9 tools (quote management + AI)
 - TypeScript compiled to JavaScript
 - 18 theme categories
 - Bulk import with auto-detection
 
 **Azure Costs**:
+
 - Cosmos DB Free Tier: $0 (1000 RU/s, 25GB)
 - Container Apps: $1-5/month (scale-to-zero)
 - Key Vault: $0.03/month
@@ -408,6 +461,7 @@ curl http://localhost:3000/health
 - **Total: $3-10/month**
 
 **Scaling**:
+
 - Min replicas: 0 (scale-to-zero)
 - Max replicas: 3
 - CPU: 0.25 cores per replica
@@ -419,6 +473,7 @@ curl http://localhost:3000/health
 ## 🎤 Demo Checklist
 
 **Before Starting**:
+
 - [ ] 5 terminals open
 - [ ] Azure CLI authenticated
 - [ ] Environment variables set
@@ -427,11 +482,13 @@ curl http://localhost:3000/health
 - [ ] Screen sharing tested
 
 **Part 1** (60 min):
+
 - [ ] CoreText code walkthrough (15 min)
 - [ ] MCP Inspector demo (25 min)
 - [ ] Key takeaways (5 min)
 
 **Part 2** (60 min):
+
 - [ ] Stoic code walkthrough (20 min)
 - [ ] TypeScript build (5 min)
 - [ ] MCP Inspector demo (15 min)
@@ -439,11 +496,13 @@ curl http://localhost:3000/health
 - [ ] Key takeaways (5 min)
 
 **Part 3** (30 min):
+
 - [ ] Claude Desktop config (15 min)
 - [ ] Test in Claude (5 min)
 - [ ] VS Code config (10 min)
 
 **Part 4** (60 min):
+
 - [ ] Azure prerequisites (5 min)
 - [ ] Docker build (10 min)
 - [ ] Bicep deployment (15 min)
@@ -453,6 +512,7 @@ curl http://localhost:3000/health
 - [ ] Key takeaways (5 min)
 
 **After Demo**:
+
 - [ ] Q&A session
 - [ ] Share repo link
 - [ ] Show diagrams for reference

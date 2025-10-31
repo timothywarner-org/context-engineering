@@ -28,7 +28,24 @@
       "Bash(az provider register:*)",
       "Bash(az provider show:*)",
       "Bash(az acr build:*)",
-      "Bash(tar czf:*)"
+      "Bash(tar czf:*)",
+      "Bash(npm install:*)",
+      "Bash(az containerapp env list:*)",
+      "Bash(az containerapp env create:*)",
+      "Bash(powershell.exe -Command \"Start-Process ''C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe''\")",
+      "Bash(az acr show:*)",
+      "Bash(ACR_NAME=\"stoicacr$RANDOM\")",
+      "Bash(echo:*)",
+      "Bash(ACR_NAME=stoicacr20531 bash:*)",
+      "Bash(az acr list:*)",
+      "Bash(az cache purge:*)",
+      "Bash(az account:*)",
+      "Bash(az login:*)",
+      "Bash(DEEPSEEK_KEY=\"$DEEPSEEK_API_KEY:-not-configured\")",
+      "Bash(az deployment group create:*)",
+      "Bash(az cosmosdb list:*)",
+      "Bash(az containerapp list:*)",
+      "Bash(az containerapp show:*)"
     ],
     "deny": []
   }

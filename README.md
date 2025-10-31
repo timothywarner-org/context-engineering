@@ -23,6 +23,26 @@ Welcome to the training hub for mastering **Context Engineering with Model Conte
 
 ---
 
+## First-Party Reference Docs
+
+- **[Claude MCP Documentation](https://docs.claude.com/en/docs/mcp)** - Official Claude integration guide
+- **[MCP Specification 2025-06-18](https://modelcontextprotocol.io/specification/2025-06-18)** - Latest protocol specification
+- **[Model Context Protocol Organization](https://github.com/modelcontextprotocol)** - Official MCP GitHub organization with core repositories
+- **[MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk)** - Official TypeScript/JavaScript SDK for building MCP servers and clients
+- **[Official MCP Servers Collection](https://github.com/modelcontextprotocol/servers)** - Anthropic's curated collection of production-ready MCP servers
+- **[Introduction to Model Context Protocol Course](https://anthropic.skilljar.com/introduction-to-model-context-protocol)** - Free training course by Anthropic
+- **[MCP Servers Directory](https://mcpservers.org/)** - Community-maintained directory of available MCP servers
+- **[Awesome MCP Servers](https://github.com/appcypher/awesome-mcp-servers)** - Curated list of community MCP server implementations
+- **[MCP Community Hub](https://github.com/mcp)** - Community-driven MCP projects and resources
+- **[Zapier MCP Server Collection](https://mcp.zapier.com/mcp/servers/)** - Zapier's MCP server implementations and integrations
+- **[GitHub MCP Server](https://github.com/github/github-mcp-server)** - Official GitHub MCP server for repository integration
+
+
+
+
+
+
+
 ## 📆 **Course Plan Overview**
 
 This hands-on course is structured into 4 segments, each approximately 50 minutes:

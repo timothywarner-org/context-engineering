@@ -17,9 +17,9 @@ DEMO_RUNBOOK.md
 IMPORT_GUIDE.md
 SCHEMA_MIGRATION.md
 
-# Source (we copy dist/ instead)
-src/
-tsconfig.json
+# Source (needed for multi-stage Docker build)
+# src/
+# tsconfig.json
 
 # Test files
 test/
