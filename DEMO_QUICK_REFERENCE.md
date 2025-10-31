@@ -74,6 +74,8 @@ npm start
 
 ## 📦 Part 1: CoreText MCP Local (60 min)
 
+**Architecture Diagram**: [coretext-mcp-local.md](diagrams/coretext-mcp-local.md)
+
 ### Start Inspector
 
 ```bash
@@ -127,6 +129,8 @@ cat data/memory.json | jq
 ---
 
 ## 🏛️ Part 2: Stoic MCP Local (60 min)
+
+**Architecture Diagram**: [stoic-mcp-local.md](diagrams/stoic-mcp-local.md)
 
 ### Build TypeScript
 
