@@ -6,10 +6,10 @@
  * Author: Tim Warner - TechTrainerTim.com
  * Purpose: O'Reilly Live Training - Context Engineering with MCP
  * Date: October 31, 2024
- * 
+ *
  * TEACHING FLOW:
  * 1. Start with "AI Amnesia" - show ChatGPT forgetting
- * 2. Deploy this server - show persistence across sessions  
+ * 2. Deploy this server - show persistence across sessions
  * 3. Demo CRUD operations - create, read, update, delete memories
  * 4. Show enrichment - Deepseek API integration
  * 5. Explore resources - context stream and knowledge graph
@@ -32,6 +32,10 @@ import { v4 as uuidv4 } from 'uuid';
 import dotenv from 'dotenv';
 import https from 'https';
 import http from 'http';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
 
 dotenv.config();
 
@@ -40,9 +44,50 @@ const __dirname = path.dirname(__filename);
 const DATA_PATH = path.join(__dirname, '..', 'data', 'memory.json');
 
 /**
+ * UTILITY: Force kill any process using a given port
+ * Needed because health server may not clean up properly on crashes
+ */
+async function killPort(port) {
+  try {
+    console.error(`🔍 Checking for processes on port ${port}...`);
+
+    // Windows: Use netstat to find PID, then taskkill
+    const { stdout } = await execAsync(`netstat -ano | findstr :${port}`);
+
+    if (stdout.trim()) {
+      const lines = stdout.trim().split('\n');
+      const pids = new Set();
+
+      for (const line of lines) {
+        // Extract PID from the last column of netstat output
+        const parts = line.trim().split(/\s+/);
+        const pid = parts[parts.length - 1];
+        if (pid && !isNaN(pid)) {
+          pids.add(pid);
+        }
+      }
+
+      for (const pid of pids) {
+        try {
+          await execAsync(`taskkill /F /PID ${pid}`);
+          console.error(`   ✅ Killed process ${pid} on port ${port}`);
+        } catch (killError) {
+          console.error(`   ⚠️  Could not kill PID ${pid}: ${killError.message}`);
+        }
+      }
+    } else {
+      console.error(`   ✅ Port ${port} is available`);
+    }
+  } catch (error) {
+    // If netstat fails (no processes found), that's good - port is free
+    console.error(`   ✅ Port ${port} is available`);
+  }
+}
+
+/**
  * MEMORY ENTRY CLASS
  * TEACHING POINT: Episodic vs Semantic memory
- * - Episodic: "I met with the client at 2pm on Tuesday" 
+ * - Episodic: "I met with the client at 2pm on Tuesday"
  * - Semantic: "The client prefers email over phone calls"
  */
 class MemoryEntry {
@@ -58,7 +103,7 @@ class MemoryEntry {
       enriched: false,
       lastAccessed: null
     };
-    this.embeddings = null; 
+    this.embeddings = null;
     this.tags = metadata.tags || [];
     this.enrichment = null;
   }
@@ -77,7 +122,7 @@ class MemoryManager {
   async initialize() {
     try {
       await fs.mkdir(path.dirname(DATA_PATH), { recursive: true });
-      
+
       try {
         const data = await fs.readFile(DATA_PATH, 'utf-8');
         const parsed = JSON.parse(data);
@@ -89,7 +134,7 @@ class MemoryManager {
         console.error('📝 Starting with empty memory store');
         await this.createDemoMemories();
       }
-      
+
       this.initialized = true;
     } catch (error) {
       console.error('❌ Failed to initialize:', error);
@@ -115,7 +160,7 @@ class MemoryManager {
         tags: ["azure", "containers", "serverless", "demo"]
       }
     ];
-    
+
     for (const demo of demos) {
       await this.create(demo.content, demo.type, { tags: demo.tags });
     }
@@ -149,7 +194,7 @@ class MemoryManager {
   async update(id, updates) {
     const memory = this.memories.get(id);
     if (!memory) return null;
-    
+
     Object.assign(memory, updates);
     memory.metadata.updated = new Date().toISOString();
     await this.persist();
@@ -205,23 +250,23 @@ class MemoryManager {
 
   identifyClusterTheme(nodeIds) {
     const clusterMemories = nodeIds.map(id => this.memories.get(id)).filter(Boolean);
-    
+
     const episodicCount = clusterMemories.filter(m => m.type === 'episodic').length;
     const semanticCount = clusterMemories.filter(m => m.type === 'semantic').length;
-    
+
     if (episodicCount > semanticCount * 2) return 'Timeline/Events';
     if (semanticCount > episodicCount * 2) return 'Knowledge/Facts';
-    
+
     const categories = {};
     clusterMemories.forEach(m => {
       if (m.enrichment && m.enrichment.category) {
         categories[m.enrichment.category] = (categories[m.enrichment.category] || 0) + 1;
       }
     });
-    
+
     const topCategory = Object.entries(categories)
       .sort((a, b) => b[1] - a[1])[0];
-    
+
     return topCategory ? topCategory[0] : 'Mixed';
   }
 }
@@ -235,13 +280,13 @@ class MemoryManager {
  */
 class DeepseekEnrichmentService {
   constructor() {
-    this.apiKey = process.env.DEEPSEEK_API_KEY || 
-                  process.env.DEEPSEEK_KEY || 
+    this.apiKey = process.env.DEEPSEEK_API_KEY ||
+                  process.env.DEEPSEEK_KEY ||
                   null;
-    
+
     this.baseUrl = 'api.deepseek.com';
     this.model = 'deepseek-chat';
-    
+
     if (this.apiKey) {
       console.error(`🔑 Deepseek API configured (key ending in: ...${this.apiKey.slice(-4)})`);
     } else {
@@ -251,14 +296,14 @@ class DeepseekEnrichmentService {
 
   async enrich(memory) {
     console.error(`🧪 Enriching memory: ${memory.id.substring(0, 8)}...`);
-    
+
     if (!this.apiKey) {
       return this.fallbackEnrich(memory);
     }
 
     try {
       const startTime = Date.now();
-      
+
       const enrichmentPrompt = `Analyze this memory entry and provide:
 1. A concise summary (max 50 words)
 2. Top 5 keywords
@@ -341,9 +386,9 @@ Respond with valid JSON only, no markdown.`;
 
   fallbackEnrich(memory) {
     console.error('   📝 Using local enrichment (no API)');
-    
+
     const text = memory.content.toLowerCase();
-    
+
     const stopWords = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'was', 'are', 'were']);
     const words = text.split(/\W+/).filter(w => w.length > 3 && !stopWords.has(w));
     const wordFreq = {};
@@ -355,7 +400,7 @@ Respond with valid JSON only, no markdown.`;
 
     const positiveWords = ['good', 'great', 'excellent', 'amazing', 'wonderful', 'fantastic', 'success', 'achieved'];
     const negativeWords = ['bad', 'poor', 'terrible', 'awful', 'failed', 'error', 'problem', 'issue'];
-    
+
     let sentiment = 'neutral';
     const posCount = positiveWords.filter(w => text.includes(w)).length;
     const negCount = negativeWords.filter(w => text.includes(w)).length;
@@ -409,7 +454,7 @@ class CoreTextServer {
 
     this.memoryManager = new MemoryManager();
     this.enrichmentService = new DeepseekEnrichmentService();
-    
+
     this.setupHandlers();
   }
 
@@ -423,13 +468,13 @@ class CoreTextServer {
           inputSchema: {
             type: 'object',
             properties: {
-              content: { 
-                type: 'string', 
-                description: 'The content to remember (fact, event, or information)' 
+              content: {
+                type: 'string',
+                description: 'The content to remember (fact, event, or information)'
               },
-              type: { 
-                type: 'string', 
-                enum: ['episodic', 'semantic'], 
+              type: {
+                type: 'string',
+                enum: ['episodic', 'semantic'],
                 description: 'Memory type - episodic for events, semantic for facts',
                 default: 'semantic'
               },
@@ -493,8 +538,8 @@ class CoreTextServer {
             type: 'object',
             properties: {
               query: { type: 'string', description: 'Search query (searches content and tags)' },
-              limit: { 
-                type: 'number', 
+              limit: {
+                type: 'number',
                 description: 'Max results to return',
                 default: 10
               }
@@ -557,12 +602,12 @@ class CoreTextServer {
               args.type || 'semantic',
               { tags: args.tags || [] }
             );
-            
+
             if (args.enrich) {
               memory = await this.enrichmentService.enrich(memory);
               await this.memoryManager.update(memory.id, memory);
             }
-            
+
             return {
               content: [
                 {
@@ -590,7 +635,7 @@ class CoreTextServer {
                 }]
               };
             }
-            
+
             return {
               content: [{
                 type: 'text',
@@ -606,7 +651,7 @@ class CoreTextServer {
             const updates = {};
             if (args.content) updates.content = args.content;
             if (args.tags) updates.tags = args.tags;
-            
+
             const memory = await this.memoryManager.update(args.id, updates);
             if (!memory) {
               return {
@@ -619,7 +664,7 @@ class CoreTextServer {
                 }]
               };
             }
-            
+
             return {
               content: [{
                 type: 'text',
@@ -648,7 +693,7 @@ class CoreTextServer {
           case 'memory_search': {
             const results = await this.memoryManager.search(args.query);
             const limited = results.slice(0, args.limit || 10);
-            
+
             return {
               content: [{
                 type: 'text',
@@ -667,7 +712,7 @@ class CoreTextServer {
             const typeFilter = args.type === 'all' ? null : args.type;
             const memories = await this.memoryManager.list(typeFilter);
             const limited = memories.slice(0, args.limit || 20);
-            
+
             return {
               content: [{
                 type: 'text',
@@ -687,16 +732,16 @@ class CoreTextServer {
             const episodic = memories.filter(m => m.type === 'episodic').length;
             const semantic = memories.filter(m => m.type === 'semantic').length;
             const enriched = memories.filter(m => m.metadata.enriched).length;
-            
+
             const stats = {
               total: memories.length,
               episodic: episodic,
               semantic: semantic,
               enriched: enriched,
-              enrichmentRate: memories.length > 0 ? 
+              enrichmentRate: memories.length > 0 ?
                 `${(enriched / memories.length * 100).toFixed(1)}%` : '0%',
               tags: [...new Set(memories.flatMap(m => m.tags))],
-              mostAccessed: memories.sort((a, b) => 
+              mostAccessed: memories.sort((a, b) =>
                 (b.metadata.accessCount || 0) - (a.metadata.accessCount || 0)
               ).slice(0, 5).map(m => ({
                 id: m.id,
@@ -704,7 +749,7 @@ class CoreTextServer {
                 accessCount: m.metadata.accessCount
               }))
             };
-            
+
             return {
               content: [{
                 type: 'text',
@@ -729,10 +774,10 @@ class CoreTextServer {
                 }]
               };
             }
-            
+
             memory = await this.enrichmentService.enrich(memory);
             await this.memoryManager.update(memory.id, memory);
-            
+
             return {
               content: [{
                 type: 'text',
@@ -790,7 +835,7 @@ class CoreTextServer {
     this.server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
       const { uri } = request.params;
       console.error(`\n📄 Resource accessed: ${uri}`);
-      
+
       // ========== MEMORY OVERVIEW RESOURCE ==========
       if (uri === 'memory://overview') {
         const memories = await this.memoryManager.list();
@@ -800,22 +845,22 @@ class CoreTextServer {
           semantic: memories.filter(m => m.type === 'semantic').length,
           enriched: memories.filter(m => m.metadata.enriched).length
         };
-        
+
         const recentMemories = memories
           .sort((a, b) => new Date(b.metadata.updated) - new Date(a.metadata.updated))
           .slice(0, 5);
-        
+
         const mostAccessed = memories
           .sort((a, b) => (b.metadata.accessCount || 0) - (a.metadata.accessCount || 0))
           .slice(0, 5);
-        
+
         const tagFreq = {};
         memories.forEach(m => {
           (m.tags || []).forEach(tag => {
             tagFreq[tag] = (tagFreq[tag] || 0) + 1;
           });
         });
-        
+
         return {
           contents: [
             {
@@ -826,7 +871,7 @@ class CoreTextServer {
 ## 📊 Current Statistics
 - **Total Memories**: ${stats.total}
 - **Episodic**: ${stats.episodic} (event-based memories)
-- **Semantic**: ${stats.semantic} (fact-based memories)  
+- **Semantic**: ${stats.semantic} (fact-based memories)
 - **AI-Enriched**: ${stats.enriched}
 - **Enrichment Coverage**: ${stats.total > 0 ? (stats.enriched / stats.total * 100).toFixed(1) : 0}%
 
@@ -869,12 +914,12 @@ User: "Remember we discussed the Azure migration at 2pm today"
           ]
         };
       }
-      
+
       // ========== CONTEXT STREAM RESOURCE ==========
       if (uri === 'memory://context-stream') {
         // TEACHING POINT: This shows "working memory" - what's currently relevant
         const memories = await this.memoryManager.list();
-        
+
         const contextStream = memories
           .map(m => ({
             ...m,
@@ -885,11 +930,11 @@ User: "Remember we discussed the Azure migration at 2pm today"
           }))
           .sort((a, b) => b.lastRelevantTime - a.lastRelevantTime)
           .slice(0, 20);
-        
+
         const now = Date.now();
         const hour = 60 * 60 * 1000;
         const day = 24 * hour;
-        
+
         const grouped = {
           recent: contextStream.filter(m => now - m.lastRelevantTime < hour),
           today: contextStream.filter(m => {
@@ -898,13 +943,13 @@ User: "Remember we discussed the Azure migration at 2pm today"
           }),
           earlier: contextStream.filter(m => now - m.lastRelevantTime >= day)
         };
-        
+
         const contextSummary = {
           timestamp: new Date().toISOString(),
           teaching_note: "This resource maintains conversation continuity by showing recent context",
           activeTopics: [...new Set(contextStream.flatMap(m => m.tags || []))].slice(0, 10),
-          dominantType: contextStream.filter(m => m.type === 'episodic').length > 
-                         contextStream.filter(m => m.type === 'semantic').length 
+          dominantType: contextStream.filter(m => m.type === 'episodic').length >
+                         contextStream.filter(m => m.type === 'semantic').length
                          ? 'episodic' : 'semantic',
           recentContext: grouped.recent.map(m => ({
             id: m.id,
@@ -933,14 +978,14 @@ User: "Remember we discussed the Azure migration at 2pm today"
             totalMemories: memories.length,
             inContextStream: contextStream.length,
             recentlyActive: grouped.recent.length,
-            enrichmentRate: memories.length > 0 ? 
+            enrichmentRate: memories.length > 0 ?
               `${(memories.filter(m => m.metadata.enriched).length / memories.length * 100).toFixed(1)}%` : '0%',
             avgAccessCount: memories.length > 0 ?
               (memories.reduce((sum, m) => sum + (m.metadata.accessCount || 0), 0) / memories.length).toFixed(1) : '0'
           },
           demo_tip: "Show how this maintains context across conversation turns!"
         };
-        
+
         return {
           contents: [
             {
@@ -951,12 +996,12 @@ User: "Remember we discussed the Azure migration at 2pm today"
           ]
         };
       }
-      
+
       // ========== KNOWLEDGE GRAPH RESOURCE ==========
       if (uri === 'memory://knowledge-graph') {
         // TEACHING POINT: This shows how memories interconnect (semantic network)
         const memories = await this.memoryManager.list();
-        
+
         // Build nodes
         const nodes = memories.map(m => ({
           id: m.id,
@@ -966,22 +1011,22 @@ User: "Remember we discussed the Azure migration at 2pm today"
           accessCount: m.metadata.accessCount || 0,
           tags: m.tags || []
         }));
-        
+
         // Build edges based on shared tags and keywords
         const edges = [];
         for (let i = 0; i < memories.length; i++) {
           for (let j = i + 1; j < memories.length; j++) {
             const m1 = memories[i];
             const m2 = memories[j];
-            
+
             const sharedTags = (m1.tags || []).filter(t => (m2.tags || []).includes(t));
-            
-            const sharedKeywords = m1.enrichment && m2.enrichment ? 
-              (m1.enrichment.keywords || []).filter(k => 
+
+            const sharedKeywords = m1.enrichment && m2.enrichment ?
+              (m1.enrichment.keywords || []).filter(k =>
                 (m2.enrichment.keywords || []).includes(k)) : [];
-            
+
             const strength = sharedTags.length + sharedKeywords.length;
-            
+
             if (strength > 0) {
               edges.push({
                 source: m1.id,
@@ -993,22 +1038,22 @@ User: "Remember we discussed the Azure migration at 2pm today"
             }
           }
         }
-        
+
         // Find clusters
         const clusters = [];
         const visited = new Set();
-        
+
         nodes.forEach(node => {
           if (!visited.has(node.id)) {
             const cluster = [];
             const queue = [node.id];
-            
+
             while (queue.length > 0) {
               const current = queue.shift();
               if (!visited.has(current)) {
                 visited.add(current);
                 cluster.push(current);
-                
+
                 edges.forEach(edge => {
                   if (edge.source === current && !visited.has(edge.target)) {
                     queue.push(edge.target);
@@ -1018,13 +1063,13 @@ User: "Remember we discussed the Azure migration at 2pm today"
                 });
               }
             }
-            
+
             if (cluster.length > 1) {
               clusters.push(cluster);
             }
           }
         });
-        
+
         const knowledgeGraph = {
           metadata: {
             generated: new Date().toISOString(),
@@ -1032,7 +1077,7 @@ User: "Remember we discussed the Azure migration at 2pm today"
             totalNodes: nodes.length,
             totalEdges: edges.length,
             clusters: clusters.length,
-            graphDensity: nodes.length > 1 ? 
+            graphDensity: nodes.length > 1 ?
               (2 * edges.length / (nodes.length * (nodes.length - 1))).toFixed(3) : '0'
           },
           nodes: nodes,
@@ -1059,13 +1104,13 @@ User: "Remember we discussed the Azure migration at 2pm today"
               strength: e.weight,
               basis: [...e.sharedTags, ...e.sharedKeywords]
             })),
-            orphanedMemories: nodes.filter(n => 
+            orphanedMemories: nodes.filter(n =>
               !edges.some(e => e.source === n.id || e.target === n.id)
             ).length
           },
           demo_tip: "Create related memories and watch clusters form!"
         };
-        
+
         return {
           contents: [
             {
@@ -1076,7 +1121,7 @@ User: "Remember we discussed the Azure migration at 2pm today"
           ]
         };
       }
-      
+
       throw new Error(`Resource not found: ${uri}`);
     });
   }
@@ -1090,6 +1135,8 @@ User: "Remember we discussed the Azure migration at 2pm today"
     await this.memoryManager.initialize();
 
     // Start health check endpoint for Azure Container Apps
+    // Note: Port killing is handled by npm run inspector (via kill-ports script)
+    // This keeps the server lightweight and doesn't interfere with stdio transport
     this.startHealthServer();
 
     const transport = new StdioServerTransport();
@@ -1110,7 +1157,8 @@ User: "Remember we discussed the Azure migration at 2pm today"
   }
 
   startHealthServer() {
-    const port = process.env.PORT || 3000;
+    // Use port 3001 to avoid conflict with MCP Inspector (which uses 3000)
+    const port = process.env.HEALTH_PORT || 3001;
 
     const healthServer = http.createServer((req, res) => {
       if (req.url === '/health' && req.method === 'GET') {

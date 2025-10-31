@@ -9,7 +9,8 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
-    "inspector": "npx @modelcontextprotocol/inspector node src/index.js",
+    "kill-ports": "node scripts/kill-ports.js",
+    "inspector": "npm run kill-ports && npx @modelcontextprotocol/inspector node src/index.js",
     "test": "node src/test-client.js",
     "test-api": "node test-api-key.js",
     "demo:reset": "node scripts/demo-reset.js",

@@ -18,12 +18,52 @@ cd /c/github/context-engineering-2
 git status
 
 # Open terminals (5 windows)
-# T1: coretext-mcp
-# T2: stoic-mcp/local
-# T3: Azure CLI
-# T4: MCP Inspector
-# T5: Backup
+# T1: deepseek-context-demo
+# T2: coretext-mcp
+# T3: stoic-mcp/local
+# T4: Azure CLI
+# T5: MCP Inspector
 ```
+
+---
+
+## 🧠 Part 0: DeepSeek Context Demo (15 min)
+
+**Purpose**: Demonstrate the AI amnesia problem before introducing MCP as the solution
+
+### Setup
+```bash
+cd deepseek-context-demo
+npm install
+```
+
+### Run Demo
+```bash
+npm start
+```
+
+### What to Show
+
+**Script demonstrates**:
+- Token counting in real-time with visual progress bar
+- Growing conversation consuming context window (128K tokens)
+- 10 simulated conversation turns
+- Warning when context limit exceeded
+- Actual DeepSeek API call at the end
+
+**Key Teaching Points**:
+- Context window limits cause AI to "forget" earlier conversation
+- Token usage grows as conversation history expands
+- This is the **AI amnesia problem** MCP solves
+- Visual progress bar shows consumption (green → yellow → red)
+
+### Demo Flow
+1. Show the code (`contextDemo.js`) briefly
+2. Run `npm start` and let it execute
+3. Point out the progress bar filling up
+4. Highlight when warnings appear (if context exceeded)
+5. Show final API response
+6. **Transition**: "This is why we need persistent memory... enter MCP!"
 
 ---
 

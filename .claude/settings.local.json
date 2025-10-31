@@ -16,7 +16,19 @@
       "Bash(git commit -m \"$(cat <<''EOF''\nAdd Azure deployment infrastructure for CoreText and Stoic MCP servers\n\nComplete production-ready Azure deployment materials including:\n\nCoreText MCP Deployment:\n- Azure infrastructure with Bicep (Cosmos DB, Container Apps, Key Vault)\n- Automated deployment script with pre-flight checks\n- Multi-stage Docker build with security hardening\n- Comprehensive documentation (README, QUICKSTART, CHECKLIST)\n- MCP Inspector tour guide (40KB comprehensive walkthrough)\n- GitHub Actions CI/CD workflow\n- Validation report with common gotchas\n- Cost-optimized (~$3-10/month)\n\nStoic MCP Deployment:\n- Azure infrastructure with Bicep (Cosmos DB 2 containers, Container Apps)\n- TypeScript build pipeline in Docker\n- Automated deployment script with ACR handling\n- Comprehensive documentation (README, QUICKSTART, CHECKLIST)\n- Validation report for student safety\n- GitHub Actions CI/CD workflow\n- Deployment summary document\n- Cost-optimized (~$8-15/month)\n\nDocumentation:\n- Main RUNBOOK.md updated with Azure deployment sections\n- AZURE_DEPLOYMENT_SUMMARY.md for quick reference\n- GitHub Actions setup guides for both servers\n- Pre/post deployment checklists (80+ items each)\n\nInfrastructure Features:\n- Cosmos DB Free Tier (1000 RU/s, 25GB storage)\n- Scale-to-zero Container Apps (Consumption plan)\n- Secure secrets in Key Vault with Managed Identity\n- RBAC authorization throughout\n- Log Analytics with 30-day retention\n- Health checks and auto-scaling\n- Student-friendly with comprehensive validation\n\nAll files validated and tested for learner use.\n\n🤖 Generated with Claude Code\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
       "Bash(git push:*)",
       "Bash(git commit -m \"$(cat <<''EOF''\nAdd MCP configuration files for Claude Desktop and VS Code\n\nCreate sample configuration files for integrating CoreText and Stoic MCP\nservers with Claude Desktop and VS Code GitHub Copilot:\n\nConfiguration Files:\n- claude_desktop_config.json: Sample config for Claude Desktop\n- mcp.json: Sample config for VS Code GitHub Copilot  \n- CONFIG_GUIDE.md: Comprehensive setup and troubleshooting guide\n\nFeatures:\n- Absolute Windows paths to both MCP servers\n- DeepSeek API key placeholder for AI enrichment\n- Fallback mode instructions (works without API key)\n- Path customization examples (Windows/macOS/Linux)\n- Verification steps and troubleshooting guide\n- Testing instructions for both servers\n\nSetup Requirements:\n- Stoic MCP requires build step (npm run build)\n- CoreText MCP works directly (JavaScript)\n- Both servers support graceful degradation without API key\n\nDocumentation:\n- Complete installation instructions\n- Claude Desktop and VS Code integration\n- Log file locations for debugging\n- Security notes about API key management\n\nReady for students to copy and customize for their environment.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(cat:*)",
+      "Bash(az account show:*)",
+      "Bash(az group:*)",
+      "Bash(az acr create:*)",
+      "Bash(az account list:*)",
+      "Bash(az account set:*)",
+      "Bash(az resource list:*)",
+      "Bash(bash:*)",
+      "Bash(az provider register:*)",
+      "Bash(az provider show:*)",
+      "Bash(az acr build:*)",
+      "Bash(tar czf:*)"
     ],
     "deny": []
   }

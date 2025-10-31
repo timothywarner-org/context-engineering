@@ -13,8 +13,15 @@ import * as dotenv from "dotenv";
 import { encode } from "gpt-tokenizer";
 import chalk from "chalk";
 import cliProgress from "cli-progress";
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
-dotenv.config(); // Load .env variables (e.g., DeepSeek API key)
+// Get the directory of the current module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Force load .env from the script's directory, overriding shell variables
+dotenv.config({ path: join(__dirname, '.env'), override: true });
 
 // ------------------------------------------------------------
 // Configuration
@@ -22,6 +29,15 @@ dotenv.config(); // Load .env variables (e.g., DeepSeek API key)
 const API_KEY = process.env.DEEPSEEK_API_KEY;   // Your DeepSeek API key
 const MODEL = "deepseek-chat";                   // Model name (or deepseek-v3)
 const MAX_CONTEXT_TOKENS = 128000;               // Typical DeepSeek V3 context size
+
+// Validate API key is loaded
+if (!API_KEY) {
+  console.error(chalk.red("❌ ERROR: DEEPSEEK_API_KEY not found in environment!"));
+  console.error(chalk.yellow("Make sure .env file exists and contains: DEEPSEEK_API_KEY=sk-..."));
+  process.exit(1);
+}
+
+console.log(chalk.dim(`Using API key: ****${API_KEY.slice(-4)}`)); // Show last 4 chars for verification
 
 // ------------------------------------------------------------
 // Seed conversation messages
@@ -65,14 +81,18 @@ async function runDemo() {
   console.log(chalk.gray("Each turn expands the conversation and shows current token usage.\n"));
 
   for (let i = 1; i <= 10; i++) {
-    // Add a fake message to expand context
-    messages.push({ role: "user", content: `This is simulated message number ${i}. Please summarize everything so far.` });
+    // Add a fake message to expand context - make it large to show real token growth
+    const filler = `In this turn ${i}, let me provide extensive context about AI systems, machine learning models, neural networks, transformers, attention mechanisms, embeddings, tokenization strategies, fine-tuning approaches, reinforcement learning from human feedback, prompt engineering techniques, few-shot learning, zero-shot capabilities, multi-modal processing, vision transformers, language model architectures, GPT variants, BERT models, T5 configurations, decoder-only models, encoder-decoder frameworks, autoregressive generation, beam search optimization, temperature sampling, top-k filtering, nucleus sampling, perplexity metrics, BLEU scores, ROUGE evaluation, human evaluation protocols, benchmark datasets, training data curation, data augmentation methods, synthetic data generation, adversarial examples, robustness testing, safety alignment, constitutional AI principles, scalable oversight mechanisms, interpretability research, mechanistic interpretability, feature visualization, activation atlases, circuit discovery, polysemantic neurons, superposition hypothesis, sparse autoencoders, dictionary learning, causal scrubbing, path patching, ablation studies, probing classifiers, representation analysis, and emergent capabilities that arise at scale. `.repeat(3);
+    const newMessage = `Turn ${i}: ${filler} Now please summarize everything we've discussed so far in this conversation.`;
+    messages.push({ role: "user", content: newMessage });
 
     const usedTokens = countTokens(messages);
     const percent = ((usedTokens / MAX_CONTEXT_TOKENS) * 100).toFixed(2);
 
     // Print current state
-    console.log(chalk.whiteBright(`\n🗨️  Turn ${i}: ${usedTokens} tokens used (${percent}% of window)\n`));
+    console.log(chalk.whiteBright(`\n🗨️  Turn ${i}: ${usedTokens} tokens used (${percent}% of window)`));
+    console.log(chalk.dim(`   Prompt: "${newMessage.substring(0, 60)}${newMessage.length > 60 ? "..." : ""}"`));
+    console.log(); // blank line before progress bar
     showMeter(usedTokens, MAX_CONTEXT_TOKENS);
 
     // Warn when near or over limit
@@ -111,6 +131,7 @@ async function callAPI(messages) {
 
     console.log(chalk.cyan("Model response:\n"));
     console.log(chalk.white(res.data.choices[0].message.content));
+    console.log(chalk.dim(`\n   (Completion tokens used for this response)`));
 
     // Print usage stats if API returns them
     if (res.data.usage) {
