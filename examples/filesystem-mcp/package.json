@@ -1,0 +1,30 @@
+{
+  "name": "filesystem-mcp",
+  "version": "1.0.0",
+  "description": "Filesystem MCP Server - Safe filesystem access for AI agents",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "filesystem-mcp": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "filesystem",
+    "file-access",
+    "example"
+  ],
+  "author": "MCP Training",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "glob": "^10.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  }
+}

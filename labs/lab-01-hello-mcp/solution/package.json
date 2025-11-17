@@ -1,0 +1,17 @@
+{
+  "name": "hello-mcp-solution",
+  "version": "1.0.0",
+  "description": "Lab 01 Solution: Your First MCP Server",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "keywords": ["mcp", "model-context-protocol", "lab", "solution"],
+  "author": "MCP Training",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "dotenv": "^16.4.0"
+  }
+}
