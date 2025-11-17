@@ -1,0 +1,30 @@
+{
+  "name": "task-manager-mcp",
+  "version": "1.0.0",
+  "description": "Local MCP server for task management with persistent storage",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "task-manager-mcp": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node src/index.js"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "task-manager",
+    "todo",
+    "tasks",
+    "productivity"
+  ],
+  "author": "MCP in Practice Training Course",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "name": "knowledge-base-mcp",
+  "version": "1.0.0",
+  "description": "Remote MCP server for knowledge base management with Azure deployment support",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "PORT=3000 API_KEY=dev-key node src/index.js",
+    "test": "curl -X GET http://localhost:3000/health"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "knowledge-base",
+    "documents",
+    "search",
+    "azure",
+    "remote",
+    "sse"
+  ],
+  "author": "MCP in Practice Training Course",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
