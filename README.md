@@ -4,6 +4,62 @@
 
 Welcome to the training hub for mastering **Context Engineering with Model Context Protocol (MCP)**. Whether you're building AI applications or deepening your understanding of persistent AI memory, this guide provides everything you need to implement production-ready context systems.
 
+---
+
+## 🚦 Quick Start for Students
+
+**New to this course?** Start here:
+
+1. **📖 [Student Setup Guide](STUDENT_SETUP_GUIDE.md)** - Prepare your environment before class (30-60 min)
+
+2. **✅ [Validate Environment](validate-environment.js)** - Run `node validate-environment.js` to check your setup
+
+3. **🆘 [Troubleshooting FAQ](TROUBLESHOOTING_FAQ.md)** - Quick fixes for common issues
+
+4. **📊 [Implementation Guide](IMPLEMENTATION_GUIDE.md)** - Choose the right MCP pattern for your needs
+
+5. **🔬 [Hands-On Labs](labs/)** - Progressive exercises from beginner to advanced
+
+6. **📚 [Post-Course Resources](POST_COURSE_RESOURCES.md)** - Continue learning after the training
+
+**During class:** Keep [TROUBLESHOOTING_FAQ.md](TROUBLESHOOTING_FAQ.md) open in a tab for quick reference.
+
+**After class:** Check [POST_COURSE_RESOURCES.md](POST_COURSE_RESOURCES.md) for next steps and learning paths.
+
+---
+
+## 📂 Repository Structure at a Glance
+
+```
+context-engineering/
+├── 📖 STUDENT_SETUP_GUIDE.md        # ⭐ Start here before class
+├── ✅ validate-environment.js       # ⭐ Verify your setup
+├── 🆘 TROUBLESHOOTING_FAQ.md        # ⭐ Common issues & fixes
+├── 📊 IMPLEMENTATION_GUIDE.md       # Choose the right pattern
+├── 📚 POST_COURSE_RESOURCES.md      # After-class learning paths
+│
+├── 🔬 labs/                         # Hands-on exercises
+│   ├── lab-01-hello-mcp/           # Your first MCP server (30 min)
+│   ├── lab-02-tool-calling/        # Multi-tool patterns (45 min)
+│   ├── lab-03-resources/           # Dynamic data (45 min)
+│   ├── lab-04-memory-patterns/     # Persistent memory (60 min)
+│   ├── lab-05-production/          # Azure deployment (60 min)
+│   └── lab-06-advanced/            # Vector search & orchestration (90 min)
+│
+├── 📦 examples/                     # Reference implementations
+│   ├── filesystem-mcp/             # File operations
+│   ├── database-mcp/               # SQL queries
+│   └── api-mcp/                    # External API integration
+│
+├── 🚀 coretext-mcp/                # Main teaching example (JavaScript)
+├── 📘 stoic-mcp/                   # TypeScript production example
+├── 🐍 context_journal_mcp_local/  # Python implementation
+└── 📊 diagrams/                    # Architecture diagrams
+
+```
+
+---
+
 📋 **Looking for the course plan?** View the [Context Engineering Course Plan](course-plan.md)!
 
 [![Build Status](https://github.com/timothywarner-org/coretext-mcp/actions/workflows/build.yml/badge.svg)](https://github.com/timothywarner-org/coretext-mcp/actions)
@@ -48,24 +104,28 @@ Welcome to the training hub for mastering **Context Engineering with Model Conte
 This hands-on course is structured into 4 segments, each approximately 50 minutes:
 
 1. **Understanding Context - Why Your AI Has Amnesia (50 min)**
+
    - Token budgets, context windows, and tokenization fundamentals
    - Live demo: ChatGPT vs Claude with MCP
    - Hands-on with Claude Desktop and VS Code GitHub Copilot
    - Configure your first MCP server for persistent context
 
 2. **Building Local MCP Servers - Your First Context System (50 min)**
+
    - Build production-ready MCP servers with TypeScript/Python SDK
    - Implement tools, resources, and prompts for AI discovery
    - Test with MCP Inspector browser tool
    - Create GitHub repository integration for long-term memory
 
 3. **Azure Deployment - From Local to Cloud-Scale Memory (50 min)**
+
    - Deploy MCP servers to Azure App Service
    - Configure authentication, secrets, and Key Vault integration
    - Implement persistent storage with Azure Cosmos DB
    - Monitor with Application Insights and logging
 
 4. **Advanced Patterns - Multi-Agent Memory Architectures (50 min)**
+
    - Design episodic, semantic, and working memory systems
    - Implement vector search with Azure AI Search
    - Build multi-agent orchestration across ChatGPT, Claude, and Copilot
@@ -214,25 +274,33 @@ Essential tools to follow along and practice efficiently:
 ### MCP Development Tools
 
 ```bash
+
 # Install MCP Inspector globally
+
 npm install -g @modelcontextprotocol/inspector
 
 # Install TypeScript SDK
+
 npm install @modelcontextprotocol/sdk
 
 # Install Python SDK
+
 pip install mcp-sdk
+
 ```
 
 ### Azure PowerShell/CLI
 
 ```bash
+
 # Install Azure CLI
 # Windows: winget install Microsoft.AzureCLI
 # Mac: brew install azure-cli
 
 # Install Azure PowerShell module
+
 Install-Module -Name Az -Scope CurrentUser -Repository PSGallery -Force
+
 ```
 
 ---
@@ -249,6 +317,7 @@ Clone the repository and set up your environment:
 git clone https://github.com/timothywarner-org/context-engineering.git
 cd context-engineering
 npm install
+
 ```
 
 ### Lab Setup Guide
@@ -382,6 +451,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     }
   ]
 }));
+
 ```
 
 **Exercise:** Extend the GitHub MCP server to access your own repository and read specific files (10 min)
@@ -415,15 +485,20 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
 **Live Deployment:**
 
 ```bash
+
 # Deploy MCP server to Azure App Service
+
 az webapp up --name coretext-mcp --runtime "NODE:20-lts"
 
 # Configure environment variables
+
 az webapp config appsettings set --name coretext-mcp \
   --settings GITHUB_TOKEN=@Microsoft.KeyVault(...)
 
 # Enable Application Insights
+
 az monitor app-insights component create --app coretext-mcp
+
 ```
 
 **Architecture:**
@@ -436,6 +511,7 @@ Claude Desktop → HTTPS → Azure App Service (MCP Server)
                         Azure Cosmos DB (memory store)
                               ↓
                         Application Insights (monitoring)
+
 ```
 
 **Exercise:** Deploy your GitHub MCP server to Azure and connect Claude Desktop to the remote endpoint (10 min)
@@ -490,13 +566,17 @@ class CustomerServiceMemory {
     });
   }
 }
+
 ```
 
 **Architecture Patterns:**
 
 1. **Episodic Memory**: Time-ordered conversation storage
+
 2. **Semantic Memory**: Vector embeddings for similarity retrieval
+
 3. **Working Memory**: Current task context (4K tokens)
+
 4. **Long-term Memory**: Compressed summaries in Azure Cosmos DB
 
 **Exercise:** Design a memory architecture for your specific use case (e.g., code review bot, documentation assistant, data analyst) (10 min)
@@ -663,40 +743,68 @@ Connect with context engineering practitioners:
 
 ```
 context-engineering/
-├── README.md                    # This file - course hub
-├── course-plan.md              # Detailed 4-segment plan
-├── GETTING-STARTED.md          # Navigation and setup guide
-├── CLAUDE.md                   # Claude Code AI instructions
+├── README.md                           # This file - course hub
+├── course-plan.md                      # Detailed 4-segment plan
+├── STUDENT_SETUP_GUIDE.md             # ⭐ Pre-course environment setup
+├── TROUBLESHOOTING_FAQ.md             # ⭐ Common issues & solutions
+├── IMPLEMENTATION_GUIDE.md            # ⭐ Choose the right MCP pattern
+├── POST_COURSE_RESOURCES.md           # Learning paths after training
+├── validate-environment.js             # ⭐ Environment validation script
+├── CLAUDE.md                           # Claude Code AI instructions
+├── DEMO_SCRIPT.md                      # Complete 4-hour demo script
+├── RUNBOOK.md                          # Execution procedures
 │
 ├── images/
-│   └── cover.png               # Course cover image
+│   └── cover.png                       # Course cover image
 │
-├── labs/                       # Hands-on exercises
-│   ├── LAB-SETUP.md           # Lab environment setup
-│   ├── lab01-context/         # Segment 1 exercises
-│   ├── lab02-local/           # Segment 2 exercises
-│   ├── lab03-azure/           # Segment 3 exercises
-│   └── lab04-advanced/        # Segment 4 exercises
+├── labs/                               # ⭐ Hands-on progressive exercises
+│   ├── README.md                       # Lab overview & navigation
+│   ├── lab-01-hello-mcp/              # Your first MCP server
+│   │   ├── README.md                   # Lab instructions
+│   │   ├── starter/                    # Starting code template
+│   │   └── solution/                   # Reference solution
+│   ├── lab-02-tool-calling/           # Multi-tool patterns (coming soon)
+│   ├── lab-03-resources/              # Resources & context (coming soon)
+│   ├── lab-04-memory-patterns/        # Persistent memory (coming soon)
+│   ├── lab-05-production/             # Azure deployment (coming soon)
+│   └── lab-06-advanced/               # Advanced patterns (coming soon)
 │
-├── examples/                   # Working code samples
-│   ├── filesystem/            # File access MCP server
-│   ├── github/                # GitHub integration
-│   ├── database/              # SQL query tools
-│   └── memory/                # Memory persistence
+├── examples/                           # ⭐ Reference implementations
+│   ├── filesystem-mcp/                # File operations server
+│   │   ├── README.md                   # Full documentation
+│   │   ├── src/index.js                # Server implementation
+│   │   └── package.json
+│   ├── database-mcp/                  # SQL query server (coming soon)
+│   └── api-mcp/                       # API integration (coming soon)
 │
-├── deploy/                     # Azure deployment
-│   ├── bicep/                 # Infrastructure as Code
-│   │   ├── main.bicep         # Main template
-│   │   └── parameters.json    # Configuration
-│   └── scripts/               # Automation scripts
-│       ├── deploy.sh          # Bash deployment
-│       └── deploy.ps1         # PowerShell deployment
+├── coretext-mcp/                      # Main teaching example (JavaScript)
+│   ├── src/index.js                    # Single-file MCP server
+│   ├── scripts/                        # Demo population scripts
+│   ├── azure/                          # Azure Bicep deployment
+│   └── CODE_WALKTHROUGH.md            # Detailed code analysis
 │
-└── docs/                       # Additional documentation
-    ├── mcp-architecture.md    # Architecture deep dive
-    ├── azure-setup.md         # Azure configuration
-    ├── security.md            # Security best practices
-    └── troubleshooting.md     # Common issues & fixes
+├── stoic-mcp/                         # TypeScript production example
+│   ├── local/                          # Local TypeScript implementation
+│   │   ├── src/                        # TypeScript source
+│   │   └── dist/                       # Compiled JavaScript
+│   ├── azure/                          # Azure deployment
+│   └── CODE_WALKTHROUGH.md            # Implementation guide
+│
+├── context_journal_mcp_local/         # Python implementation
+│   ├── context_journal_mcp.py         # Python MCP server
+│   ├── requirements.txt
+│   └── INSTRUCTOR_GUIDE.md            # Teaching notes
+│
+├── diagrams/                           # Architecture diagrams
+│   ├── coretext-mcp-local.md          # CoreText architecture
+│   ├── stoic-mcp-azure.md             # Stoic Azure deployment
+│   └── DIAGRAM_SUMMARY.md             # Diagram index
+│
+└── .github/
+    └── workflows/                      # CI/CD pipelines
+        ├── deploy-coretext-mcp.yml
+        └── deploy-stoic-mcp.yml
+
 ```
 
 ---
@@ -757,9 +865,13 @@ Found an issue or have a suggestion? Contributions are welcome!
 ### How to Contribute
 
 1. **Report Issues**: [Open an issue](https://github.com/timothywarner-org/context-engineering/issues)
+
 2. **Suggest Improvements**: Submit feature requests
+
 3. **Fix Bugs**: Create pull requests with fixes
+
 4. **Share Examples**: Add your MCP server implementations
+
 5. **Improve Documentation**: Help make instructions clearer
 
 ### Contribution Guidelines
@@ -795,3 +907,4 @@ This README is designed for maximum utility and easy navigation. If you have sug
 **Ready to build persistent AI memory?** Start with the [Getting Started Guide](GETTING-STARTED.md) or jump straight to [Lab Setup](labs/LAB-SETUP.md)!
 
 **Questions?** See you in the course, or reach out via the [community channels](#-community--support) above.
+

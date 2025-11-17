@@ -1,0 +1,18 @@
+{
+  "name": "hello-mcp",
+  "version": "1.0.0",
+  "description": "Lab 01: Your First MCP Server - A simple calculator MCP server",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node test-client.js"
+  },
+  "keywords": ["mcp", "model-context-protocol", "lab", "learning"],
+  "author": "MCP Training",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "dotenv": "^16.4.0"
+  }
+}
