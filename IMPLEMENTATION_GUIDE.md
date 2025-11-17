@@ -15,6 +15,7 @@ Do you need persistent memory?
     ├─ File Operations → Filesystem MCP
     ├─ Data Queries → Database MCP
     └─ External Services → API MCP
+
 ```
 
 ---
@@ -61,11 +62,13 @@ Do you need persistent memory?
   metadata: object,
   enrichment?: object  // AI-generated
 }
+
 ```
 
 #### When to Choose
 
 ✅ **Choose CoreText MCP if:**
+
 - You're learning MCP for the first time
 - You need a working example to study
 - You want to prototype memory features quickly
@@ -73,6 +76,7 @@ Do you need persistent memory?
 - You prefer JavaScript over TypeScript
 
 ❌ **Don't choose CoreText MCP if:**
+
 - You need production-grade scalability
 - You require complex TypeScript types
 - You need multi-container deployment
@@ -87,6 +91,7 @@ const result = await client.callTool('create', {
   type: 'episodic',
   metadata: { category: 'preference' }
 });
+
 ```
 
 ---
@@ -116,11 +121,13 @@ interface Quote {
   tags: string[];
   source?: string;
 }
+
 ```
 
 #### When to Choose
 
 ✅ **Choose Stoic MCP if:**
+
 - You're building a production TypeScript application
 - You need strong typing and IDE support
 - You want to deploy to Azure with Cosmos DB
@@ -128,6 +135,7 @@ interface Quote {
 - You prefer monorepo structure
 
 ❌ **Don't choose Stoic MCP if:**
+
 - You're just learning MCP basics
 - You don't need TypeScript
 - You want simple, single-file implementation
@@ -145,6 +153,7 @@ interface GetQuoteParams {
 const quote = await client.callTool<Quote>('get_quote', {
   category: 'resilience'
 });
+
 ```
 
 ---
@@ -165,7 +174,9 @@ const quote = await client.callTool<Quote>('get_quote', {
 #### Architecture
 
 ```python
+
 # Python memory structure
+
 @dataclass
 class JournalEntry:
     id: str
@@ -173,11 +184,13 @@ class JournalEntry:
     timestamp: datetime
     tags: List[str]
     metadata: Dict[str, Any]
+
 ```
 
 #### When to Choose
 
 ✅ **Choose Context Journal MCP if:**
+
 - Your team works primarily in Python
 - You're integrating with data science tools
 - You want to use Jupyter notebooks
@@ -185,6 +198,7 @@ class JournalEntry:
 - You prefer Python's ecosystem
 
 ❌ **Don't choose Context Journal MCP if:**
+
 - Your project is JavaScript/TypeScript
 - You need the largest MCP community (TypeScript SDK is more common)
 - You want the most examples and documentation
@@ -193,13 +207,16 @@ class JournalEntry:
 #### Code Example
 
 ```python
+
 # Python async tool calling
+
 async def create_journal_entry(content: str, tags: List[str]) -> str:
     result = await client.call_tool('create_entry', {
         'content': content,
         'tags': tags
     })
     return result['id']
+
 ```
 
 ---
@@ -220,6 +237,7 @@ async def create_journal_entry(content: str, tags: List[str]) -> str:
 #### When to Choose
 
 ✅ **Choose Filesystem MCP if:**
+
 - AI needs to read/write files
 - You're building code generation tools
 - You need documentation management
@@ -227,6 +245,7 @@ async def create_journal_entry(content: str, tags: List[str]) -> str:
 - You need simple, auditable file access
 
 ❌ **Don't choose Filesystem MCP if:**
+
 - You need remote file access (use API MCP instead)
 - You need complex file transformations
 - You're working with binary files primarily
@@ -245,6 +264,7 @@ const jsFiles = await client.callTool('search_files', {
   pattern: '**/*.js',
   directory: 'src'
 });
+
 ```
 
 ---
@@ -265,6 +285,7 @@ const jsFiles = await client.callTool('search_files', {
 #### When to Choose
 
 ✅ **Choose Database MCP if:**
+
 - AI needs to query your database
 - You're building analytics tools
 - You need natural language to SQL
@@ -272,6 +293,7 @@ const jsFiles = await client.callTool('search_files', {
 - You have existing database infrastructure
 
 ❌ **Don't choose Database MCP if:**
+
 - You don't have a database
 - You need to store AI memory (use Memory MCP instead)
 - You can't provide database credentials securely
@@ -285,6 +307,7 @@ const result = await client.callTool('query', {
   sql: 'SELECT * FROM users WHERE created_at > $1',
   params: ['2024-01-01']
 });
+
 ```
 
 ---
@@ -305,6 +328,7 @@ const result = await client.callTool('query', {
 #### When to Choose
 
 ✅ **Choose API MCP if:**
+
 - AI needs to call external APIs
 - You're integrating third-party services
 - You need webhook support
@@ -312,6 +336,7 @@ const result = await client.callTool('query', {
 - You're building API orchestration
 
 ❌ **Don't choose API MCP if:**
+
 - You're working offline
 - APIs have strict rate limits (add careful throttling)
 - You need complex authentication flows
@@ -329,6 +354,7 @@ const weather = await client.callTool('api_call', {
   },
   params: { city: 'San Francisco' }
 });
+
 ```
 
 ---
@@ -393,6 +419,7 @@ You can run multiple MCP servers simultaneously for different capabilities:
     }
   }
 }
+
 ```
 
 #### Example Use Case: Code Generation with Memory
@@ -401,11 +428,17 @@ You can run multiple MCP servers simultaneously for different capabilities:
 User: "Create a React component using my preferred coding style"
 
 AI workflow:
+
 1. Call memory.search("coding style") → Gets user preferences
+
 2. Call filesystem.read_file("src/components/Example.jsx") → Gets example
+
 3. Generate new component following style
+
 4. Call filesystem.write_file("src/components/New.jsx", code) → Creates file
+
 5. Call memory.create("Created New.jsx component", type: "episodic") → Records action
+
 ```
 
 ---
@@ -417,10 +450,15 @@ AI workflow:
 **When**: You need TypeScript or production database
 
 **Steps**:
+
 1. Convert memory entries to TypeScript interfaces
+
 2. Add build pipeline (tsconfig.json)
+
 3. Migrate JSON data to Cosmos DB (optional)
+
 4. Update tooling for TypeScript
+
 5. Add type-safe validation
 
 ### From JSON File to Database
@@ -428,11 +466,17 @@ AI workflow:
 **When**: You exceed 10K entries or need querying
 
 **Steps**:
+
 1. Export existing JSON data
+
 2. Create database schema
+
 3. Write migration script
+
 4. Update tool handlers to use database
+
 5. Add connection pooling
+
 6. Test queries match JSON behavior
 
 ### From Local to Azure
@@ -440,11 +484,17 @@ AI workflow:
 **When**: You need cloud deployment or sharing
 
 **Steps**:
+
 1. Containerize with Docker
+
 2. Create Azure Bicep templates
+
 3. Set up CI/CD pipeline
+
 4. Configure environment variables
+
 5. Deploy to Azure Container Apps
+
 6. Update clients to use remote URL (if HTTP transport)
 
 ---
@@ -466,6 +516,7 @@ function getCachedMemories() {
   }
   return memoryCache.get('all');
 }
+
 ```
 
 ### Stoic MCP Performance
@@ -480,6 +531,7 @@ const querySpec = {
   query: 'SELECT * FROM c WHERE c.category = @category',
   parameters: [{ name: '@category', value: 'resilience' }]
 };
+
 ```
 
 ### Database MCP Performance
@@ -493,6 +545,7 @@ CREATE INDEX idx_users_created ON users(created_at);
 
 // Use connection pool
 const pool = new Pool({ max: 10 });
+
 ```
 
 ---
@@ -555,6 +608,7 @@ const pool = new Pool({ max: 10 });
 | Context Journal MCP | $0 (local) | $3-5 | $10-20 | $50+ |
 
 **Cost Optimization Tips**:
+
 - Use free tier Cosmos DB (25GB, 1000 RU/s)
 - Enable scale-to-zero on Container Apps
 - Use consumption plan (not dedicated)
@@ -570,6 +624,7 @@ const pool = new Pool({ max: 10 });
 Primary: CoreText MCP (comprehensive example)
 Secondary: Filesystem MCP (utility pattern)
 Optional: Stoic MCP (TypeScript reference)
+
 ```
 
 ### For Production (Enterprise)
@@ -579,6 +634,7 @@ Memory: Stoic MCP (TypeScript + Cosmos DB)
 Files: Filesystem MCP (with enhanced security)
 Data: Database MCP (with read-only mode)
 APIs: API MCP (with rate limiting)
+
 ```
 
 ### For Python Projects
@@ -587,6 +643,7 @@ APIs: API MCP (with rate limiting)
 Memory: Context Journal MCP
 Data: Database MCP (Python variant)
 APIs: API MCP (Python variant)
+
 ```
 
 ---
@@ -594,9 +651,13 @@ APIs: API MCP (Python variant)
 ## Next Steps
 
 1. **Review your use case** against the decision tree
+
 2. **Choose one implementation** to start with
+
 3. **Deploy locally** and test thoroughly
+
 4. **Consider hybrid approach** if you need multiple capabilities
+
 5. **Plan migration path** if you expect to scale
 
 ---
@@ -606,11 +667,17 @@ APIs: API MCP (Python variant)
 Before choosing an implementation:
 
 1. **Language preference**: JavaScript, TypeScript, or Python?
+
 2. **Scale requirements**: How many entries/queries per day?
+
 3. **Deployment target**: Local, Docker, Azure, AWS, GCP?
+
 4. **Persistence needs**: Memory, files, database, external APIs?
+
 5. **Team expertise**: What's your team comfortable with?
+
 6. **Budget**: Development time vs. runtime costs?
+
 7. **Security requirements**: Sandboxing, audit logs, compliance?
 
 ---
@@ -618,6 +685,9 @@ Before choosing an implementation:
 **Remember**: Start simple (CoreText MCP or Filesystem MCP), then scale to more complex implementations (Stoic MCP, Database MCP) as your needs grow.
 
 For questions or clarifications, refer to:
+
 - `TROUBLESHOOTING_FAQ.md` - Common issues
 - `STUDENT_SETUP_GUIDE.md` - Environment setup
 - Individual README files in each implementation directory
+
+

@@ -7,11 +7,15 @@ This FAQ addresses the most common issues students encounter during the course. 
 **Start here if you're stuck:**
 
 ```bash
+
 # Run this diagnostic command in the problematic directory
+
 node --version && npm --version && npm list @modelcontextprotocol/sdk
+
 ```
 
 Expected output:
+
 - Node: v20.x.x or higher
 - npm: 9.x.x or higher
 - MCP SDK: 1.x.x
@@ -21,14 +25,23 @@ Expected output:
 ## 📂 Table of Contents
 
 1. [Installation & Setup Issues](#installation--setup-issues)
+
 2. [MCP Server Won't Start](#mcp-server-wont-start)
+
 3. [Connection & Communication Issues](#connection--communication-issues)
+
 4. [Tool Call Failures](#tool-call-failures)
+
 5. [Claude Desktop Integration](#claude-desktop-integration)
+
 6. [Docker & Container Issues](#docker--container-issues)
+
 7. [Azure Deployment Problems](#azure-deployment-problems)
+
 8. [Performance & Memory Issues](#performance--memory-issues)
+
 9. [API Key & Authentication](#api-key--authentication)
+
 10. [Development Workflow](#development-workflow)
 
 ---
@@ -40,17 +53,23 @@ Expected output:
 **Problem**: Permission denied when installing global packages.
 
 **Solution**:
+
 ```bash
+
 # DON'T use sudo! Instead, reconfigure npm:
+
 mkdir ~/.npm-global
 npm config set prefix ~/.npm-global
 
 # Add to your shell profile (~/.bashrc, ~/.zshrc, etc.)
+
 echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
 source ~/.bashrc
 
 # Now retry
+
 npm install
+
 ```
 
 ### Q: "Python not found" error on Windows
@@ -58,7 +77,9 @@ npm install
 **Problem**: Python installed but not in PATH.
 
 **Solution**:
+
 ```powershell
+
 # Option 1: Reinstall Python with "Add to PATH" checked
 
 # Option 2: Add manually
@@ -67,7 +88,9 @@ npm install
 # 3. Restart terminal
 
 # Verify
+
 python --version
+
 ```
 
 ### Q: Package installation hangs or times out
@@ -75,18 +98,25 @@ python --version
 **Problem**: Network issues or npm registry problems.
 
 **Solution**:
+
 ```bash
+
 # Clear npm cache
+
 npm cache clean --force
 
 # Try with verbose logging
+
 npm install --verbose
 
 # Alternative: Use a different registry
+
 npm config set registry https://registry.npmjs.org/
 
 # Retry
+
 npm install
+
 ```
 
 ### Q: "node-gyp" build failures on Windows
@@ -94,8 +124,11 @@ npm install
 **Problem**: Missing build tools for native dependencies.
 
 **Solution**:
+
 ```powershell
+
 # Install Windows Build Tools (run as Administrator)
+
 npm install -g windows-build-tools
 
 # Or use Visual Studio Build Tools
@@ -103,7 +136,9 @@ npm install -g windows-build-tools
 # Select "Desktop development with C++"
 
 # Retry installation
+
 npm install
+
 ```
 
 ---
@@ -115,22 +150,32 @@ npm install
 **Problem**: Missing dependencies or incorrect import paths.
 
 **Diagnosis**:
+
 ```bash
+
 # Check if dependencies are installed
+
 npm list @modelcontextprotocol/sdk
 
 # Look for broken symlinks
+
 ls -la node_modules/.bin/
+
 ```
 
 **Solution**:
+
 ```bash
+
 # Clean install
+
 rm -rf node_modules package-lock.json
 npm install
 
 # For TypeScript projects, rebuild
+
 npm run build
+
 ```
 
 ### Q: "Address already in use" error (EADDRINUSE)
@@ -140,27 +185,39 @@ npm run build
 **Solution**:
 
 **macOS/Linux:**
+
 ```bash
+
 # Find process using port 3000
+
 lsof -ti:3000
 
 # Kill it
+
 lsof -ti:3000 | xargs kill -9
 
 # Or use the provided script
+
 node scripts/kill-ports.js
+
 ```
 
 **Windows:**
+
 ```powershell
+
 # Find process on port 3000
+
 netstat -ano | findstr :3000
 
 # Kill by PID
+
 taskkill /PID <PID> /F
 
 # Or use PowerShell script
+
 .\scripts\kill-ports.ps1
+
 ```
 
 ### Q: Server starts but immediately exits with no error
@@ -168,15 +225,21 @@ taskkill /PID <PID> /F
 **Problem**: Server process isn't staying alive (common with stdio transport).
 
 **Diagnosis**:
+
 ```bash
+
 # Run with debug output
+
 NODE_ENV=development node src/index.js
 
 # Check for syntax errors
+
 node --check src/index.js
+
 ```
 
 **Solution**:
+
 - Ensure the server isn't exiting prematurely
 - Check for unhandled promise rejections
 - Verify stdio transport is configured correctly
@@ -187,6 +250,7 @@ node --check src/index.js
 **Problem**: Incorrect relative path or file extension.
 
 **Solution**:
+
 ```javascript
 // ❌ Wrong - missing .js extension for ESM
 import { foo } from './utils';
@@ -196,6 +260,7 @@ import { foo } from './utils.js';
 
 // For CommonJS (require), .js is optional
 const { foo } = require('./utils');  // Works
+
 ```
 
 ---
@@ -209,23 +274,33 @@ const { foo } = require('./utils');  // Works
 **Solution**:
 
 1. **Verify server is running:**
+
 ```bash
+
 # Check process
+
 ps aux | grep "node.*index.js"
+
 ```
 
 2. **Check transport type:**
+
    - CoreText/Stoic use **stdio** (not HTTP)
    - Inspector needs to connect via command, not URL
 
 3. **Correct Inspector setup:**
+
 ```bash
+
 # Start Inspector
+
 npx @modelcontextprotocol/inspector
 
 # In Inspector UI, use "Command" mode:
 # Command: node
 # Args: /absolute/path/to/context-engineering/coretext-mcp/src/index.js
+
+
 ```
 
 ### Q: Claude Desktop shows "Server disconnected"
@@ -233,22 +308,28 @@ npx @modelcontextprotocol/inspector
 **Problem**: Server crashed or configuration incorrect.
 
 **Diagnosis**:
+
 ```bash
+
 # Check Claude Desktop logs
 
 # macOS:
+
 tail -f ~/Library/Logs/Claude/mcp*.log
 
 # Windows:
 # %APPDATA%\Claude\logs\mcp*.log
 
 # Linux:
+
 tail -f ~/.config/Claude/logs/mcp*.log
+
 ```
 
 **Solution**:
 
 1. **Verify config file syntax:**
+
 ```json
 {
   "mcpServers": {
@@ -261,20 +342,27 @@ tail -f ~/.config/Claude/logs/mcp*.log
     }
   }
 }
+
 ```
 
 2. **Common config mistakes:**
+
    - ❌ Relative paths instead of absolute
    - ❌ Backslashes not escaped on Windows: `C:\Users\...` → `C:\\Users\\...`
    - ❌ Trailing commas in JSON
    - ❌ Missing `node` command (just providing the .js file)
 
 3. **Test server manually:**
+
 ```bash
+
 # Run the exact command from config
+
 node /absolute/path/to/coretext-mcp/src/index.js
 
 # Should start without errors
+
+
 ```
 
 ### Q: Tools not appearing in Claude Desktop
@@ -284,12 +372,16 @@ node /absolute/path/to/coretext-mcp/src/index.js
 **Solution**:
 
 1. **Check server logs** - look for `server.tool()` registrations
+
 2. **Restart Claude Desktop** - sometimes needed after config changes
+
 3. **Verify tool schema:**
+
 ```javascript
 // Ensure tools are registered BEFORE server.connect()
 server.tool("tool_name", "description", { /* schema */ }, handler);
 server.connect(transport);  // Must be last
+
 ```
 
 ---
@@ -303,6 +395,7 @@ server.connect(transport);  // Must be last
 **Solution**:
 
 **Add error handling:**
+
 ```javascript
 server.tool("my_tool", "Description", schema, async (params) => {
   try {
@@ -319,6 +412,7 @@ server.tool("my_tool", "Description", schema, async (params) => {
     };
   }
 });
+
 ```
 
 ### Q: Tool receives undefined/null parameters
@@ -326,15 +420,18 @@ server.tool("my_tool", "Description", schema, async (params) => {
 **Problem**: Schema mismatch or client sending different format.
 
 **Diagnosis**:
+
 ```javascript
 server.tool("debug_tool", "Test", { /* schema */ }, async (params) => {
   console.error("Received params:", JSON.stringify(params, null, 2));
   // Check what you're actually receiving
   return { content: [{ type: "text", text: "Check console" }] };
 });
+
 ```
 
 **Solution**:
+
 - Verify schema matches expected input
 - Check for required vs. optional properties
 - Add parameter validation
@@ -344,6 +441,7 @@ server.tool("debug_tool", "Test", { /* schema */ }, async (params) => {
 **Problem**: Returning invalid JSON structure.
 
 **Solution**:
+
 ```javascript
 // ❌ Wrong - returning raw string
 return JSON.stringify(result);
@@ -355,6 +453,7 @@ return {
     text: JSON.stringify(result, null, 2)  // Pretty-print for readability
   }]
 };
+
 ```
 
 ### Q: File operations fail with permission errors
@@ -362,6 +461,7 @@ return {
 **Problem**: Insufficient permissions or path issues.
 
 **Solution**:
+
 ```javascript
 // Always use absolute paths
 const path = require('path');
@@ -386,6 +486,7 @@ try {
     throw error;  // Re-throw other errors
   }
 }
+
 ```
 
 ---
@@ -401,23 +502,32 @@ try {
 - **Linux**: `~/.config/Claude/claude_desktop_config.json`
 
 **Create if missing:**
+
 ```bash
+
 # macOS/Linux
+
 mkdir -p ~/Library/Application\ Support/Claude
 touch ~/Library/Application\ Support/Claude/claude_desktop_config.json
 
 # Windows (PowerShell)
+
 New-Item -Path "$env:APPDATA\Claude\claude_desktop_config.json" -ItemType File -Force
+
 ```
 
 ### Q: Changes to config not taking effect
 
 **Solution**:
+
 1. **Fully quit Claude Desktop** (not just close window)
+
    - macOS: Cmd+Q or right-click dock icon → Quit
    - Windows: Right-click system tray icon → Exit
 2. **Wait 5 seconds**
+
 3. **Restart Claude Desktop**
+
 4. **Check for typos** in config (use JSON validator)
 
 ### Q: How to verify server is working in Claude Desktop?
@@ -425,14 +535,21 @@ New-Item -Path "$env:APPDATA\Claude\claude_desktop_config.json" -ItemType File -
 **Test Method**:
 
 1. Open Claude Desktop
+
 2. Start a new conversation
+
 3. Type: "What MCP tools do you have access to?"
+
 4. Claude should list your registered tools
 
 **If tools don't appear:**
+
 ```bash
+
 # Check logs for errors
+
 tail -f ~/Library/Logs/Claude/mcp*.log  # macOS
+
 ```
 
 ### Q: Multiple MCP servers - which one is being used?
@@ -440,6 +557,7 @@ tail -f ~/Library/Logs/Claude/mcp*.log  # macOS
 **Answer**: All configured servers are loaded simultaneously.
 
 **Configuration example:**
+
 ```json
 {
   "mcpServers": {
@@ -453,6 +571,7 @@ tail -f ~/Library/Logs/Claude/mcp*.log  # macOS
     }
   }
 }
+
 ```
 
 Claude has access to tools from **both** servers.
@@ -468,17 +587,23 @@ Claude has access to tools from **both** servers.
 **Solution**:
 
 1. **Enable WSL2:**
+
 ```powershell
+
 # Run as Administrator
+
 wsl --install
 wsl --set-default-version 2
+
 ```
 
 2. **Install WSL2 kernel update:**
+
    - Download: <https://aka.ms/wsl2kernel>
    - Install and restart
 
 3. **Enable virtualization in BIOS:**
+
    - Restart PC
    - Enter BIOS (usually F2, F10, or Del during boot)
    - Enable Intel VT-x or AMD-V
@@ -491,35 +616,47 @@ wsl --set-default-version 2
 **Problem**: Docker not in PATH or daemon not running.
 
 **Solution**:
+
 ```bash
+
 # Verify Docker Desktop is running
 # Check system tray (Windows) or menu bar (macOS)
 
 # macOS - add to PATH if needed
+
 echo 'export PATH="/usr/local/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 
 # Linux - ensure daemon is running
+
 sudo systemctl start docker
 sudo systemctl enable docker
 
 # Verify
+
 docker --version
 docker ps
+
 ```
 
 ### Q: Container exits immediately with exit code 1
 
 **Diagnosis**:
+
 ```bash
+
 # Check container logs
+
 docker logs <container_name>
 
 # Run interactively to see errors
+
 docker run -it <image_name> /bin/sh
+
 ```
 
 **Common causes:**
+
 - Missing environment variables
 - Incorrect entrypoint/command
 - Dependencies not installed in image
@@ -527,15 +664,21 @@ docker run -it <image_name> /bin/sh
 ### Q: "docker build" fails with network timeout
 
 **Solution**:
+
 ```bash
+
 # Increase timeout
+
 docker build --network=host -t myimage .
 
 # Or use build args for proxy
+
 docker build --build-arg HTTP_PROXY=http://proxy:port -t myimage .
 
 # Clear build cache if needed
+
 docker builder prune
+
 ```
 
 ---
@@ -547,32 +690,45 @@ docker builder prune
 **Problem**: Azure CLI not installed.
 
 **Solution**:
+
 ```bash
+
 # macOS
+
 brew install azure-cli
 
 # Windows
+
 winget install Microsoft.AzureCLI
 
 # Linux
+
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
 # Verify
+
 az --version
+
 ```
 
 ### Q: Authentication fails with "az login"
 
 **Solution**:
+
 ```bash
+
 # Clear cached credentials
+
 az account clear
 
 # Re-login with device code (works in any environment)
+
 az login --use-device-code
 
 # Verify logged in
+
 az account show
+
 ```
 
 ### Q: Bicep deployment fails with "resource provider not registered"
@@ -580,35 +736,47 @@ az account show
 **Problem**: Required Azure resource providers not enabled.
 
 **Solution**:
+
 ```bash
+
 # Register required providers
+
 az provider register --namespace Microsoft.App
 az provider register --namespace Microsoft.OperationalInsights
 az provider register --namespace Microsoft.DocumentDB
 
 # Check registration status
+
 az provider show --namespace Microsoft.App --query "registrationState"
 
 # Wait for "Registered" (can take 5-10 minutes)
+
+
 ```
 
 ### Q: Container App deployment succeeds but app doesn't work
 
 **Diagnosis**:
+
 ```bash
+
 # Check container app logs
+
 az containerapp logs show \
   --name <app_name> \
   --resource-group <rg_name> \
   --follow
 
 # Check replica status
+
 az containerapp replica list \
   --name <app_name> \
   --resource-group <rg_name>
+
 ```
 
 **Common issues:**
+
 - Environment variables not set (DEEPSEEK_API_KEY, etc.)
 - Port mismatch (ensure EXPOSE in Dockerfile matches Container App ingress)
 - Secrets not properly referenced
@@ -620,32 +788,41 @@ az containerapp replica list \
 **Solution**:
 
 1. **Verify Managed Identity is assigned:**
+
 ```bash
 az containerapp identity show \
   --name <app_name> \
   --resource-group <rg_name>
+
 ```
 
 2. **Check RBAC role assignment:**
+
 ```bash
 az cosmosdb sql role assignment list \
   --account-name <cosmos_account> \
   --resource-group <rg_name>
+
 ```
 
 3. **Test connection string** (if using key-based auth):
+
 ```bash
+
 # Get connection string
+
 az cosmosdb keys list \
   --name <cosmos_account> \
   --resource-group <rg_name> \
   --type connection-strings
 
 # Verify in Container App environment variables
+
 az containerapp show \
   --name <app_name> \
   --resource-group <rg_name> \
   --query "properties.template.containers[0].env"
+
 ```
 
 ---
@@ -657,19 +834,27 @@ az containerapp show \
 **Problem**: Memory leak or inefficient data structures.
 
 **Diagnosis**:
+
 ```bash
+
 # Monitor Node.js memory
+
 node --expose-gc --trace-gc src/index.js
 
 # Or use built-in profiling
+
 node --prof src/index.js
+
 # Process the log
+
 node --prof-process isolate-*-v8.log > processed.txt
+
 ```
 
 **Solution**:
 
 1. **Implement pagination for large datasets:**
+
 ```javascript
 // ❌ Loading entire database
 const allMemories = JSON.parse(fs.readFileSync('memory.json'));
@@ -679,9 +864,11 @@ function getMemories(limit = 100, offset = 0) {
   const all = JSON.parse(fs.readFileSync('memory.json'));
   return all.slice(offset, offset + limit);
 }
+
 ```
 
 2. **Clear old data:**
+
 ```javascript
 // Implement retention policy
 function cleanOldMemories() {
@@ -690,6 +877,7 @@ function cleanOldMemories() {
   const recent = memories.filter(m => new Date(m.timestamp) > cutoff);
   fs.writeFileSync('memory.json', JSON.stringify(recent, null, 2));
 }
+
 ```
 
 ### Q: High CPU usage when idle
@@ -697,6 +885,7 @@ function cleanOldMemories() {
 **Problem**: Polling loop or inefficient event listeners.
 
 **Solution**:
+
 - Use event-driven patterns instead of polling
 - Implement debouncing for frequent operations
 - Check for runaway intervals/timeouts
@@ -710,8 +899,11 @@ function cleanOldMemories() {
 **Problem**: Invalid or missing API key.
 
 **Verification**:
+
 ```bash
+
 # Test API key directly
+
 curl https://api.deepseek.com/v1/chat/completions \
   -H "Authorization: Bearer YOUR_KEY_HERE" \
   -H "Content-Type: application/json" \
@@ -721,22 +913,30 @@ curl https://api.deepseek.com/v1/chat/completions \
   }'
 
 # Should return JSON response, not 401
+
+
 ```
 
 **Solution**:
+
 1. **Verify key is correct** - regenerate if needed
+
 2. **Check .env file** is loaded:
+
 ```javascript
 require('dotenv').config();
 console.log('API Key loaded:', process.env.DEEPSEEK_API_KEY ? 'YES' : 'NO');
+
 ```
 
 3. **Ensure key is passed to API client:**
+
 ```javascript
 const apiKey = process.env.DEEPSEEK_API_KEY || 'not-configured';
 if (apiKey === 'not-configured') {
   console.warn('Running in fallback mode without AI enrichment');
 }
+
 ```
 
 ### Q: API key exposed in logs or error messages
@@ -744,6 +944,7 @@ if (apiKey === 'not-configured') {
 **Problem**: Security risk - API keys should never be logged.
 
 **Solution**:
+
 ```javascript
 // ❌ Never do this
 console.log('Using API key:', process.env.DEEPSEEK_API_KEY);
@@ -757,6 +958,7 @@ catch (error) {
   const sanitized = error.message.replace(/sk-[a-zA-Z0-9]+/g, 'sk-***');
   console.error('Error:', sanitized);
 }
+
 ```
 
 ---
@@ -768,14 +970,19 @@ catch (error) {
 **Solution**:
 
 **Use nodemon for auto-restart:**
+
 ```bash
+
 # Install nodemon
+
 npm install -g nodemon
 
 # Run with auto-restart
+
 nodemon src/index.js
 
 # Or add to package.json scripts:
+
 {
   "scripts": {
     "dev": "nodemon src/index.js",
@@ -784,7 +991,9 @@ nodemon src/index.js
 }
 
 # Then use:
+
 npm run dev
+
 ```
 
 ### Q: How to debug MCP tool handlers?
@@ -792,6 +1001,7 @@ npm run dev
 **Technique**:
 
 1. **Add verbose logging:**
+
 ```javascript
 server.tool("my_tool", "...", schema, async (params) => {
   console.error("=== TOOL CALL START ===");
@@ -803,19 +1013,26 @@ server.tool("my_tool", "...", schema, async (params) => {
 
   return { content: [{ type: "text", text: JSON.stringify(result) }] };
 });
+
 ```
 
 2. **Use debugger:**
+
 ```bash
+
 # Start with Node inspector
+
 node --inspect src/index.js
 
 # Open Chrome DevTools:
 # chrome://inspect
+
+
 ```
 
 3. **VS Code debugging:**
 Create `.vscode/launch.json`:
+
 ```json
 {
   "version": "0.2.0",
@@ -829,6 +1046,7 @@ Create `.vscode/launch.json`:
     }
   ]
 }
+
 ```
 
 ### Q: How to test changes without Claude Desktop?
@@ -836,18 +1054,26 @@ Create `.vscode/launch.json`:
 **Solution** - Use MCP Inspector or test client:
 
 **Option 1: MCP Inspector**
+
 ```bash
 npx @modelcontextprotocol/inspector
+
 # Connect to your server
 # Test tools interactively
+
+
 ```
 
 **Option 2: Test client script**
+
 ```bash
+
 # Use the provided test client
+
 node src/test-client.js
 
 # Or create custom test
+
 node -e "
 const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
 const { StdioClientTransport } = require('@modelcontextprotocol/sdk/client/stdio.js');
@@ -867,6 +1093,7 @@ async function test() {
 }
 test();
 "
+
 ```
 
 ---
@@ -876,9 +1103,13 @@ test();
 If your issue isn't covered here:
 
 1. **Check server logs** - most issues show up there
+
 2. **Review DEMO_SCRIPT.md** - see working examples
+
 3. **Check coretext-mcp/PORT_FIXES.md** - port-related issues
+
 4. **Search GitHub issues** - may already be solved
+
 5. **Ask during training** - that's what we're here for!
 
 ---
@@ -888,8 +1119,11 @@ If your issue isn't covered here:
 Found a solution to a problem not listed here? Please:
 
 1. Document the problem clearly
+
 2. Include diagnostic steps
+
 3. Provide working solution
+
 4. Submit as course feedback
 
 ---
@@ -897,3 +1131,5 @@ Found a solution to a problem not listed here? Please:
 **Last Updated**: Pre-course preparation
 **Maintainer**: Course instructor
 **Version**: 1.0
+
+
