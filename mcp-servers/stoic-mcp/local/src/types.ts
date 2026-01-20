@@ -16,6 +16,12 @@ export interface QuotesMetadata {
   lastModified: string;
 }
 
+export interface QuoteStorage {
+  getRandomQuote(): Promise<Quote | null>;
+  searchQuotes(params: SearchParams): Promise<Quote[]>;
+  addQuote(quote: Omit<Quote, "id">): Promise<Quote>;
+}
+
 export interface QuotesData {
   metadata: QuotesMetadata;
   quotes: Quote[];

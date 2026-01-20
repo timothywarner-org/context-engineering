@@ -1,26 +1,31 @@
-import { readFile, writeFile } from 'fs/promises';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
-import type { Quote, QuotesData, SearchParams } from './types.js';
+import { readFile, writeFile } from "fs/promises";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
+import type {
+  Quote,
+  QuotesData,
+  SearchParams,
+  QuoteStorage as IQuoteStorage,
+} from "./types.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const QUOTES_FILE = join(__dirname, '..', 'quotes.json');
+const QUOTES_FILE = join(__dirname, "..", "quotes.json");
 
-export class QuoteStorage {
+export class QuoteStorage implements IQuoteStorage {
   private async readQuotes(): Promise<QuotesData> {
     try {
-      const data = await readFile(QUOTES_FILE, 'utf-8');
+      const data = await readFile(QUOTES_FILE, "utf-8");
       return JSON.parse(data);
     } catch (error) {
-      console.error('Error reading quotes file:', error);
+      console.error("Error reading quotes file:", error);
       return {
         metadata: {
           lastId: 0,
-          version: '1.0.0',
-          lastModified: new Date().toISOString()
+          version: "1.0.0",
+          lastModified: new Date().toISOString(),
         },
-        quotes: []
+        quotes: [],
       };
     }
   }
@@ -29,17 +34,17 @@ export class QuoteStorage {
     try {
       // Update lastModified timestamp
       data.metadata.lastModified = new Date().toISOString();
-      await writeFile(QUOTES_FILE, JSON.stringify(data, null, 2), 'utf-8');
+      await writeFile(QUOTES_FILE, JSON.stringify(data, null, 2), "utf-8");
     } catch (error) {
-      console.error('Error writing quotes file:', error);
-      throw new Error('Failed to write quotes');
+      console.error("Error writing quotes file:", error);
+      throw new Error("Failed to write quotes");
     }
   }
 
   async getRandomQuote(): Promise<Quote | null> {
     const data = await this.readQuotes();
     if (data.quotes.length === 0) return null;
-    
+
     const randomIndex = Math.floor(Math.random() * data.quotes.length);
     return data.quotes[randomIndex];
   }
@@ -49,30 +54,31 @@ export class QuoteStorage {
     let results = data.quotes;
 
     if (params.author) {
-      results = results.filter(q => 
-        q.author.toLowerCase().includes(params.author!.toLowerCase())
+      results = results.filter((q) =>
+        q.author.toLowerCase().includes(params.author!.toLowerCase()),
       );
     }
 
     if (params.theme) {
-      results = results.filter(q => 
-        q.theme.toLowerCase() === params.theme!.toLowerCase()
+      results = results.filter(
+        (q) => q.theme.toLowerCase() === params.theme!.toLowerCase(),
       );
     }
 
     if (params.query) {
       const searchLower = params.query.toLowerCase();
-      results = results.filter(q =>
-        q.text.toLowerCase().includes(searchLower) ||
-        q.author.toLowerCase().includes(searchLower) ||
-        q.theme.toLowerCase().includes(searchLower)
+      results = results.filter(
+        (q) =>
+          q.text.toLowerCase().includes(searchLower) ||
+          q.author.toLowerCase().includes(searchLower) ||
+          q.theme.toLowerCase().includes(searchLower),
       );
     }
 
     return results;
   }
 
-  async addQuote(quote: Omit<Quote, 'id'>): Promise<Quote> {
+  async addQuote(quote: Omit<Quote, "id">): Promise<Quote> {
     const data = await this.readQuotes();
 
     // Generate new ID from metadata
@@ -80,7 +86,8 @@ export class QuoteStorage {
 
     const newQuote: Quote = {
       ...quote,
-      id: newId
+      id: newId,
+      createdAt: new Date().toISOString(),
     };
 
     data.quotes.push(newQuote);
@@ -90,9 +97,12 @@ export class QuoteStorage {
     return newQuote;
   }
 
-  async updateQuote(id: number, updates: Partial<Quote>): Promise<Quote | null> {
+  async updateQuote(
+    id: number,
+    updates: Partial<Quote>,
+  ): Promise<Quote | null> {
     const data = await this.readQuotes();
-    const index = data.quotes.findIndex(q => q.id === id);
+    const index = data.quotes.findIndex((q) => q.id === id);
 
     if (index === -1) return null;
 
@@ -106,7 +116,7 @@ export class QuoteStorage {
     const data = await this.readQuotes();
     const initialLength = data.quotes.length;
 
-    data.quotes = data.quotes.filter(q => q.id !== id);
+    data.quotes = data.quotes.filter((q) => q.id !== id);
 
     if (data.quotes.length === initialLength) {
       return false; // Quote not found
@@ -118,12 +128,12 @@ export class QuoteStorage {
 
   async getFavorites(): Promise<Quote[]> {
     const data = await this.readQuotes();
-    return data.quotes.filter(q => q.favorite);
+    return data.quotes.filter((q) => q.favorite);
   }
 
   async toggleFavorite(id: number): Promise<Quote | null> {
     const data = await this.readQuotes();
-    const quote = data.quotes.find(q => q.id === id);
+    const quote = data.quotes.find((q) => q.id === id);
 
     if (!quote) return null;
 
