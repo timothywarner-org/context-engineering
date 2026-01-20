@@ -96,15 +96,18 @@ You mastered prompting—now stop your AI from forgetting everything. This hands
 ## Required Setup
 
 **AI Platform Access**
+
 - [Claude Desktop](https://claude.ai/download) (Windows/Mac) - Native MCP support
 - [VS Code](https://code.visualstudio.com/) with [GitHub Copilot](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot)
 
 **Development Environment**
+
 - [Node.js 20 LTS](https://nodejs.org/) or [Python 3.10+](https://www.python.org/downloads/)
 - [Git](https://git-scm.com/downloads)
 - [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) (for deployment labs)
 
 **MCP Development Tools**
+
 ```bash
 # Install MCP Inspector globally
 npm install -g @modelcontextprotocol/inspector
@@ -131,7 +134,7 @@ npm install @modelcontextprotocol/sdk
 
 ## License & Usage
 
-© 2025 Timothy Warner. Course materials provided for educational purposes.
+© 2026 Timothy Warner. Course materials provided for educational purposes.
 
 Model Context Protocol is an open standard - free to implement in commercial and open-source projects.
 
