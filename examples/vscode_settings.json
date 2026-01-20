@@ -1,0 +1,68 @@
+{
+  "$comment": [
+    "VS Code Settings with MCP Integration",
+    "Add this to your .vscode/settings.json file",
+    "Requires MCP VS Code extension and GitHub Copilot"
+  ],
+
+  "// MCP Server Configuration": "",
+  "mcp.servers": {
+    "workspace-memory": {
+      "command": "python",
+      "args": ["${workspaceFolder}/mcp-servers/memory_server/server.py"],
+      "env": {
+        "MEMORY_BACKEND": "sqlite",
+        "MEMORY_PATH": "${workspaceFolder}/.vscode/workspace_memory.db"
+      }
+    },
+    "semantic-search": {
+      "command": "python",
+      "args": ["${workspaceFolder}/mcp-servers/memory_server/server.py"],
+      "env": {
+        "MEMORY_BACKEND": "chroma",
+        "CHROMA_PERSIST_DIR": "${workspaceFolder}/.vscode/chroma_data"
+      }
+    }
+  },
+
+  "// GitHub Copilot MCP Integration (Experimental)": "",
+  "github.copilot.chat.experimental.mcpServers": true,
+  "github.copilot.chat.experimental.contextMcpServers": ["workspace-memory"],
+
+  "// Copilot Settings": "",
+  "github.copilot.enable": {
+    "*": true,
+    "markdown": true,
+    "plaintext": true,
+    "python": true,
+    "javascript": true,
+    "typescript": true
+  },
+
+  "// Python Configuration for MCP Development": "",
+  "python.analysis.typeCheckingMode": "basic",
+  "python.defaultInterpreterPath": "${workspaceFolder}/venv/bin/python",
+
+  "// Terminal Configuration": "",
+  "terminal.integrated.env.linux": {
+    "PYTHONPATH": "${workspaceFolder}"
+  },
+  "terminal.integrated.env.osx": {
+    "PYTHONPATH": "${workspaceFolder}"
+  },
+  "terminal.integrated.env.windows": {
+    "PYTHONPATH": "${workspaceFolder}"
+  },
+
+  "// Editor Settings for MCP Development": "",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+
+  "// File Associations": "",
+  "files.associations": {
+    "*.mcp.json": "json",
+    "claude_desktop_config.json": "json"
+  }
+}

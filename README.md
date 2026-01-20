@@ -1,22 +1,58 @@
-# Context Engineering with MCP: From Prompts to Persistent AI Memory
+# Context Engineering with MCP: Build AI Systems That Actually Remember
 
 <img src="images/cover.png" alt="Context Engineering with MCP Course Cover" width="700"/>
 
-Welcome to the training hub for mastering **Context Engineering with Model Context Protocol (MCP)**. Whether you're building AI applications or deepening your understanding of persistent AI memory, this guide provides everything you need to implement production-ready context systems.
+Welcome to the training hub for mastering **Context Engineering with Model Context Protocol (MCP)**. This comprehensive course teaches you to implement production-ready semantic memory systems for AI assistants using Python, FastMCP, and multiple vector database backends.
 
 ---
 
-## Quick Start for Students
+## Course Structure (4 x 50 Minutes)
 
-**New to this course?** Start here:
+| Segment | Topic | Focus |
+|---------|-------|-------|
+| **1** | All About Context | Token economics, context loss types, why RAG isn't enough |
+| **2** | All About MCP | FastMCP, FastAPI, tools, resources, prompts |
+| **3** | Semantic Memory Stores | JSON, SQLite, ChromaDB, Pinecone implementations |
+| **4** | MCP in Production | Claude Code, VS Code, GitHub Copilot, LangGraph |
 
-1. **[Student Setup Guide](student/STUDENT_SETUP_GUIDE.md)** - Prepare your environment before class (30-60 min)
-2. **[Validate Environment](scripts/validate-environment.js)** - Run `node scripts/validate-environment.js` to check your setup
-3. **[Troubleshooting FAQ](student/TROUBLESHOOTING_FAQ.md)** - Quick fixes for common issues
-4. **[Hands-On Labs](labs/)** - Progressive exercises from beginner to advanced
-5. **[Post-Course Resources](student/POST_COURSE_RESOURCES.md)** - Continue learning after the training
+**Total Duration:** 4 hours (with 10-minute breaks)
 
-**During class:** Keep the [Troubleshooting FAQ](student/TROUBLESHOOTING_FAQ.md) open for quick reference.
+---
+
+## Quick Start
+
+### Prerequisites
+
+- Python 3.11+
+- Node.js 18+ (for some MCP tools)
+- Claude Desktop or Claude Code
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/timothywarner-org/context-engineering.git
+cd context-engineering
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # or venv\Scripts\activate on Windows
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### Run Your First Memory Server
+
+```bash
+# Start the memory server
+cd mcp-servers/memory_server
+python server.py
+
+# Test with MCP Inspector (in another terminal)
+pip install mcp-inspector
+mcp-inspector python server.py
+```
 
 ---
 
@@ -24,97 +60,180 @@ Welcome to the training hub for mastering **Context Engineering with Model Conte
 
 ```
 context-engineering/
-│
-├── instructor/              # Instructor materials
-│   ├── course-plan.md           # Full course plan
-│   ├── DEMO_SCRIPT.md           # Complete demo walkthrough
-│   ├── RUNBOOK.md               # Execution procedures
-│   └── *.pptx                   # Presentation deck
-│
-├── student/                 # Student materials
-│   ├── STUDENT_SETUP_GUIDE.md   # Pre-course setup
-│   ├── TROUBLESHOOTING_FAQ.md   # Common issues & fixes
-│   └── POST_COURSE_RESOURCES.md # After-class learning
-│
-├── reference/               # Reference documentation
-│   ├── IMPLEMENTATION_GUIDE.md  # Choose the right pattern
-│   ├── MCP_TUTORIALS.md         # MCP tutorials & guides
-│   ├── CONFIG_GUIDE.md          # Configuration reference
-│   └── POPULAR_REMOTE_MCP_SERVERS.md
-│
-├── mcp-servers/             # MCP server implementations
-│   ├── coretext-mcp/            # Main teaching example (JavaScript)
-│   ├── stoic-mcp/               # TypeScript production example
-│   ├── context_journal_mcp_local/   # Python implementation
-│   ├── context_journal_mcp_azure/   # Azure deployment
-│   └── deepseek-context-demo/       # DeepSeek integration
-│
-├── labs/                    # Hands-on exercises
-│   └── lab-01-hello-mcp/        # Your first MCP server
-│
-├── examples/                # Reference implementations
-│   └── filesystem-mcp/          # File operations server
-│
-├── diagrams/                # Architecture diagrams
-├── images/                  # Course images
-├── scripts/                 # Utility scripts
-├── config/                  # Sample configuration files
-└── docs/                    # Internal documentation
+├── mcp-servers/
+│   ├── memory_server/           # Main FastMCP memory server
+│   │   ├── server.py            # Full MCP implementation
+│   │   └── requirements.txt
+│   ├── memory_stores/           # Pluggable storage backends
+│   │   ├── interface.py         # Abstract interface
+│   │   ├── json_store.py        # JSON file storage
+│   │   ├── sqlite_store.py      # SQLite + FTS5
+│   │   ├── chroma_store.py      # ChromaDB vectors
+│   │   └── pinecone_store.py    # Cloud vectors
+│   └── langgraph_integration/   # Multi-agent examples
+│       └── multi_agent_memory.py
+├── examples/
+│   ├── claude_desktop_config.json
+│   ├── claude_code_mcp.json
+│   └── vscode_settings.json
+├── labs/
+│   ├── lab-01-context-basics/
+│   ├── lab-02-fastmcp-server/
+│   ├── lab-03-semantic-memory/
+│   └── lab-04-client-integration/
+├── instructor/
+│   ├── course-plan-jan-2026.md
+│   └── *.pptx
+└── student/
+    ├── STUDENT_SETUP_GUIDE.md
+    └── TROUBLESHOOTING_FAQ.md
 ```
 
 ---
 
-## Course Overview
+## What You'll Build
 
-**Level:** Intermediate
-**Duration:** 2-4 hours (flexible format)
-**Format:** Hands-on live training
+### Segment 1: Understanding Context
 
-### What You'll Build
+Learn why AI "forgets" and how to fix it:
 
-You mastered prompting—now stop your AI from forgetting everything. This hands-on course teaches you **Context Engineering** using MCP—the production-ready protocol adopted by Microsoft and Anthropic.
+- **Window Overflow** - Messages pushed out of context
+- **Session Boundary** - Complete loss between sessions
+- **Attention Dilution** - Context ignored in noise
+- **Compression Loss** - Summarization loses details
 
-**By the end of this course, you will have:**
+### Segment 2: MCP Server Development
 
-- Built a working MCP server that gives AI access to your GitHub repositories
-- Deployed production MCP infrastructure to Azure with authentication and monitoring
-- Implemented multi-agent memory systems that persist across sessions
-- Configured Claude Desktop, VS Code Copilot, and ChatGPT with persistent context
+Build production MCP servers with FastMCP:
 
----
+```python
+from fastmcp import FastMCP
+from pydantic import BaseModel, Field
 
-## First-Party Reference Docs
+mcp = FastMCP("memory-server")
 
-- **[MCP Specification](https://spec.modelcontextprotocol.io/)** - Official protocol specification
-- **[MCP Documentation](https://modelcontextprotocol.io/docs)** - Protocol overview
-- **[MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk)** - Official SDK
-- **[Official MCP Servers](https://github.com/modelcontextprotocol/servers)** - Production-ready servers
-- **[Claude MCP Documentation](https://docs.claude.com/en/docs/mcp)** - Claude integration guide
+class MemoryInput(BaseModel):
+    content: str = Field(..., description="Content to remember")
+    importance: int = Field(default=5, ge=1, le=10)
 
----
-
-## Required Setup
-
-**AI Platform Access**
-
-- [Claude Desktop](https://claude.ai/download) (Windows/Mac) - Native MCP support
-- [VS Code](https://code.visualstudio.com/) with [GitHub Copilot](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot)
-
-**Development Environment**
-
-- [Node.js 20 LTS](https://nodejs.org/) or [Python 3.10+](https://www.python.org/downloads/)
-- [Git](https://git-scm.com/downloads)
-- [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) (for deployment labs)
-
-**MCP Development Tools**
-
-```bash
-# Install MCP Inspector globally
-npm install -g @modelcontextprotocol/inspector
-
-# Install TypeScript SDK
-npm install @modelcontextprotocol/sdk
+@mcp.tool()
+async def store_memory(params: MemoryInput) -> str:
+    """Store a memory for future retrieval."""
+    memory_id = save_to_store(params.content, params.importance)
+    return f"Stored memory {memory_id}"
 ```
+
+### Segment 3: Semantic Memory Stores
+
+Implement multiple storage backends:
+
+| Backend | Best For | Key Feature |
+|---------|----------|-------------|
+| JSON | Prototyping | Zero setup |
+| SQLite | Structured data | FTS5 search |
+| ChromaDB | Local vectors | Auto embeddings |
+| Pinecone | Production | Multi-tenant |
+
+```python
+from memory_stores import ChromaMemoryStore
+
+store = ChromaMemoryStore(persist_directory="./chroma_data")
+
+# Store with automatic embedding
+memory_id = store.store(
+    content="The API uses JWT with 1-hour expiry",
+    category="architecture",
+    tags=["auth", "jwt"],
+    importance=8
+)
+
+# Semantic search
+results = store.semantic_search("how does authentication work?")
+```
+
+### Segment 4: Client Integration
+
+Configure Claude Desktop, Claude Code, and VS Code:
+
+**Claude Desktop** (`~/Library/Application Support/Claude/claude_desktop_config.json`):
+```json
+{
+  "mcpServers": {
+    "memory": {
+      "command": "python",
+      "args": ["/path/to/memory_server/server.py"]
+    }
+  }
+}
+```
+
+**Claude Code** (`.claude/mcp.json`):
+```json
+{
+  "servers": {
+    "project-memory": {
+      "command": "python",
+      "args": ["./mcp-servers/memory_server/server.py"]
+    }
+  }
+}
+```
+
+---
+
+## Memory Store Comparison
+
+| Feature | JSON | SQLite | ChromaDB | Pinecone |
+|---------|------|--------|----------|----------|
+| Setup | None | None | `pip install` | API key |
+| Semantic Search | No | No | Yes | Yes |
+| Full-Text Search | No | Yes | No | No |
+| Scale | <1K | <100K | <100K | Millions |
+| Cost | Free | Free | Free | Pay-per-use |
+
+---
+
+## API Reference
+
+### Tools
+
+| Tool | Description |
+|------|-------------|
+| `store_memory` | Store content with metadata |
+| `search_memories` | Semantic/keyword search |
+| `get_memory` | Retrieve by ID |
+| `update_memory` | Modify existing |
+| `delete_memory` | Remove memory |
+| `list_memories` | Paginated listing |
+
+### Resources
+
+| URI | Description |
+|-----|-------------|
+| `memory://stats` | Storage statistics |
+| `memory://recent` | Recent memories |
+| `memory://important` | High-importance items |
+
+---
+
+## Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `MEMORY_BACKEND` | `json` | Backend type |
+| `MEMORY_PATH` | `memories.json` | Storage path |
+| `CHROMA_PERSIST_DIR` | `./chroma_data` | ChromaDB directory |
+| `PINECONE_API_KEY` | - | Pinecone API key |
+
+---
+
+## Resources
+
+- **[MCP Specification](https://spec.modelcontextprotocol.io/)**
+- **[FastMCP Documentation](https://github.com/jlowin/fastmcp)**
+- **[Claude Documentation](https://docs.anthropic.com/)**
+- **[ChromaDB Docs](https://docs.trychroma.com/)**
+- **[Pinecone Docs](https://docs.pinecone.io/)**
 
 ---
 
@@ -122,24 +241,20 @@ npm install @modelcontextprotocol/sdk
 
 ### Tim Warner
 
-**Microsoft MVP** - Azure AI and Cloud/Datacenter Management (6+ years)
+**Microsoft MVP** - Azure AI and Cloud/Datacenter Management
 **Microsoft Certified Trainer** (25+ years)
 
 - Website: [techtrainertim.com](https://techtrainertim.com)
 - LinkedIn: [linkedin.com/in/timothywarner](https://www.linkedin.com/in/timothywarner/)
 - YouTube: [youtube.com/timothywarner](https://www.youtube.com/channel/UCim7PFtynyPuzMHtbNyYOXA)
-- Bluesky: [@techtrainertim.bsky.social](https://bsky.app/profile/techtrainertim.bsky.social)
+- Email: timothywarner316@gmail.com
 
 ---
 
-## License & Usage
+## License
 
-© 2026 Timothy Warner. Course materials provided for educational purposes.
-
-Model Context Protocol is an open standard - free to implement in commercial and open-source projects.
+© 2026 Timothy Warner. MIT License.
 
 ---
 
-## Contributing
-
-Found an issue or have a suggestion? [Open an issue](https://github.com/timothywarner-org/context-engineering/issues) or submit a pull request.
+**Now go build AI systems that actually remember!** 🧠

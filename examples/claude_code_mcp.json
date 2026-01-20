@@ -1,0 +1,39 @@
+{
+  "$schema": "https://spec.modelcontextprotocol.io/mcp-config.json",
+  "_comment": [
+    "Claude Code MCP Configuration",
+    "Place this file at: .claude/mcp.json in your project root",
+    "Claude Code will automatically discover and load these servers"
+  ],
+  "servers": {
+    "project-memory": {
+      "_description": "Project-specific memory for decisions and context",
+      "command": "python",
+      "args": ["./mcp-servers/memory_server/server.py"],
+      "env": {
+        "MEMORY_BACKEND": "json",
+        "MEMORY_PATH": "./.claude/project_memory.json"
+      }
+    },
+    "semantic-memory": {
+      "_description": "ChromaDB for semantic search (requires chromadb)",
+      "command": "python",
+      "args": ["./mcp-servers/memory_server/server.py"],
+      "env": {
+        "MEMORY_BACKEND": "chroma",
+        "CHROMA_PERSIST_DIR": "./.claude/chroma_data"
+      }
+    },
+    "codebase": {
+      "_description": "Codebase understanding and navigation",
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-codebase", "."]
+    },
+    "git": {
+      "_description": "Git operations and history",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-git", "."]
+    }
+  },
+  "defaultServer": "project-memory"
+}

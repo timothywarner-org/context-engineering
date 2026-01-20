@@ -1,0 +1,19 @@
+# Memory MCP Server Dependencies
+# ================================
+
+# Core MCP Framework
+fastmcp>=0.1.0
+
+# Data Validation
+pydantic>=2.0.0
+
+# API Server (optional - for HTTP/SSE deployment)
+fastapi>=0.100.0
+uvicorn>=0.23.0
+sse-starlette>=1.6.0
+
+# Anthropic SDK (for embeddings and API access)
+anthropic>=0.25.0
+
+# Development tools
+python-dotenv>=1.0.0

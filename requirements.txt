@@ -1,0 +1,33 @@
+# Context Engineering with MCP - Course Requirements
+# ==================================================
+
+# Core MCP Framework
+fastmcp>=0.1.0
+
+# Data Validation
+pydantic>=2.0.0
+
+# API Server
+fastapi>=0.100.0
+uvicorn>=0.23.0
+sse-starlette>=1.6.0
+
+# Anthropic SDK
+anthropic>=0.25.0
+
+# Vector Databases (Optional - install as needed)
+# chromadb>=0.4.0
+# pinecone-client>=3.0.0
+
+# LangGraph Integration (Optional)
+# langgraph>=0.1.0
+# langchain-anthropic>=0.1.0
+
+# Development Tools
+python-dotenv>=1.0.0
+pytest>=7.0.0
+
+# Embedding Models (Optional - for Pinecone)
+# openai>=1.0.0
+# voyageai>=0.2.0
+# sentence-transformers>=2.2.0
