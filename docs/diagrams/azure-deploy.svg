@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 900" style="background:#1a1a2e">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+    <linearGradient id="externalGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#5da9e9"/>
+      <stop offset="100%" style="stop-color:#4a90d9"/>
+    </linearGradient>
+    <linearGradient id="apimGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f7b84e"/>
+      <stop offset="100%" style="stop-color:#f39c12"/>
+    </linearGradient>
+    <linearGradient id="computeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#5ec69d"/>
+      <stop offset="100%" style="stop-color:#50b890"/>
+    </linearGradient>
+    <linearGradient id="dataGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#a86cc1"/>
+      <stop offset="100%" style="stop-color:#9b59b6"/>
+    </linearGradient>
+    <linearGradient id="aiGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#e95e5e"/>
+      <stop offset="100%" style="stop-color:#e74c3c"/>
+    </linearGradient>
+    <linearGradient id="securityGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4a5568"/>
+      <stop offset="100%" style="stop-color:#34495e"/>
+    </linearGradient>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#4a90d9"/>
+    </marker>
+    <marker id="arrowOrange" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#f39c12"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#50b890"/>
+    </marker>
+    <marker id="arrowPurple" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#9b59b6"/>
+    </marker>
+    <marker id="arrowRed" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#e74c3c"/>
+    </marker>
+    <marker id="arrowGray" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#808090"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="500" y="35" text-anchor="middle" fill="#e0e0e0" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="bold">WARNERCO Schematica - Azure Deployment Architecture</text>
+
+  <!-- External Clients Section -->
+  <rect x="30" y="60" width="940" height="110" rx="10" fill="#252545" stroke="#4a90d9" stroke-width="2" filter="url(#shadow)"/>
+  <text x="50" y="85" fill="#a0a0c0" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="bold">EXTERNAL CLIENTS</text>
+
+  <rect x="100" y="100" width="160" height="55" rx="8" fill="url(#externalGrad)" filter="url(#shadow)"/>
+  <text x="180" y="125" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="bold">Claude Desktop</text>
+  <text x="180" y="145" text-anchor="middle" fill="#d0e8ff" font-family="Segoe UI, Arial, sans-serif" font-size="10">MCP over HTTP</text>
+
+  <rect x="320" y="100" width="160" height="55" rx="8" fill="url(#externalGrad)" filter="url(#shadow)"/>
+  <text x="400" y="125" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="bold">Web Browser</text>
+  <text x="400" y="145" text-anchor="middle" fill="#d0e8ff" font-family="Segoe UI, Arial, sans-serif" font-size="10">Dashboards / API</text>
+
+  <rect x="540" y="100" width="160" height="55" rx="8" fill="url(#externalGrad)" filter="url(#shadow)"/>
+  <text x="620" y="125" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="bold">Mobile Apps</text>
+  <text x="620" y="145" text-anchor="middle" fill="#d0e8ff" font-family="Segoe UI, Arial, sans-serif" font-size="10">REST API</text>
+
+  <!-- Azure Cloud Container -->
+  <rect x="30" y="195" width="940" height="665" rx="12" fill="#1e2a40" stroke="#0078d4" stroke-width="3" filter="url(#shadow)"/>
+  <text x="50" y="225" fill="#0078d4" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="bold">AZURE CLOUD</text>
+
+  <!-- Azure logo hint -->
+  <rect x="910" y="205" width="45" height="25" rx="4" fill="#0078d4"/>
+  <text x="932" y="222" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold">Azure</text>
+
+  <!-- API Management Section -->
+  <rect x="60" y="250" width="400" height="130" rx="10" fill="#252545" stroke="#f39c12" stroke-width="2" filter="url(#shadow)"/>
+  <text x="80" y="275" fill="#d0c0a0" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">API MANAGEMENT</text>
+
+  <rect x="80" y="290" width="360" height="75" rx="8" fill="url(#apimGrad)" filter="url(#shadow)"/>
+  <text x="260" y="318" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="bold">Azure APIM</text>
+  <line x1="100" y1="328" x2="420" y2="328" stroke="#d68910" stroke-width="1"/>
+  <text x="260" y="348" text-anchor="middle" fill="#4a3a1a" font-family="Segoe UI, Arial, sans-serif" font-size="10">Rate Limiting | API Keys | OAuth | Routing | Caching</text>
+
+  <!-- Container Apps Section -->
+  <rect x="510" y="250" width="430" height="130" rx="10" fill="#252545" stroke="#50b890" stroke-width="2" filter="url(#shadow)"/>
+  <text x="530" y="275" fill="#a0c0a0" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">CONTAINER APPS ENVIRONMENT</text>
+
+  <rect x="530" y="290" width="390" height="75" rx="8" fill="url(#computeGrad)" filter="url(#shadow)"/>
+  <text x="725" y="318" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="bold">Container App - Schematica</text>
+  <line x1="550" y1="328" x2="900" y2="328" stroke="#2e8b57" stroke-width="1"/>
+  <text x="725" y="348" text-anchor="middle" fill="#1a4a3a" font-family="Segoe UI, Arial, sans-serif" font-size="10">FastAPI + FastMCP | LangGraph Flow | uvicorn | Auto-scaling</text>
+
+  <!-- Data Services Section -->
+  <rect x="60" y="410" width="400" height="200" rx="10" fill="#252545" stroke="#9b59b6" stroke-width="2" filter="url(#shadow)"/>
+  <text x="80" y="435" fill="#c0a0d0" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">DATA SERVICES</text>
+
+  <rect x="80" y="455" width="360" height="70" rx="8" fill="url(#dataGrad)" filter="url(#shadow)"/>
+  <text x="260" y="480" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="bold">Azure AI Search</text>
+  <line x1="100" y1="490" x2="420" y2="490" stroke="#6c3483" stroke-width="1"/>
+  <text x="260" y="510" text-anchor="middle" fill="#e0d0f0" font-family="Segoe UI, Arial, sans-serif" font-size="10">Vector Index | Semantic Ranking | Hybrid Search</text>
+
+  <rect x="80" y="535" width="360" height="60" rx="8" fill="url(#dataGrad)" filter="url(#shadow)"/>
+  <text x="260" y="560" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="bold">Cosmos DB (optional)</text>
+  <line x1="100" y1="570" x2="420" y2="570" stroke="#6c3483" stroke-width="1"/>
+  <text x="260" y="585" text-anchor="middle" fill="#e0d0f0" font-family="Segoe UI, Arial, sans-serif" font-size="10">Schematic Storage | Query Logs | Session State</text>
+
+  <!-- AI Services Section -->
+  <rect x="510" y="410" width="430" height="200" rx="10" fill="#252545" stroke="#e74c3c" stroke-width="2" filter="url(#shadow)"/>
+  <text x="530" y="435" fill="#d0a0a0" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">AI SERVICES</text>
+
+  <rect x="530" y="455" width="390" height="140" rx="8" fill="url(#aiGrad)" filter="url(#shadow)"/>
+  <text x="725" y="485" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="bold">Azure OpenAI</text>
+  <line x1="550" y1="495" x2="900" y2="495" stroke="#c0392b" stroke-width="1"/>
+  <text x="725" y="520" text-anchor="middle" fill="#f0d0d0" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">Models Deployed:</text>
+  <text x="725" y="545" text-anchor="middle" fill="#f0d0d0" font-family="Segoe UI, Arial, sans-serif" font-size="11">gpt-4o-mini (reasoning)</text>
+  <text x="725" y="565" text-anchor="middle" fill="#f0d0d0" font-family="Segoe UI, Arial, sans-serif" font-size="11">text-embedding-ada-002 (vectors)</text>
+  <text x="725" y="585" text-anchor="middle" fill="#e0c0c0" font-family="Segoe UI, Arial, sans-serif" font-size="10">PTU or Pay-as-you-go deployment</text>
+
+  <!-- Security Section -->
+  <rect x="60" y="640" width="880" height="190" rx="10" fill="#252545" stroke="#34495e" stroke-width="2" filter="url(#shadow)"/>
+  <text x="80" y="665" fill="#a0a0b0" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">SECURITY & IDENTITY</text>
+
+  <rect x="80" y="690" width="300" height="120" rx="8" fill="url(#securityGrad)" filter="url(#shadow)"/>
+  <text x="230" y="720" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="bold">Azure Key Vault</text>
+  <line x1="100" y1="730" x2="360" y2="730" stroke="#2c3e50" stroke-width="1"/>
+  <text x="230" y="755" text-anchor="middle" fill="#c0c0d0" font-family="Segoe UI, Arial, sans-serif" font-size="10">API Keys</text>
+  <text x="230" y="775" text-anchor="middle" fill="#c0c0d0" font-family="Segoe UI, Arial, sans-serif" font-size="10">Connection Strings</text>
+  <text x="230" y="795" text-anchor="middle" fill="#c0c0d0" font-family="Segoe UI, Arial, sans-serif" font-size="10">Certificates</text>
+
+  <rect x="430" y="690" width="300" height="120" rx="8" fill="url(#securityGrad)" filter="url(#shadow)"/>
+  <text x="580" y="720" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="bold">Managed Identity</text>
+  <line x1="450" y1="730" x2="710" y2="730" stroke="#2c3e50" stroke-width="1"/>
+  <text x="580" y="755" text-anchor="middle" fill="#c0c0d0" font-family="Segoe UI, Arial, sans-serif" font-size="10">Passwordless Authentication</text>
+  <text x="580" y="775" text-anchor="middle" fill="#c0c0d0" font-family="Segoe UI, Arial, sans-serif" font-size="10">System-assigned identity</text>
+  <text x="580" y="795" text-anchor="middle" fill="#c0c0d0" font-family="Segoe UI, Arial, sans-serif" font-size="10">RBAC integration</text>
+
+  <rect x="780" y="690" width="140" height="120" rx="8" fill="url(#securityGrad)" filter="url(#shadow)"/>
+  <text x="850" y="720" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="bold">Network Security</text>
+  <line x1="795" y1="730" x2="905" y2="730" stroke="#2c3e50" stroke-width="1"/>
+  <text x="850" y="755" text-anchor="middle" fill="#c0c0d0" font-family="Segoe UI, Arial, sans-serif" font-size="9">VNet Integration</text>
+  <text x="850" y="775" text-anchor="middle" fill="#c0c0d0" font-family="Segoe UI, Arial, sans-serif" font-size="9">Private Endpoints</text>
+  <text x="850" y="795" text-anchor="middle" fill="#c0c0d0" font-family="Segoe UI, Arial, sans-serif" font-size="9">NSG Rules</text>
+
+  <!-- Connection Arrows -->
+  <!-- Clients to APIM -->
+  <path d="M180 155 L180 180 L260 180 L260 250" stroke="#4a90d9" stroke-width="2" fill="none" marker-end="url(#arrowBlue)"/>
+  <path d="M400 155 L400 180 L260 180" stroke="#4a90d9" stroke-width="2" fill="none"/>
+  <path d="M620 155 L620 180 L260 180" stroke="#4a90d9" stroke-width="2" fill="none"/>
+  <text x="300" y="173" fill="#4a90d9" font-family="Segoe UI, Arial, sans-serif" font-size="9">HTTPS</text>
+
+  <!-- APIM to Container App -->
+  <path d="M460 328 L510 328" stroke="#f39c12" stroke-width="3" fill="none" marker-end="url(#arrowOrange)"/>
+  <text x="485" y="320" fill="#f39c12" font-family="Segoe UI, Arial, sans-serif" font-size="9">Route</text>
+
+  <!-- Container App to AI Search -->
+  <path d="M725 365 L725 390 L260 390 L260 455" stroke="#50b890" stroke-width="2" fill="none" marker-end="url(#arrowGreen)"/>
+  <text x="400" y="383" fill="#50b890" font-family="Segoe UI, Arial, sans-serif" font-size="9">Semantic Search</text>
+
+  <!-- Container App to Cosmos DB -->
+  <path d="M530 365 L200 365 L200 535" stroke="#50b890" stroke-width="2" fill="none" marker-end="url(#arrowGreen)"/>
+  <text x="350" y="358" fill="#50b890" font-family="Segoe UI, Arial, sans-serif" font-size="9">Store/Query</text>
+
+  <!-- Container App to Azure OpenAI -->
+  <path d="M725 365 L725 455" stroke="#e74c3c" stroke-width="2" fill="none" marker-end="url(#arrowRed)"/>
+  <text x="740" y="410" fill="#e74c3c" font-family="Segoe UI, Arial, sans-serif" font-size="9">Embeddings & Chat</text>
+
+  <!-- Security connections (dashed) -->
+  <path d="M920 340 L920 620 L230 620 L230 690" stroke="#808090" stroke-width="2" stroke-dasharray="5,5" fill="none" marker-end="url(#arrowGray)"/>
+  <text x="870" y="475" fill="#808090" font-family="Segoe UI, Arial, sans-serif" font-size="8">Get Secrets</text>
+
+  <path d="M900 365 L900 620 L580 620 L580 690" stroke="#808090" stroke-width="2" stroke-dasharray="5,5" fill="none" marker-end="url(#arrowGray)"/>
+  <text x="780" y="610" fill="#808090" font-family="Segoe UI, Arial, sans-serif" font-size="8">Authenticate</text>
+
+  <!-- Managed Identity to services (dashed) -->
+  <path d="M580 690 L580 620 L260 620 L260 595" stroke="#34495e" stroke-width="2" stroke-dasharray="3,3" fill="none" marker-end="url(#arrowGray)"/>
+  <path d="M580 690 L580 620 L725 620 L725 595" stroke="#34495e" stroke-width="2" stroke-dasharray="3,3" fill="none" marker-end="url(#arrowGray)"/>
+
+  <!-- Legend -->
+  <rect x="760" y="60" width="200" height="110" rx="5" fill="#1a1a2e" stroke="#404060" stroke-width="1"/>
+  <text x="860" y="80" text-anchor="middle" fill="#808090" font-family="Segoe UI, Arial, sans-serif" font-size="10" font-weight="bold">LEGEND</text>
+  <rect x="775" y="90" width="12" height="12" fill="#4a90d9"/>
+  <text x="795" y="100" fill="#a0a0b0" font-family="Segoe UI, Arial, sans-serif" font-size="9">External Clients</text>
+  <rect x="875" y="90" width="12" height="12" fill="#f39c12"/>
+  <text x="895" y="100" fill="#a0a0b0" font-family="Segoe UI, Arial, sans-serif" font-size="9">API Gateway</text>
+  <rect x="775" y="110" width="12" height="12" fill="#50b890"/>
+  <text x="795" y="120" fill="#a0a0b0" font-family="Segoe UI, Arial, sans-serif" font-size="9">Compute</text>
+  <rect x="875" y="110" width="12" height="12" fill="#9b59b6"/>
+  <text x="895" y="120" fill="#a0a0b0" font-family="Segoe UI, Arial, sans-serif" font-size="9">Data Services</text>
+  <rect x="775" y="130" width="12" height="12" fill="#e74c3c"/>
+  <text x="795" y="140" fill="#a0a0b0" font-family="Segoe UI, Arial, sans-serif" font-size="9">AI Services</text>
+  <rect x="875" y="130" width="12" height="12" fill="#34495e"/>
+  <text x="895" y="140" fill="#a0a0b0" font-family="Segoe UI, Arial, sans-serif" font-size="9">Security</text>
+  <line x1="775" y1="155" x2="800" y2="155" stroke="#808090" stroke-width="2" stroke-dasharray="4,4"/>
+  <text x="810" y="158" fill="#a0a0b0" font-family="Segoe UI, Arial, sans-serif" font-size="9">Identity flow</text>
+</svg>

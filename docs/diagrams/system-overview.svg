@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 800" style="background:#1a1a2e">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+    <linearGradient id="clientGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#5da9e9"/>
+      <stop offset="100%" style="stop-color:#4a90d9"/>
+    </linearGradient>
+    <linearGradient id="appGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#5ec69d"/>
+      <stop offset="100%" style="stop-color:#50b890"/>
+    </linearGradient>
+    <linearGradient id="memoryGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f7b84e"/>
+      <stop offset="100%" style="stop-color:#f5a623"/>
+    </linearGradient>
+    <linearGradient id="llmGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#a86cc1"/>
+      <stop offset="100%" style="stop-color:#9b59b6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Title -->
+  <text x="500" y="35" text-anchor="middle" fill="#e0e0e0" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="bold">WARNERCO Robotics Schematica - System Overview</text>
+
+  <!-- Client Layer -->
+  <rect x="30" y="60" width="940" height="100" rx="10" fill="#252545" stroke="#4a90d9" stroke-width="2" filter="url(#shadow)"/>
+  <text x="50" y="85" fill="#a0a0c0" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="bold">CLIENT LAYER</text>
+
+  <rect x="80" y="100" width="180" height="50" rx="8" fill="url(#clientGrad)" filter="url(#shadow)"/>
+  <text x="170" y="122" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="bold">Claude Desktop</text>
+  <text x="170" y="140" text-anchor="middle" fill="#d0e8ff" font-family="Segoe UI, Arial, sans-serif" font-size="11">(MCP stdio)</text>
+
+  <rect x="310" y="100" width="180" height="50" rx="8" fill="url(#clientGrad)" filter="url(#shadow)"/>
+  <text x="400" y="122" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="bold">Web Dashboards</text>
+  <text x="400" y="140" text-anchor="middle" fill="#d0e8ff" font-family="Segoe UI, Arial, sans-serif" font-size="11">(SPA)</text>
+
+  <rect x="540" y="100" width="180" height="50" rx="8" fill="url(#clientGrad)" filter="url(#shadow)"/>
+  <text x="630" y="122" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="bold">REST API</text>
+  <text x="630" y="140" text-anchor="middle" fill="#d0e8ff" font-family="Segoe UI, Arial, sans-serif" font-size="11">Consumers</text>
+
+  <!-- Application Layer -->
+  <rect x="30" y="180" width="940" height="320" rx="10" fill="#252545" stroke="#50b890" stroke-width="2" filter="url(#shadow)"/>
+  <text x="50" y="205" fill="#a0c0a0" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="bold">APPLICATION LAYER</text>
+
+  <!-- FastAPI Server -->
+  <rect x="50" y="220" width="280" height="140" rx="8" fill="#1e3a2f" stroke="#3d8b6e" stroke-width="1"/>
+  <text x="190" y="245" text-anchor="middle" fill="#8fd0b0" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">FastAPI Server</text>
+
+  <rect x="70" y="260" width="100" height="35" rx="5" fill="url(#appGrad)" filter="url(#shadow)"/>
+  <text x="120" y="282" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="11">/api Routes</text>
+
+  <rect x="180" y="260" width="100" height="35" rx="5" fill="url(#appGrad)" filter="url(#shadow)"/>
+  <text x="230" y="282" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="11">/mcp Endpoint</text>
+
+  <rect x="120" y="305" width="100" height="35" rx="5" fill="url(#appGrad)" filter="url(#shadow)"/>
+  <text x="170" y="327" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="11">/dash Static</text>
+
+  <!-- FastMCP Tools -->
+  <rect x="360" y="220" width="280" height="140" rx="8" fill="#1e3a2f" stroke="#3d8b6e" stroke-width="1"/>
+  <text x="500" y="245" text-anchor="middle" fill="#8fd0b0" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">FastMCP Tools</text>
+
+  <rect x="380" y="260" width="110" height="30" rx="5" fill="url(#appGrad)" filter="url(#shadow)"/>
+  <text x="435" y="280" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="10">warn_list_robots</text>
+
+  <rect x="510" y="260" width="110" height="30" rx="5" fill="url(#appGrad)" filter="url(#shadow)"/>
+  <text x="565" y="280" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="10">warn_get_robot</text>
+
+  <rect x="380" y="300" width="110" height="30" rx="5" fill="url(#appGrad)" filter="url(#shadow)"/>
+  <text x="435" y="320" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="9">warn_semantic_search</text>
+
+  <rect x="510" y="300" width="110" height="30" rx="5" fill="url(#appGrad)" filter="url(#shadow)"/>
+  <text x="565" y="320" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="10">warn_memory_stats</text>
+
+  <!-- LangGraph -->
+  <rect x="50" y="380" width="590" height="100" rx="8" fill="#1e3a2f" stroke="#3d8b6e" stroke-width="1"/>
+  <text x="345" y="405" text-anchor="middle" fill="#8fd0b0" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">LangGraph Orchestration</text>
+
+  <rect x="70" y="420" width="550" height="45" rx="5" fill="url(#appGrad)" filter="url(#shadow)"/>
+  <text x="345" y="448" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">5-Node RAG Flow: parse_intent -> retrieve -> compress_context -> reason -> respond</text>
+
+  <!-- LLM Layer -->
+  <rect x="670" y="220" width="280" height="260" rx="8" fill="#2d2345" stroke="#7d5a9b" stroke-width="1"/>
+  <text x="810" y="245" text-anchor="middle" fill="#c0a0d0" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="bold">LLM LAYER</text>
+
+  <rect x="710" y="290" width="200" height="80" rx="8" fill="url(#llmGrad)" filter="url(#shadow)"/>
+  <text x="810" y="320" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="bold">Azure OpenAI</text>
+  <text x="810" y="345" text-anchor="middle" fill="#e0d0f0" font-family="Segoe UI, Arial, sans-serif" font-size="11">gpt-4o-mini</text>
+  <text x="810" y="362" text-anchor="middle" fill="#d0c0e0" font-family="Segoe UI, Arial, sans-serif" font-size="10">text-embedding-ada-002</text>
+
+  <!-- Memory Layer -->
+  <rect x="30" y="520" width="940" height="140" rx="10" fill="#252545" stroke="#f5a623" stroke-width="2" filter="url(#shadow)"/>
+  <text x="50" y="545" fill="#d0c0a0" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="bold">3-TIER MEMORY LAYER</text>
+
+  <rect x="80" y="560" width="220" height="80" rx="8" fill="url(#memoryGrad)" filter="url(#shadow)"/>
+  <text x="190" y="590" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="bold">JSON Store</text>
+  <text x="190" y="610" text-anchor="middle" fill="#4a3a1a" font-family="Segoe UI, Arial, sans-serif" font-size="11">(Source of Truth)</text>
+  <text x="190" y="628" text-anchor="middle" fill="#5a4a2a" font-family="Segoe UI, Arial, sans-serif" font-size="10">Fastest startup</text>
+
+  <rect x="390" y="560" width="220" height="80" rx="8" fill="url(#memoryGrad)" filter="url(#shadow)"/>
+  <text x="500" y="590" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="bold">Chroma DB</text>
+  <text x="500" y="610" text-anchor="middle" fill="#4a3a1a" font-family="Segoe UI, Arial, sans-serif" font-size="11">(Vector Embeddings)</text>
+  <text x="500" y="628" text-anchor="middle" fill="#5a4a2a" font-family="Segoe UI, Arial, sans-serif" font-size="10">Local semantic search</text>
+
+  <rect x="700" y="560" width="240" height="80" rx="8" fill="url(#memoryGrad)" filter="url(#shadow)"/>
+  <text x="820" y="590" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="bold">Azure AI Search</text>
+  <text x="820" y="610" text-anchor="middle" fill="#4a3a1a" font-family="Segoe UI, Arial, sans-serif" font-size="11">(Enterprise Scale)</text>
+  <text x="820" y="628" text-anchor="middle" fill="#5a4a2a" font-family="Segoe UI, Arial, sans-serif" font-size="10">Hybrid search + semantic ranking</text>
+
+  <!-- Arrows -->
+  <!-- Client to App -->
+  <path d="M170 150 L170 175 L230 175 L230 260" stroke="#4a90d9" stroke-width="2" fill="none" marker-end="url(#arrowBlue)"/>
+  <path d="M400 150 L400 175 L120 175 L120 260" stroke="#4a90d9" stroke-width="2" fill="none" marker-end="url(#arrowBlue)"/>
+  <path d="M630 150 L630 175 L120 175" stroke="#4a90d9" stroke-width="2" fill="none"/>
+
+  <!-- App internal -->
+  <path d="M330 290 L360 290" stroke="#50b890" stroke-width="2" fill="none" marker-end="url(#arrowGreen)"/>
+  <path d="M500 340 L345 380" stroke="#50b890" stroke-width="2" fill="none" marker-end="url(#arrowGreen)"/>
+
+  <!-- App to LLM -->
+  <path d="M640 445 L700 380" stroke="#9b59b6" stroke-width="2" fill="none" marker-end="url(#arrowPurple)"/>
+
+  <!-- App to Memory -->
+  <path d="M345 480 L345 520" stroke="#50b890" stroke-width="2" fill="none" marker-end="url(#arrowGreen)"/>
+
+  <!-- Memory migration arrows -->
+  <path d="M300 600 L390 600" stroke="#f5a623" stroke-width="2" stroke-dasharray="5,5" fill="none" marker-end="url(#arrowOrange)"/>
+  <path d="M610 600 L700 600" stroke="#f5a623" stroke-width="2" stroke-dasharray="5,5" fill="none" marker-end="url(#arrowOrange)"/>
+  <text x="345" y="590" fill="#d0b080" font-family="Segoe UI, Arial, sans-serif" font-size="9">migrate</text>
+  <text x="655" y="590" fill="#d0b080" font-family="Segoe UI, Arial, sans-serif" font-size="9">scale</text>
+
+  <!-- Arrow markers -->
+  <defs>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#4a90d9"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#50b890"/>
+    </marker>
+    <marker id="arrowPurple" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#9b59b6"/>
+    </marker>
+    <marker id="arrowOrange" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#f5a623"/>
+    </marker>
+  </defs>
+
+  <!-- Legend -->
+  <rect x="760" y="700" width="200" height="80" rx="5" fill="#1a1a2e" stroke="#404060" stroke-width="1"/>
+  <text x="860" y="720" text-anchor="middle" fill="#808090" font-family="Segoe UI, Arial, sans-serif" font-size="10" font-weight="bold">LEGEND</text>
+  <rect x="775" y="730" width="12" height="12" fill="#4a90d9"/>
+  <text x="795" y="740" fill="#a0a0b0" font-family="Segoe UI, Arial, sans-serif" font-size="9">Clients</text>
+  <rect x="855" y="730" width="12" height="12" fill="#50b890"/>
+  <text x="875" y="740" fill="#a0a0b0" font-family="Segoe UI, Arial, sans-serif" font-size="9">Application</text>
+  <rect x="775" y="750" width="12" height="12" fill="#f5a623"/>
+  <text x="795" y="760" fill="#a0a0b0" font-family="Segoe UI, Arial, sans-serif" font-size="9">Memory</text>
+  <rect x="855" y="750" width="12" height="12" fill="#9b59b6"/>
+  <text x="875" y="760" fill="#a0a0b0" font-family="Segoe UI, Arial, sans-serif" font-size="9">LLM</text>
+</svg>
