@@ -1,11 +1,361 @@
-<!DOCTYPE html><html lang="en"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Schematics | WARNERCO Robotics Schematica</title><link rel="icon" type="image/svg+xml" href="/assets/favicon.svg"><link rel="stylesheet" href="/dash/styles/global.css"></head> <body> <nav class="nav"> <div class="nav-container"> <a href="/dash/" class="nav-brand"> <img src="/assets/warnerco-logo.svg" alt="WARNERCO" class="nav-logo"> </a> <div class="nav-links"> <a href="/dash/schematics/" class="nav-link active">
-Schematics
-</a> <a href="/dash/memory/" class="nav-link">
-Memory
-</a> <a href="/docs" class="nav-link" target="_blank">
-API Docs
-</a> </div> </div> </nav> <main class="container" style="padding-top: var(--space-xl); padding-bottom: var(--space-2xl);">  <div class="flex flex-between mb-lg"> <h1>Robot Schematics</h1> <button class="btn btn-primary" id="index-all-btn">
-Index All
-</button> </div>  <div class="card mb-lg"> <div class="input-group mb-md"> <input type="text" class="input" id="search-input" placeholder="Search schematics (e.g., 'thermal sensors for heavy-duty robots')..."> <button class="btn btn-primary" id="search-btn">Search</button> </div> <div class="flex gap-md"> <select class="input" id="category-filter" style="max-width: 200px;"> <option value="">All Categories</option> </select> <select class="input" id="model-filter" style="max-width: 200px;"> <option value="">All Models</option> </select> <select class="input" id="status-filter" style="max-width: 150px;"> <option value="">All Statuses</option> <option value="active">Active</option> <option value="deprecated">Deprecated</option> <option value="draft">Draft</option> </select> <button class="btn btn-secondary" id="refresh-btn">Refresh</button> </div> </div>  <div class="grid grid-4 mb-lg" id="stats-grid"> <div class="card stat-card"> <div class="stat-value" id="total-count">-</div> <div class="stat-label">Total Schematics</div> </div> <div class="card stat-card"> <div class="stat-value" style="color: var(--success-green);" id="active-count">-</div> <div class="stat-label">Active</div> </div> <div class="card stat-card"> <div class="stat-value" style="color: var(--warnerco-blue);" id="indexed-count">-</div> <div class="stat-label">Indexed</div> </div> <div class="card stat-card"> <div class="stat-value" style="color: var(--warning-orange);" id="categories-count">-</div> <div class="stat-label">Categories</div> </div> </div>  <div id="results-container"> <div class="grid grid-3" id="schematics-grid"> <!-- Cards populated by JavaScript --> </div> <div class="empty-state" id="empty-state" style="display: none;"> <img src="/assets/robot-offline.svg" alt="" class="empty-state-icon"> <p>No schematics found. Try adjusting your search or filters.</p> </div> <div class="flex flex-center" id="loading-state"> <div class="loader"></div> </div> </div>  <div class="card" id="search-results-panel" style="display: none; margin-top: var(--space-lg);"> <div class="card-header"> <h3 class="card-title">Search Results</h3> <button class="btn btn-secondary" id="close-search-btn">Close</button> </div> <div id="search-reasoning" class="alert alert-info mb-md" style="display: none;"></div> <div id="search-results-list"></div> </div>  </main> <footer style="text-align: center; padding: var(--space-lg); color: var(--text-muted); font-size: 0.875rem;">
-WARNERCO Robotics Schematica &copy; 2025 | Educational Demonstration
-</footer> </body></html> <script type="module" src="/dash/_assets/index.astro_astro_type_script_index_0_lang.CQ8wB01D.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Schematics Browser | WARNERCO Robotics</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="stylesheet" href="/dash/styles/global.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-container">
+      <a href="/dash/" class="nav-brand">
+        <img src="/assets/warnerco-logo.svg" alt="WARNERCO" class="nav-logo">
+      </a>
+      <div class="nav-links">
+        <a href="/dash/schematics/" class="nav-link active">Schematics</a>
+        <a href="/dash/memory/" class="nav-link">Memory</a>
+        <a href="/docs" class="nav-link" target="_blank">API Docs</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container" style="padding: var(--space-xl) var(--space-lg);">
+    <!-- Search Section -->
+    <div class="card mb-lg">
+      <h2 style="margin-bottom: var(--space-lg);">Semantic Search</h2>
+      <div class="flex gap-md" style="flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 300px;">
+          <input type="text" id="searchInput" class="input" placeholder="Search schematics... (e.g., 'thermal sensors for industrial robots')">
+        </div>
+        <select id="categoryFilter" class="input select" style="width: auto; min-width: 150px;">
+          <option value="">All Categories</option>
+        </select>
+        <select id="modelFilter" class="input select" style="width: auto; min-width: 150px;">
+          <option value="">All Models</option>
+        </select>
+        <button id="searchBtn" class="btn btn-primary">Search</button>
+      </div>
+
+      <!-- Search Results -->
+      <div id="searchResults" class="hidden mt-lg">
+        <div class="flex flex-between" style="align-items: center; margin-bottom: var(--space-md);">
+          <h3>Search Results</h3>
+          <button id="clearSearch" class="btn btn-outline btn-sm">Clear</button>
+        </div>
+        <div id="searchResultsList"></div>
+        <div id="reasoning" class="card mt-md hidden" style="background: var(--bg-secondary);">
+          <h4 style="color: var(--primary-light); margin-bottom: var(--space-sm);">AI Reasoning</h4>
+          <p id="reasoningText" style="white-space: pre-wrap; margin: 0;"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="grid grid-4 mb-lg" id="statsRow">
+      <div class="stat-card">
+        <div class="stat-value" id="totalCount">-</div>
+        <div class="stat-label">Total Schematics</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="activeCount">-</div>
+        <div class="stat-label">Active</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="categoryCount">-</div>
+        <div class="stat-label">Categories</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="modelCount">-</div>
+        <div class="stat-label">Robot Models</div>
+      </div>
+    </div>
+
+    <!-- Schematics Grid -->
+    <div class="flex flex-between mb-md" style="align-items: center;">
+      <h2>All Schematics</h2>
+      <div class="flex gap-sm">
+        <select id="statusFilter" class="input select" style="width: auto;">
+          <option value="">All Status</option>
+          <option value="active">Active</option>
+          <option value="deprecated">Deprecated</option>
+          <option value="draft">Draft</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="schematicsGrid" class="grid grid-3">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div id="detailModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: var(--space-lg);">
+      <div class="card" style="max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto;">
+        <div class="flex flex-between mb-md">
+          <span id="modalModel" class="badge badge-info"></span>
+          <button id="closeModal" class="btn btn-outline btn-sm">Close</button>
+        </div>
+        <h2 id="modalName"></h2>
+        <p id="modalComponent" class="text-secondary"></p>
+        <div id="modalStatus" class="mt-sm"></div>
+
+        <div class="mt-lg">
+          <h4>Summary</h4>
+          <p id="modalSummary" class="text-secondary"></p>
+        </div>
+
+        <div class="mt-lg">
+          <h4>Specifications</h4>
+          <div id="modalSpecs" class="mt-sm"></div>
+        </div>
+
+        <div class="mt-lg">
+          <h4>Tags</h4>
+          <div id="modalTags" class="schematic-tags"></div>
+        </div>
+
+        <div class="mt-lg flex gap-md">
+          <a id="modalUrl" href="#" target="_blank" class="btn btn-primary">View Documentation</a>
+          <span id="modalVerified" class="text-muted" style="align-self: center;"></span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer style="text-align: center; padding: var(--space-lg); color: var(--text-muted); font-size: 0.875rem;">
+    WARNERCO Robotics Schematica &copy; 2025 | Educational Demonstration
+  </footer>
+
+  <script>
+    const API_BASE = '/api';
+    let allSchematics = [];
+    let categories = new Set();
+    let models = new Set();
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadStats();
+      await loadSchematics();
+      setupEventListeners();
+    });
+
+    async function loadStats() {
+      try {
+        const res = await fetch(`${API_BASE}/memory/stats`);
+        const stats = await res.json();
+
+        document.getElementById('totalCount').textContent = stats.total_schematics;
+        document.getElementById('activeCount').textContent = stats.status_counts?.active || 0;
+        document.getElementById('categoryCount').textContent = Object.keys(stats.categories || {}).length;
+
+        const categorySelect = document.getElementById('categoryFilter');
+        Object.keys(stats.categories || {}).sort().forEach(cat => {
+          const option = document.createElement('option');
+          option.value = cat;
+          option.textContent = `${cat} (${stats.categories[cat]})`;
+          categorySelect.appendChild(option);
+        });
+      } catch (err) {
+        console.error('Failed to load stats:', err);
+      }
+    }
+
+    async function loadSchematics() {
+      try {
+        const res = await fetch(`${API_BASE}/robots?limit=100`);
+        const data = await res.json();
+        allSchematics = data.items || [];
+
+        allSchematics.forEach(s => models.add(s.model));
+
+        const modelSelect = document.getElementById('modelFilter');
+        [...models].sort().forEach(model => {
+          const option = document.createElement('option');
+          option.value = model;
+          option.textContent = model;
+          modelSelect.appendChild(option);
+        });
+
+        document.getElementById('modelCount').textContent = models.size;
+        renderSchematics(allSchematics);
+      } catch (err) {
+        console.error('Failed to load schematics:', err);
+        document.getElementById('schematicsGrid').innerHTML = '<p class="text-danger">Failed to load schematics</p>';
+      }
+    }
+
+    function renderSchematics(schematics) {
+      const grid = document.getElementById('schematicsGrid');
+
+      if (schematics.length === 0) {
+        grid.innerHTML = '<p class="text-muted" style="grid-column: 1/-1; text-align: center; padding: var(--space-2xl);">No schematics found</p>';
+        return;
+      }
+
+      grid.innerHTML = schematics.map(s => `
+        <div class="schematic-card" data-id="${s.id}">
+          <div class="schematic-header">
+            <div>
+              <div class="schematic-model">${s.model}</div>
+              <div class="schematic-name">${s.name}</div>
+              <div class="schematic-component">${s.component}</div>
+            </div>
+            <span class="badge ${getStatusBadge(s.status)}">${s.status}</span>
+          </div>
+          <p class="schematic-summary">${truncate(s.summary, 120)}</p>
+          <div class="flex flex-between" style="align-items: center;">
+            <span class="badge badge-neutral">${s.category}</span>
+            <span class="text-muted" style="font-size: 0.75rem;">${s.version}</span>
+          </div>
+          <div class="schematic-tags">
+            ${(s.tags || []).slice(0, 3).map(t => `<span class="schematic-tag">${t}</span>`).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function getStatusBadge(status) {
+      return { active: 'badge-success', deprecated: 'badge-danger', draft: 'badge-warning' }[status] || 'badge-neutral';
+    }
+
+    function truncate(str, len) {
+      return str && str.length > len ? str.substring(0, len) + '...' : str;
+    }
+
+    async function performSearch() {
+      const query = document.getElementById('searchInput').value.trim();
+      if (!query) return;
+
+      const category = document.getElementById('categoryFilter').value;
+      const model = document.getElementById('modelFilter').value;
+
+      const searchResults = document.getElementById('searchResults');
+      const resultsList = document.getElementById('searchResultsList');
+
+      resultsList.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+      searchResults.classList.remove('hidden');
+
+      try {
+        const body = { query, top_k: 10 };
+        if (category) body.category = category;
+        if (model) body.model = model;
+
+        const res = await fetch(`${API_BASE}/search`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+
+        const data = await res.json();
+
+        if (data.results && data.results.length > 0) {
+          resultsList.innerHTML = data.results.map(r => `
+            <div class="search-result">
+              <div class="flex flex-between mb-sm">
+                <div>
+                  <span class="schematic-model">${r.model}</span>
+                  <strong style="margin-left: var(--space-sm);">${r.name}</strong>
+                </div>
+                <span class="search-score">${(r.score * 100).toFixed(1)}% match</span>
+              </div>
+              <p class="text-secondary" style="margin: 0;">${r.summary}</p>
+              <div class="flex gap-sm mt-sm">
+                <span class="badge badge-neutral">${r.category}</span>
+                <span class="badge ${getStatusBadge(r.status)}">${r.status}</span>
+              </div>
+            </div>
+          `).join('');
+
+          if (data.reasoning && !data.reasoning.includes('[LLM unavailable')) {
+            document.getElementById('reasoning').classList.remove('hidden');
+            document.getElementById('reasoningText').textContent = data.reasoning;
+          } else {
+            document.getElementById('reasoning').classList.add('hidden');
+          }
+        } else {
+          resultsList.innerHTML = '<p class="text-muted">No results found</p>';
+        }
+      } catch (err) {
+        console.error('Search failed:', err);
+        resultsList.innerHTML = '<p class="text-danger">Search failed</p>';
+      }
+    }
+
+    function showDetail(schematic) {
+      const modal = document.getElementById('detailModal');
+      document.getElementById('modalModel').textContent = schematic.model;
+      document.getElementById('modalName').textContent = schematic.name;
+      document.getElementById('modalComponent').textContent = schematic.component + ' (' + schematic.version + ')';
+      document.getElementById('modalStatus').innerHTML = `<span class="badge ${getStatusBadge(schematic.status)}">${schematic.status}</span>`;
+      document.getElementById('modalSummary').textContent = schematic.summary;
+      document.getElementById('modalUrl').href = schematic.url;
+      document.getElementById('modalVerified').textContent = schematic.last_verified ? `Last verified: ${schematic.last_verified}` : '';
+
+      const specsDiv = document.getElementById('modalSpecs');
+      if (schematic.specifications && Object.keys(schematic.specifications).length > 0) {
+        specsDiv.innerHTML = `<table class="table"><tbody>${Object.entries(schematic.specifications).map(([k, v]) => `<tr><td style="font-weight: 500;">${k}</td><td>${v}</td></tr>`).join('')}</tbody></table>`;
+      } else {
+        specsDiv.innerHTML = '<p class="text-muted">No specifications available</p>';
+      }
+
+      document.getElementById('modalTags').innerHTML = (schematic.tags || []).map(t => `<span class="schematic-tag">${t}</span>`).join('');
+      modal.classList.remove('hidden');
+      modal.style.display = 'flex';
+    }
+
+    function setupEventListeners() {
+      document.getElementById('searchBtn').addEventListener('click', performSearch);
+      document.getElementById('searchInput').addEventListener('keypress', e => { if (e.key === 'Enter') performSearch(); });
+
+      document.getElementById('clearSearch').addEventListener('click', () => {
+        document.getElementById('searchResults').classList.add('hidden');
+        document.getElementById('searchInput').value = '';
+        document.getElementById('reasoning').classList.add('hidden');
+      });
+
+      document.getElementById('statusFilter').addEventListener('change', filterSchematics);
+      document.getElementById('categoryFilter').addEventListener('change', filterSchematics);
+      document.getElementById('modelFilter').addEventListener('change', filterSchematics);
+
+      document.getElementById('schematicsGrid').addEventListener('click', async e => {
+        const card = e.target.closest('.schematic-card');
+        if (card) {
+          const id = card.dataset.id;
+          try {
+            const res = await fetch(`${API_BASE}/robots/${id}`);
+            const schematic = await res.json();
+            showDetail(schematic);
+          } catch (err) {
+            console.error('Failed to load schematic:', err);
+          }
+        }
+      });
+
+      document.getElementById('closeModal').addEventListener('click', () => {
+        document.getElementById('detailModal').classList.add('hidden');
+        document.getElementById('detailModal').style.display = 'none';
+      });
+
+      document.getElementById('detailModal').addEventListener('click', e => {
+        if (e.target.id === 'detailModal') {
+          document.getElementById('detailModal').classList.add('hidden');
+          document.getElementById('detailModal').style.display = 'none';
+        }
+      });
+    }
+
+    function filterSchematics() {
+      const status = document.getElementById('statusFilter').value;
+      const category = document.getElementById('categoryFilter').value;
+      const model = document.getElementById('modelFilter').value;
+
+      let filtered = allSchematics;
+      if (status) filtered = filtered.filter(s => s.status === status);
+      if (category) filtered = filtered.filter(s => s.category === category);
+      if (model) filtered = filtered.filter(s => s.model === model);
+
+      renderSchematics(filtered);
+    }
+  </script>
+</body>
+</html>
