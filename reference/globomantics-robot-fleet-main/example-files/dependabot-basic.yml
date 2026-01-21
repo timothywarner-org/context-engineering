@@ -1,0 +1,17 @@
+# Basic Dependabot configuration example
+# This is a minimal configuration that covers the most common use case
+
+version: 2
+updates:
+  # Enable version updates for npm
+  - package-ecosystem: "npm"
+    # Look for `package.json` and `lock` files in the `root` directory
+    directory: "/"
+    # Check for updates once a week
+    schedule:
+      interval: "weekly"
+      # Schedule updates for Monday at 10:00 UTC
+      day: "monday"
+      time: "10:00"
+    # Allow up to 10 open pull requests for npm dependencies
+    open-pull-requests-limit: 10

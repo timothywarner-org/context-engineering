@@ -1,0 +1,59 @@
+# Enterprise Dependency Review Workflow
+# Module 3: Production Security Pipeline - Tim Warner
+# Demonstrates real-world dependency scanning used by Fortune 500
+
+name: "🔒 Enterprise Dependency Review"
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - "package*.json"
+      - "yarn.lock"
+      - "pnpm-lock.yaml"
+
+# Enterprise security permissions - principle of least privilege
+permissions:
+  contents: read
+  pull-requests: write
+  security-events: write
+  actions: read
+
+jobs:
+  dependency-review:
+    name: "🛡️ Dependency Security Scan"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "📥 Checkout Repository"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "🔍 Enterprise Dependency Review"
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: moderate
+          allow-licenses: MIT, Apache-2.0, BSD-3-Clause, ISC
+          deny-licenses: GPL-2.0, GPL-3.0
+          vulnerability-check: true
+          license-check: true
+          comment-summary-in-pr: true
+          retry-on-snapshot-warnings: true
+          warn-only: false
+
+      - name: "📊 Security Report"
+        if: always()
+        run: |
+          echo "🔒 Enterprise Security Scan Complete"
+          echo "📋 Vulnerability assessment finished"
+          echo "⚖️ License compliance checked"
+          echo "📊 Results available in PR comments"
+
+# Enterprise Features Demonstrated:
+# ✅ Granular permissions (security-first)
+# ✅ Advanced vulnerability filtering
+# ✅ License compliance checking
+# ✅ Automated PR security comments
+# ✅ Multi-trigger event handling
+# ✅ File path filtering for efficiency

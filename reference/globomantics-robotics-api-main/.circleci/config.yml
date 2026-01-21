@@ -1,0 +1,155 @@
+version: 2.1
+
+jobs:
+  install-deps:
+    docker:
+      - image: cimg/node:18.19
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-npm-deps-{{ checksum "package-lock.json" }}
+      - run: npm ci
+      - save_cache:
+          key: v1-npm-deps-{{ checksum "package-lock.json" }}
+          paths:
+            - node_modules
+      - persist_to_workspace:
+          root: .
+          paths:
+            - node_modules
+
+  lint:
+    docker:
+      - image: cimg/node:18.19
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Run Linting
+          command: npm run lint
+
+  test-unit:
+    docker:
+      - image: cimg/node:18.19
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Run Unit Tests
+          command: npm test -- --testPathPattern=unit --passWithNoTests
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: coverage
+
+  test-integration:
+    docker:
+      - image: cimg/node:18.19
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Run Integration Tests
+          command: npm test -- --testPathPattern=integration --passWithNoTests
+      - store_test_results:
+          path: test-results
+
+  build:
+    docker:
+      - image: cimg/node:18.19
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run: npm run build
+      - store_artifacts:
+          path: dist
+          destination: build
+
+  deploy-staging:
+    docker:
+      - image: cimg/node:18.19
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Deploy to Staging
+          command: |
+            echo "Deploying Globomantics API to staging..."
+            echo "Environment: staging.globomantics.com"
+            echo "Version: $CIRCLE_SHA1"
+            echo "Deployment complete!"
+
+  approve-production:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - run: echo "Production deployment approved"
+
+  deploy-production:
+    docker:
+      - image: cimg/node:18.19
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Deploy to Production
+          command: |
+            echo "Deploying Globomantics API to PRODUCTION..."
+            echo "Environment: api.globomantics.com"
+            echo "Version: $CIRCLE_SHA1"
+            echo "PRODUCTION deployment complete!"
+
+workflows:
+  build-test-deploy:
+    jobs:
+      # Install dependencies first
+      - install-deps
+
+      # Fan out: lint and tests run in parallel
+      - lint:
+          requires:
+            - install-deps
+      - test-unit:
+          requires:
+            - install-deps
+      - test-integration:
+          requires:
+            - install-deps
+
+      # Fan in: build requires all tests to pass
+      - build:
+          requires:
+            - lint
+            - test-unit
+            - test-integration
+
+      # Deploy staging on all branches
+      - deploy-staging:
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: main
+
+      # Production: only on main, with manual approval
+      - hold-for-approval:
+          type: approval
+          requires:
+            - build
+          filters:
+            branches:
+              only: main
+
+      - deploy-production:
+          requires:
+            - hold-for-approval
+          filters:
+            branches:
+              only: main

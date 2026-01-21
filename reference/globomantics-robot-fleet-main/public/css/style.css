@@ -1,0 +1,330 @@
+/* Globomantics Robotics - Professional 2025 IT Styling */
+
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&display=swap');
+
+:root {
+    /* Official Globomantics Brand Colors from Brand Guidelines */
+    --globo-blue: #0066CC;
+    --tech-black: #1A1A1A;
+    --innovation-orange: #FF6B35;
+    --success-green: #28A745;
+    --neutral-gray: #6C757D;
+    --electric-purple: #7B2CBF;
+    --robotics-silver: #C0C0C0;
+    --data-cyan: #00D4FF;
+    --pure-white: #FFFFFF;
+
+    /* Modern 2025 IT aesthetics */
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --shadow-subtle: 0 4px 24px rgba(0, 0, 0, 0.06);
+    --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.12);
+    --border-radius: 12px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Global Typography - Open Sans per brand guidelines */
+body {
+    font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--tech-black);
+    background: linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%);
+    min-height: 100vh;
+}
+
+/* Modern Glass Morphism Navigation */
+.navbar {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-subtle);
+    padding: 1rem 0;
+}
+
+.navbar-brand {
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: var(--globo-blue) !important;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.globomantics-logo {
+    height: 32px;
+    width: auto;
+}
+
+.brand-text {
+    color: var(--tech-black) !important;
+}
+
+.brand-text .highlight {
+    color: var(--innovation-orange);
+}
+
+.nav-link {
+    font-weight: 600;
+    color: var(--tech-black) !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 8px;
+    transition: var(--transition);
+}
+
+.nav-link:hover {
+    background-color: rgba(0, 102, 204, 0.1);
+    color: var(--globo-blue) !important;
+}
+
+/* Modern Card Design */
+.card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-subtle);
+    transition: var(--transition);
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-elevated);
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--globo-blue) 0%, #004a99 100%);
+    border: none;
+    color: var(--pure-white);
+    font-weight: 700;
+    padding: 1.25rem;
+    border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
+}
+
+/* Hero Section Styling */
+.hero-section {
+    background: linear-gradient(135deg, var(--globo-blue) 0%, var(--electric-purple) 100%);
+    color: var(--pure-white);
+    border-radius: var(--border-radius);
+    padding: 3rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+    pointer-events: none;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+/* Modern Buttons */
+.btn {
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    transition: var(--transition);
+    border: none;
+    text-transform: none;
+    letter-spacing: 0.025em;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--globo-blue) 0%, #004a99 100%);
+    box-shadow: 0 4px 16px rgba(0, 102, 204, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 102, 204, 0.4);
+}
+
+.btn-outline-primary {
+    border: 2px solid var(--globo-blue);
+    color: var(--globo-blue);
+    background: transparent;
+}
+
+.btn-outline-primary:hover {
+    background: var(--globo-blue);
+    transform: translateY(-2px);
+}
+
+/* Status Indicators */
+.badge {
+    font-weight: 600;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+}
+
+.badge.bg-success {
+    background: linear-gradient(135deg, var(--success-green) 0%, #1e7e34 100%) !important;
+}
+
+.badge.bg-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%) !important;
+    color: var(--tech-black) !important;
+}
+
+.badge.bg-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+}
+
+/* Modern Progress Bars */
+.progress {
+    height: 8px;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.progress-bar {
+    border-radius: 4px;
+    transition: var(--transition);
+}
+
+/* Data Visualization */
+.stats-card {
+    background: linear-gradient(135deg, var(--pure-white) 0%, #f8faff 100%);
+    border: none;
+    text-align: center;
+}
+
+.stats-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+}
+
+.stats-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--globo-blue);
+    line-height: 1;
+}
+
+.stats-label {
+    font-weight: 600;
+    color: var(--neutral-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.85rem;
+}
+
+/* Modern Table Design */
+.table {
+    background: var(--pure-white);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-subtle);
+}
+
+.table th {
+    background: linear-gradient(135deg, var(--globo-blue) 0%, #004a99 100%);
+    color: var(--pure-white);
+    font-weight: 700;
+    border: none;
+    padding: 1rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.table td {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    vertical-align: middle;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(0, 102, 204, 0.02);
+}
+
+/* Alert Styling */
+.alert {
+    border: none;
+    border-radius: var(--border-radius);
+    border-left: 4px solid;
+    backdrop-filter: blur(10px);
+    font-weight: 500;
+}
+
+.alert-warning {
+    background: rgba(255, 193, 7, 0.1);
+    border-left-color: #ffc107;
+    color: #856404;
+}
+
+.alert-info {
+    background: rgba(0, 212, 255, 0.1);
+    border-left-color: var(--data-cyan);
+    color: #0c5460;
+}
+
+.alert-success {
+    background: rgba(40, 167, 69, 0.1);
+    border-left-color: var(--success-green);
+    color: #155724;
+}
+
+/* Footer */
+footer {
+    background: linear-gradient(135deg, var(--tech-black) 0%, #000000 100%);
+    color: var(--robotics-silver);
+    margin-top: 4rem;
+    padding: 2rem 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 2rem 1.5rem;
+        text-align: center;
+    }
+
+    .stats-card {
+        margin-bottom: 1rem;
+    }
+
+    .navbar-brand {
+        font-size: 1.25rem;
+    }
+
+    .globomantics-logo {
+        height: 28px;
+    }
+}
+
+/* Loading States */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Focus States for Accessibility */
+.btn:focus,
+.nav-link:focus {
+    outline: 2px solid var(--innovation-orange);
+    outline-offset: 2px;
+}

@@ -1,0 +1,123 @@
+<%- include('layout', { body: `
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-robot me-2"></i><%= robot.name %></h2>
+    <a href="/robots" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i>Back to Fleet
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Robot Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/robot/<%= robot.id %>/update">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Robot Name</label>
+                                <input type="text" class="form-control" name="name" value="<%= robot.name %>">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Model</label>
+                                <input type="text" class="form-control" name="model" value="<%= robot.model %>" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Status</label>
+                                <select class="form-control" name="status">
+                                    <option value="Active" <%= robot.status === 'Active' ? 'selected' : '' %>>Active</option>
+                                    <option value="Maintenance" <%= robot.status === 'Maintenance' ? 'selected' : '' %>>Maintenance</option>
+                                    <option value="Offline" <%= robot.status === 'Offline' ? 'selected' : '' %>>Offline</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Location</label>
+                                <input type="text" class="form-control" name="location" value="<%= robot.location %>">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Battery Level (%)</label>
+                                <input type="number" class="form-control" name="batteryLevel" value="<%= robot.batteryLevel %>" min="0" max="100">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Assigned Task</label>
+                                <input type="text" class="form-control" name="assignedTask" value="<%= robot.assignedTask %>">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i>Update Robot
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">System Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Battery Level</label>
+                    <div class="progress mb-2">
+                        <div class="progress-bar bg-<%= robot.batteryLevel > 50 ? 'success' : robot.batteryLevel > 20 ? 'warning' : 'danger' %>"
+                             style="width: <%= robot.batteryLevel %>%">
+                            <%= robot.batteryLevel %>%
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Operational Status</label>
+                    <p>
+                        <% if (robot.status === 'Active') { %>
+                            <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i>Operational</span>
+                        <% } else if (robot.status === 'Maintenance') { %>
+                            <span class="badge bg-warning fs-6"><i class="fas fa-tools me-1"></i>Under Maintenance</span>
+                        <% } else { %>
+                            <span class="badge bg-danger fs-6"><i class="fas fa-power-off me-1"></i>Offline</span>
+                        <% } %>
+                    </p>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Last Maintenance</label>
+                    <p class="form-control-plaintext"><%= moment(robot.lastMaintenance).format('MMMM DD, YYYY') %></p>
+                </div>
+
+                <div class="mb-0">
+                    <label class="form-label">Days Since Maintenance</label>
+                    <p class="form-control-plaintext"><%= moment().diff(moment(robot.lastMaintenance), 'days') %> days</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header bg-warning text-dark">
+                <h6 class="mb-0">Quick Actions</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-play me-1"></i>Start Task
+                    </button>
+                    <button class="btn btn-outline-warning btn-sm">
+                        <i class="fas fa-pause me-1"></i>Pause Operations
+                    </button>
+                    <button class="btn btn-outline-info btn-sm">
+                        <i class="fas fa-sync me-1"></i>Sync Data
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm">
+                        <i class="fas fa-power-off me-1"></i>Emergency Stop
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+` }) %>

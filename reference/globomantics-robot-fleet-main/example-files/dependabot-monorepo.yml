@@ -1,0 +1,189 @@
+# Monorepo Dependabot configuration
+# This example shows how to handle multiple projects in a single repository
+
+version: 2
+updates:
+  # Frontend React app
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    groups:
+      # Group all React-related packages
+      react-ecosystem:
+        patterns:
+          - "react"
+          - "react-*"
+          - "@testing-library/react*"
+      # Group build tools
+      build-tools:
+        patterns:
+          - "webpack*"
+          - "babel*"
+          - "@babel/*"
+          - "rollup*"
+      # Group all Material-UI packages
+      material-ui:
+        patterns:
+          - "@mui/*"
+          - "@emotion/*"
+    labels:
+      - "frontend"
+      - "dependencies"
+    commit-message:
+      prefix: "deps(frontend)"
+    # Separate PR limits for frontend
+    open-pull-requests-limit: 5
+
+  # Backend Node.js API
+  - package-ecosystem: "npm"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+    groups:
+      # Group Express and middleware
+      express-ecosystem:
+        patterns:
+          - "express*"
+          - "body-parser"
+          - "cors"
+          - "helmet"
+          - "compression"
+      # Group database packages
+      database:
+        patterns:
+          - "mongoose*"
+          - "mongodb*"
+          - "redis*"
+      # Group authentication packages
+      auth:
+        patterns:
+          - "passport*"
+          - "jsonwebtoken"
+          - "bcrypt*"
+    labels:
+      - "backend"
+      - "dependencies"
+    commit-message:
+      prefix: "deps(backend)"
+    open-pull-requests-limit: 5
+
+  # Shared utilities package
+  - package-ecosystem: "npm"
+    directory: "/packages/shared-utils"
+    schedule:
+      interval: "monthly"
+    labels:
+      - "shared"
+      - "dependencies"
+    commit-message:
+      prefix: "deps(shared)"
+    # More conservative update strategy for shared code
+    versioning-strategy: "increase-if-necessary"
+
+  # Mobile React Native app
+  - package-ecosystem: "npm"
+    directory: "/mobile"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+    groups:
+      # Group React Native core packages
+      react-native-core:
+        patterns:
+          - "react-native*"
+          - "@react-native*"
+          - "metro*"
+      # Group navigation packages
+      navigation:
+        patterns:
+          - "@react-navigation/*"
+          - "react-native-screens"
+          - "react-native-gesture-handler"
+    labels:
+      - "mobile"
+      - "dependencies"
+    commit-message:
+      prefix: "deps(mobile)"
+    # React Native often needs careful updates
+    open-pull-requests-limit: 3
+
+  # Documentation site
+  - package-ecosystem: "npm"
+    directory: "/docs"
+    schedule:
+      interval: "monthly"
+    groups:
+      # Group all documentation-related packages
+      docs:
+        patterns:
+          - "@docusaurus/*"
+          - "prism*"
+          - "remark*"
+    labels:
+      - "documentation"
+      - "dependencies"
+    commit-message:
+      prefix: "deps(docs)"
+
+  # E2E tests
+  - package-ecosystem: "npm"
+    directory: "/e2e"
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+    groups:
+      # Group testing frameworks
+      testing:
+        patterns:
+          - "playwright*"
+          - "@playwright/*"
+          - "cypress*"
+    labels:
+      - "testing"
+      - "dependencies"
+    commit-message:
+      prefix: "deps(e2e)"
+
+  # Infrastructure as Code
+  - package-ecosystem: "terraform"
+    directory: "/infrastructure/terraform"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "infrastructure"
+      - "terraform"
+    commit-message:
+      prefix: "deps(infra)"
+    reviewers:
+      - "devops-team"
+
+  # Kubernetes manifests
+  - package-ecosystem: "docker"
+    directory: "/k8s"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "kubernetes"
+      - "containers"
+    commit-message:
+      prefix: "deps(k8s)"
+
+  # CI/CD workflows
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "friday"
+    groups:
+      # Group all CI/CD actions
+      ci-cd:
+        patterns:
+          - "*"
+    labels:
+      - "ci/cd"
+      - "github-actions"
+    commit-message:
+      prefix: "ci(deps)"

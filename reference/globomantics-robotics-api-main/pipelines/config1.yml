@@ -1,0 +1,65 @@
+version: 2.1
+
+jobs:
+  build-and-test:
+    docker:
+      - image: cimg/node:18.19
+    resource_class: small
+    steps:
+      - checkout
+
+      # Restore npm cache if available
+      - restore_cache:
+          keys:
+            - npm-cache-{{ checksum "package-lock.json" }}
+            - npm-cache-
+
+      - run:
+          name: Install Dependencies
+          command: npm ci
+
+      # Introduce an intentional error:
+      # This package does NOT exist in node_modules and will cause npx to fail.
+      - run:
+          name: Run Security Audit
+          command: npx audit-ci --moderate  # This package isn't installed
+
+      # Save dependencies cache
+      - save_cache:
+          key: npm-cache-{{ checksum "package-lock.json" }}
+          paths:
+            - ~/.npm
+            - node_modules
+
+      - run:
+          name: Run Tests
+          command: npm test
+
+      - run:
+          name: Build Application
+          command: npm run build
+
+      # Store JUnit test reports separately (optional)
+      - store_test_results:
+          path: test-results
+
+      # Create a clean ZIP artifact
+      - run:
+          name: Package artifacts as ZIP
+          command: |
+            mkdir -p artifacts
+            cp -R dist artifacts/
+            cp -R coverage artifacts/
+            cp -R test-results artifacts/
+            cd artifacts
+            zip -r build-bundle.zip .
+
+      # Upload the single ZIP artifact
+      - store_artifacts:
+          path: artifacts/build-bundle.zip
+          destination: build-bundle.zip
+
+workflows:
+  build:
+    jobs:
+      - build-and-test

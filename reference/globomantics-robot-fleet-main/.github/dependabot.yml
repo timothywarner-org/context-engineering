@@ -1,0 +1,120 @@
+# Dependabot Configuration for Enterprise JavaScript Projects
+# This represents the 80% use case for production teams
+# Module 3: Automated Dependency Management - Tim Warner
+
+version: 2
+updates:
+    # NPM Dependencies - Primary Package Management
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"  # Security-first: Daily checks for vulnerabilities
+      time: "09:00"
+      timezone: "America/New_York"
+
+    open-pull-requests-limit: 5
+
+    # Enterprise PR Management
+    reviewers:
+      - "timothywarner-org"
+      - "github-copilot[bot]"
+    assignees:
+      - "timothywarner-org"
+    labels:
+      - "dependencies"
+      - "security"
+      - "automated"
+
+    # Group related updates to reduce PR noise
+    groups:
+      # Production dependencies - careful approach
+      production-dependencies:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "@types/*"
+          - "eslint*"
+          - "webpack*"
+          - "*test*"
+        update-types:
+          - "patch"
+          - "minor"
+
+      # Development tools - more aggressive
+      development-dependencies:
+        patterns:
+          - "@types/*"
+          - "eslint*"
+          - "webpack*"
+          - "*test*"
+          - "nodemon"
+        update-types:
+          - "patch"
+          - "minor"
+          - "major"
+
+    # Version strategy for enterprise CI/CD
+    versioning-strategy: "increase"
+
+    # Commit message format for conventional commits
+    commit-message:
+      prefix: "deps"
+      prefix-development: "build"
+      include: "scope"
+
+    # Target branch for updates (follows GitFlow)
+    target-branch: "main"
+
+    # Rebase strategy for cleaner history
+    rebase-strategy: "auto"
+
+    # Vendor specific configurations
+    vendor:
+      # Only allow known, trusted registries
+      - "registry.npmjs.org"
+
+    # Ignore specific packages that cause issues
+    ignore:
+      # Ignore major version bumps for critical packages
+      - dependency-name: "express"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "lodash"
+        update-types: ["version-update:semver-major"]
+
+      # Ignore packages with known breaking changes
+      - dependency-name: "moment"
+        # Moment.js is in maintenance mode
+
+  # GitHub Actions - Keep CI/CD current
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      day: "monday"
+      time: "09:00"
+
+    commit-message:
+      prefix: "ci"
+
+    reviewers:
+      - "timothywarner-org"
+
+    # Group all action updates together
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+        update-types:
+          - "patch"
+          - "minor"
+          - "major"
+
+# Enterprise Best Practices Demonstrated:
+# ✅ Security-first: Daily security checks
+# ✅ Noise reduction: Grouped updates
+# ✅ Team workflow: Proper reviewers/assignees
+# ✅ CI/CD friendly: Version strategy + rebase
+# ✅ Risk management: Ignore major breaking changes
+# ✅ Compliance: Vendor restrictions
+# ✅ Conventional commits: Standardized messages
+# ✅ Multi-ecosystem: NPM + GitHub Actions

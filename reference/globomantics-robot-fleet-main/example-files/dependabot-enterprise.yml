@@ -1,0 +1,216 @@
+# Enterprise Dependabot configuration with compliance and governance features
+# This example includes advanced features for large organizations
+
+version: 2
+# Enable Dependabot security updates globally
+enable-beta-ecosystems: true
+updates:
+  # Production application dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "02:00"
+      timezone: "America/New_York"
+    # Grouping strategy for enterprise
+    groups:
+      # Group patches for all packages
+      all-patch-updates:
+        applies-to: version-updates
+        update-types:
+          - "patch"
+      # Group minor updates by category
+      aws-minor:
+        patterns:
+          - "@aws-sdk/*"
+          - "aws-*"
+        update-types:
+          - "minor"
+      azure-minor:
+        patterns:
+          - "@azure/*"
+          - "azure-*"
+        update-types:
+          - "minor"
+      google-cloud-minor:
+        patterns:
+          - "@google-cloud/*"
+          - "gcp-*"
+        update-types:
+          - "minor"
+      # Security and compliance tools
+      security-tools:
+        patterns:
+          - "snyk*"
+          - "eslint-plugin-security*"
+          - "audit-*"
+      # Major updates handled individually
+    # Compliance labels
+    labels:
+      - "dependencies"
+      - "compliance-review"
+      - "needs-security-review"
+    # Multiple review teams
+    reviewers:
+      - "@myorg/security-team"
+      - "@myorg/architecture-team"
+      - "@myorg/dependency-committee"
+    # Auto-assign to dependency manager
+    assignees:
+      - "dependency-bot-manager"
+      - "backup-dependency-manager"
+    # Enterprise commit message format
+    commit-message:
+      prefix: "deps"
+      prefix-development: "deps-dev"
+      include: "scope"
+    # Pull request limits
+    open-pull-requests-limit: 20
+    # Milestone for tracking
+    milestone: 12
+    # Branch naming
+    pull-request-branch-name:
+      separator: "-"
+    # Rebase strategy for cleaner history
+    rebase-strategy: "auto"
+    # Private registry configuration
+    registries:
+      - npm-private
+    # Allow list for approved packages
+    allow:
+      # Only allow packages from approved vendors
+      - dependency-name: "@mycompany/*"
+      - dependency-name: "@trusted-vendor/*"
+      - dependency-name: "lodash"
+      - dependency-name: "express"
+      - dependency-name: "react"
+      - dependency-name: "react-dom"
+    # Extensive ignore list
+    ignore:
+      # Ignore all major updates by default
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+      # Ignore specific problematic versions
+      - dependency-name: "webpack"
+        versions: ["6.0.0", "6.0.1"]  # Known issues
+      # Ignore packages pending security review
+      - dependency-name: "left-pad"  # Under review
+      - dependency-name: "event-stream"  # Security concerns
+
+  # Java/Maven configuration
+  - package-ecosystem: "maven"
+    directory: "/services/payment-service"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "14:00"
+    groups:
+      # Group by organization
+      spring-framework:
+        patterns:
+          - "org.springframework*"
+      apache-commons:
+        patterns:
+          - "org.apache.commons:*"
+      testing-frameworks:
+        patterns:
+          - "org.junit*"
+          - "org.mockito:*"
+          - "org.assertj:*"
+    labels:
+      - "java"
+      - "maven"
+      - "payment-service"
+    reviewers:
+      - "@myorg/java-team"
+      - "@myorg/payment-team"
+    commit-message:
+      prefix: "deps(payment)"
+    # Use property version updates
+    versioning-strategy: "increase"
+
+  # .NET/NuGet configuration
+  - package-ecosystem: "nuget"
+    directory: "/services/inventory-service"
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+    groups:
+      microsoft-packages:
+        patterns:
+          - "Microsoft.*"
+          - "System.*"
+      aspnet-core:
+        patterns:
+          - "Microsoft.AspNetCore.*"
+      entity-framework:
+        patterns:
+          - "Microsoft.EntityFrameworkCore.*"
+    labels:
+      - "dotnet"
+      - "inventory-service"
+    reviewers:
+      - "@myorg/dotnet-team"
+    registries:
+      - nuget-private
+
+  # Private registries configuration (referenced above)
+  registries:
+    npm-private:
+      type: "npm-registry"
+      url: "https://npm.mycompany.com"
+      username: "${{secrets.NPM_USERNAME}}"
+      password: "${{secrets.NPM_PASSWORD}}"
+      # For registries using tokens
+      token: "${{secrets.NPM_TOKEN}}"
+    
+    nuget-private:
+      type: "nuget-feed"
+      url: "https://nuget.mycompany.com/v3/index.json"
+      username: "${{secrets.NUGET_USERNAME}}"
+      password: "${{secrets.NUGET_PASSWORD}}"
+    
+    docker-private:
+      type: "docker-registry"
+      url: "docker.mycompany.com"
+      username: "${{secrets.DOCKER_USERNAME}}"
+      password: "${{secrets.DOCKER_PASSWORD}}"
+
+  # Compliance scanning for licenses
+  - package-ecosystem: "bundler"
+    directory: "/legacy/ruby-app"
+    schedule:
+      interval: "monthly"
+    labels:
+      - "ruby"
+      - "legacy"
+      - "license-review-required"
+    # Only security updates for legacy apps
+    allow:
+      - dependency-type: "production"
+        update-types: ["security"]
+    reviewers:
+      - "@myorg/legal-team"  # For license review
+      - "@myorg/security-team"
+
+  # Golang modules
+  - package-ecosystem: "gomod"
+    directory: "/services/api-gateway"
+    schedule:
+      interval: "weekly"
+    groups:
+      # Group by major Go frameworks
+      gin-framework:
+        patterns:
+          - "github.com/gin-gonic/*"
+      grpc-ecosystem:
+        patterns:
+          - "google.golang.org/grpc*"
+          - "github.com/grpc-ecosystem/*"
+    labels:
+      - "golang"
+      - "api-gateway"
+    commit-message:
+      prefix: "deps(gateway)"
+    # Go uses minimal version selection
+    versioning-strategy: "increase"

@@ -211,13 +211,11 @@ async def reason(state: GraphState) -> GraphState:
                     api_key=settings.azure_openai_api_key,
                     azure_deployment=settings.azure_openai_deployment,
                     api_version=settings.azure_openai_api_version,
-                    temperature=0,
                 )
             else:
                 llm = ChatOpenAI(
                     api_key=settings.openai_api_key,
                     model="gpt-4o-mini",
-                    temperature=0,
                 )
 
             prompt = f"""You are a robotics engineer assistant. Based on the query and context, provide a helpful response.

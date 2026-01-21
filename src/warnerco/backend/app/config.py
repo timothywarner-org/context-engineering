@@ -36,7 +36,8 @@ class Settings(BaseSettings):
     openai_api_key: Optional[str] = None
     azure_openai_endpoint: Optional[str] = None
     azure_openai_api_key: Optional[str] = None
-    azure_openai_deployment: Optional[str] = None
+    azure_openai_deployment: str = "gpt-4o-mini"  # Chat model for reasoning
+    azure_openai_embedding_deployment: str = "text-embedding-ada-002"  # Embeddings
     azure_openai_api_version: str = "2024-08-01-preview"
 
     # Azure AI Search

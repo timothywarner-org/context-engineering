@@ -1,0 +1,121 @@
+# Advanced Dependabot configuration with multiple ecosystems and grouping
+# This example shows how to manage dependencies across different package managers
+
+version: 2
+updates:
+  # JavaScript/Node.js dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "America/New_York"
+    # Group dependencies by type
+    groups:
+      # Group all development dependencies
+      development-dependencies:
+        dependency-type: "development"
+        # Exclude specific packages from the group
+        exclude-patterns:
+          - "eslint*"
+          - "@types/*"
+      # Group all production dependencies
+      production-dependencies:
+        dependency-type: "production"
+      # Group all ESLint-related packages
+      eslint:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint/*"
+      # Group all AWS SDK packages
+      aws-sdk:
+        patterns:
+          - "@aws-sdk/*"
+          - "aws-sdk"
+    # Customize commit messages
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+    # Add labels to PRs
+    labels:
+      - "dependencies"
+      - "automated"
+    # Add reviewers automatically
+    reviewers:
+      - "octocat"
+      - "security-team"
+    # Add assignees
+    assignees:
+      - "dependency-manager"
+    # Only allow security updates for these packages
+    allow:
+      - dependency-name: "express"
+        dependency-type: "direct"
+      - dependency-name: "lodash"
+    # Ignore specific versions
+    ignore:
+      - dependency-name: "aws-sdk"
+        versions: ["2.x", "3.x"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+
+  # Python dependencies
+  - package-ecosystem: "pip"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+    groups:
+      # Group all Django-related packages
+      django:
+        patterns:
+          - "django*"
+      # Group testing frameworks
+      testing:
+        patterns:
+          - "pytest*"
+          - "coverage"
+          - "mock"
+    labels:
+      - "python"
+      - "dependencies"
+    # Increase version requirements to the latest resolvable
+    versioning-strategy: "increase"
+
+  # Docker dependencies
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    labels:
+      - "docker"
+      - "infrastructure"
+    reviewers:
+      - "devops-team"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "github-actions"
+      - "ci/cd"
+    # Only create PRs for major versions
+    allow:
+      - dependency-type: "direct"
+    ignore:
+      - dependency-name: "actions/checkout"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
+
+  # Terraform modules
+  - package-ecosystem: "terraform"
+    directory: "/infrastructure"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "terraform"
+      - "infrastructure"
+    commit-message:
+      prefix: "infra"

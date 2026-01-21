@@ -1,0 +1,113 @@
+# Issue Labels Configuration for Schematica
+# Apply with: gh label import labels.yml (requires GitHub CLI)
+# Or use GitHub Settings > Labels to create manually
+
+# Type Labels
+- name: "bug"
+  description: "Something isn't working"
+  color: "d73a4a"
+
+- name: "enhancement"
+  description: "New feature or request"
+  color: "a2eeef"
+
+- name: "documentation"
+  description: "Improvements or additions to documentation"
+  color: "0075ca"
+
+- name: "question"
+  description: "Further information is requested"
+  color: "d876e3"
+
+# Priority Labels
+- name: "priority: critical"
+  description: "Must be addressed immediately"
+  color: "b60205"
+
+- name: "priority: high"
+  description: "Important issue that should be addressed soon"
+  color: "ff6b6b"
+
+- name: "priority: medium"
+  description: "Should be addressed in normal course"
+  color: "fbca04"
+
+- name: "priority: low"
+  description: "Nice to have, address when time permits"
+  color: "0e8a16"
+
+# Component Labels
+- name: "component: mcp-api"
+  description: "Related to MCP API endpoints"
+  color: "1d76db"
+
+- name: "component: docker"
+  description: "Related to Docker configuration"
+  color: "2496ed"
+
+- name: "component: ci-cd"
+  description: "Related to CI/CD pipelines"
+  color: "4c1"
+
+- name: "component: schematics"
+  description: "Related to schematic data or lookup"
+  color: "5319e7"
+
+- name: "component: auth"
+  description: "Related to authentication"
+  color: "d93f0b"
+
+# Status Labels
+- name: "status: blocked"
+  description: "Blocked by another issue or external dependency"
+  color: "000000"
+
+- name: "status: needs-triage"
+  description: "Needs review and categorization"
+  color: "ededed"
+
+- name: "status: in-progress"
+  description: "Currently being worked on"
+  color: "0052cc"
+
+- name: "status: needs-review"
+  description: "Ready for code review"
+  color: "fbca04"
+
+# Effort Labels
+- name: "effort: small"
+  description: "Quick fix or small change"
+  color: "c5def5"
+
+- name: "effort: medium"
+  description: "Moderate amount of work"
+  color: "bfd4f2"
+
+- name: "effort: large"
+  description: "Significant implementation effort"
+  color: "bfdadc"
+
+# Special Labels
+- name: "good first issue"
+  description: "Good for newcomers"
+  color: "7057ff"
+
+- name: "help wanted"
+  description: "Extra attention is needed"
+  color: "008672"
+
+- name: "wontfix"
+  description: "This will not be worked on"
+  color: "ffffff"
+
+- name: "duplicate"
+  description: "This issue or pull request already exists"
+  color: "cfd3d7"
+
+- name: "training"
+  description: "Related to DevOps training content"
+  color: "f9d0c4"
+
+- name: "security"
+  description: "Security-related issue"
+  color: "ee0701"

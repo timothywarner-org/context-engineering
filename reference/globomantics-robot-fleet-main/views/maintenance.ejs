@@ -1,0 +1,54 @@
+<%- include('layout', { body: `
+<h2><i class="fas fa-tools me-2"></i>Maintenance Schedule</h2>
+<p class="text-muted mb-4">Robots currently requiring maintenance or scheduled for service</p>
+
+<div class="row">
+    <% if (robots.length === 0) { %>
+    <div class="col-12">
+        <div class="alert alert-success text-center">
+            <i class="fas fa-check-circle fa-3x mb-3"></i>
+            <h4>All Systems Operational</h4>
+            <p>No robots currently require maintenance. Great job keeping the fleet running smoothly!</p>
+        </div>
+    </div>
+    <% } else { %>
+        <% robots.forEach(robot => { %>
+        <div class="col-md-6 mb-4">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i><%= robot.name %>
+                    </h5>
+                    <small>Model: <%= robot.model %></small>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <p><strong>Current Location:</strong><br><%= robot.location %></p>
+                            <p><strong>Battery Level:</strong><br>
+                                <span class="badge bg-danger"><%= robot.batteryLevel %>%</span>
+                            </p>
+                        </div>
+                        <div class="col-6">
+                            <p><strong>Last Maintenance:</strong><br><%= moment(robot.lastMaintenance).format('MMM DD, YYYY') %></p>
+                            <p><strong>Days Overdue:</strong><br>
+                                <span class="badge bg-warning"><%= moment().diff(moment(robot.lastMaintenance), 'days') %> days</span>
+                            </p>
+                        </div>
+                    </div>
+                    <p><strong>Issue:</strong> <%= robot.assignedTask %></p>
+                </div>
+                <div class="card-footer">
+                    <a href="/robot/<%= robot.id %>" class="btn btn-primary btn-sm me-2">
+                        <i class="fas fa-eye"></i> View Details
+                    </a>
+                    <button class="btn btn-success btn-sm">
+                        <i class="fas fa-wrench"></i> Start Maintenance
+                    </button>
+                </div>
+            </div>
+        </div>
+        <% }); %>
+    <% } %>
+</div>
+` }) %>

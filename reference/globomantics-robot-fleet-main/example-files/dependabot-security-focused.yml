@@ -1,0 +1,123 @@
+# Security-focused Dependabot configuration
+# This example prioritizes security updates and includes security-specific settings
+
+version: 2
+updates:
+  # JavaScript dependencies with security focus
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      # Check daily for security updates
+      interval: "daily"
+      time: "02:00"
+    # Security updates are created immediately
+    # Regular updates follow the schedule
+    open-pull-requests-limit: 20
+    # Group security updates separately
+    groups:
+      # Group all non-security updates
+      regular-updates:
+        applies-to: version-updates
+        patterns:
+          - "*"
+      # Security updates are never grouped (default behavior)
+    # Target branch for PRs
+    target-branch: "develop"
+    # Add security label to all PRs
+    labels:
+      - "dependencies"
+      - "security"
+    # Notify security team
+    reviewers:
+      - "security-team"
+      - "@myorg/security-reviewers"
+    # Security-focused commit message
+    commit-message:
+      prefix: "sec"
+      prefix-development: "sec-dev"
+      include: "scope"
+    # Allow only security updates for older packages
+    allow:
+      - dependency-name: "*"
+        dependency-type: "all"
+    # Ignore updates for deprecated packages
+    ignore:
+      - dependency-name: "request"  # deprecated package
+      - dependency-name: "node-uuid"  # replaced by uuid
+    # Vendor dependencies when updating
+    vendor: true
+    # Enable auto-merge for patch updates
+    # (Requires GitHub auto-merge to be enabled)
+    milestone: 1
+
+  # Python with security scanning
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "03:00"
+    # Use pip-compile to maintain requirements.txt
+    insecure-external-code-execution: "allow"
+    labels:
+      - "python-security"
+      - "dependencies"
+    # Group by update type
+    groups:
+      # Group all patch updates
+      patch-updates:
+        update-types:
+          - "patch"
+      # Group all minor updates
+      minor-updates:
+        update-types:
+          - "minor"
+    # Security updates remain ungrouped
+
+  # Container scanning
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "docker-security"
+      - "container"
+    reviewers:
+      - "security-team"
+      - "devops-team"
+    # Only update base images
+    allow:
+      - dependency-type: "direct"
+
+  # Composer (PHP) with security focus
+  - package-ecosystem: "composer"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "php-security"
+    # Increase version requirements
+    versioning-strategy: "increase-if-necessary"
+    # Allow pre-release versions for security fixes
+    allow:
+      - dependency-name: "*"
+        dependency-type: "all"
+    ignore:
+      # Ignore major version updates for framework
+      - dependency-name: "symfony/*"
+        update-types: ["version-update:semver-major"]
+
+  # Security-focused GitHub Actions updates
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "actions-security"
+    # Group all non-security action updates
+    groups:
+      actions:
+        patterns:
+          - "*"
+    # Add security team as mandatory reviewers
+    reviewers:
+      - "security-team"
