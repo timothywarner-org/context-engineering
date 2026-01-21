@@ -1,0 +1,74 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+---
+
+<MainLayout title="Dashboard">
+  <div style="text-align: center; padding: var(--space-2xl) 0;">
+    <h1 style="font-size: 2.5rem; margin-bottom: var(--space-md);">
+      WARNERCO Robotics Schematica
+    </h1>
+    <p style="font-size: 1.25rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto var(--space-xl);">
+      Agentic robot schematics system with semantic memory.
+      Search, browse, and analyze robot component documentation.
+    </p>
+
+    <div class="flex flex-center gap-md">
+      <a href="/dash/schematics/" class="btn btn-primary">
+        Browse Schematics
+      </a>
+      <a href="/dash/memory/" class="btn btn-outline">
+        Memory Dashboard
+      </a>
+    </div>
+  </div>
+
+  <div class="grid grid-3" style="margin-top: var(--space-2xl);">
+    <div class="card" style="text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: var(--space-sm);">
+        <img src="/assets/robot-active.svg" alt="" width="64" height="64" style="display: block; margin: 0 auto;" />
+      </div>
+      <h3>Semantic Search</h3>
+      <p class="text-muted">Find schematics using natural language queries. Powered by vector embeddings.</p>
+    </div>
+
+    <div class="card" style="text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: var(--space-sm);">
+        <img src="/assets/robot-maintenance.svg" alt="" width="64" height="64" style="display: block; margin: 0 auto;" />
+      </div>
+      <h3>LangGraph Orchestration</h3>
+      <p class="text-muted">Retrieval-augmented reasoning with intent classification and context compression.</p>
+    </div>
+
+    <div class="card" style="text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: var(--space-sm);">
+        <img src="/assets/robot-offline.svg" alt="" width="64" height="64" style="display: block; margin: 0 auto;" />
+      </div>
+      <h3>MCP Integration</h3>
+      <p class="text-muted">FastMCP tools enable AI assistants to query and reason about schematics.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: var(--space-2xl);">
+    <h2>Quick Start</h2>
+    <div class="grid grid-2" style="margin-top: var(--space-lg);">
+      <div>
+        <h4>API Endpoints</h4>
+        <ul style="padding-left: var(--space-lg); color: var(--text-secondary);">
+          <li><code>GET /api/robots</code> - List schematics</li>
+          <li><code>GET /api/robots/{'{id}'}</code> - Get schematic</li>
+          <li><code>POST /api/search</code> - Semantic search</li>
+          <li><code>GET /api/memory/stats</code> - Memory stats</li>
+        </ul>
+      </div>
+      <div>
+        <h4>MCP Tools</h4>
+        <ul style="padding-left: var(--space-lg); color: var(--text-secondary);">
+          <li><code>warn_list_robots</code> - List schematics</li>
+          <li><code>warn_get_robot</code> - Get details</li>
+          <li><code>warn_semantic_search</code> - Search</li>
+          <li><code>warn_memory_stats</code> - Statistics</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</MainLayout>

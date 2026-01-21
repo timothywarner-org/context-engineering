@@ -1,0 +1,361 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import SchematicCard from '../../components/SchematicCard.astro';
+---
+
+<MainLayout title="Schematics" activePage="schematics">
+  <div class="flex flex-between mb-lg">
+    <h1>Robot Schematics</h1>
+    <button class="btn btn-primary" id="index-all-btn">
+      Index All
+    </button>
+  </div>
+
+  <!-- Search and Filters -->
+  <div class="card mb-lg">
+    <div class="input-group mb-md">
+      <input
+        type="text"
+        class="input"
+        id="search-input"
+        placeholder="Search schematics (e.g., 'thermal sensors for heavy-duty robots')..."
+      />
+      <button class="btn btn-primary" id="search-btn">Search</button>
+    </div>
+
+    <div class="flex gap-md">
+      <select class="input" id="category-filter" style="max-width: 200px;">
+        <option value="">All Categories</option>
+      </select>
+      <select class="input" id="model-filter" style="max-width: 200px;">
+        <option value="">All Models</option>
+      </select>
+      <select class="input" id="status-filter" style="max-width: 150px;">
+        <option value="">All Statuses</option>
+        <option value="active">Active</option>
+        <option value="deprecated">Deprecated</option>
+        <option value="draft">Draft</option>
+      </select>
+      <button class="btn btn-secondary" id="refresh-btn">Refresh</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-4 mb-lg" id="stats-grid">
+    <div class="card stat-card">
+      <div class="stat-value" id="total-count">-</div>
+      <div class="stat-label">Total Schematics</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-value" style="color: var(--success-green);" id="active-count">-</div>
+      <div class="stat-label">Active</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-value" style="color: var(--warnerco-blue);" id="indexed-count">-</div>
+      <div class="stat-label">Indexed</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-value" style="color: var(--warning-orange);" id="categories-count">-</div>
+      <div class="stat-label">Categories</div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="results-container">
+    <div class="grid grid-3" id="schematics-grid">
+      <!-- Cards populated by JavaScript -->
+    </div>
+    <div class="empty-state" id="empty-state" style="display: none;">
+      <img src="/assets/robot-offline.svg" alt="" class="empty-state-icon" />
+      <p>No schematics found. Try adjusting your search or filters.</p>
+    </div>
+    <div class="flex flex-center" id="loading-state">
+      <div class="loader"></div>
+    </div>
+  </div>
+
+  <!-- Search Results Panel -->
+  <div class="card" id="search-results-panel" style="display: none; margin-top: var(--space-lg);">
+    <div class="card-header">
+      <h3 class="card-title">Search Results</h3>
+      <button class="btn btn-secondary" id="close-search-btn">Close</button>
+    </div>
+    <div id="search-reasoning" class="alert alert-info mb-md" style="display: none;"></div>
+    <div id="search-results-list"></div>
+  </div>
+</MainLayout>
+
+<script>
+  const API_BASE = '/api';
+
+  // State
+  let schematics = [];
+  let categories = [];
+  let models = [];
+
+  // DOM Elements
+  const schematicsGrid = document.getElementById('schematics-grid');
+  const loadingState = document.getElementById('loading-state');
+  const emptyState = document.getElementById('empty-state');
+  const searchInput = document.getElementById('search-input') as HTMLInputElement;
+  const searchBtn = document.getElementById('search-btn');
+  const categoryFilter = document.getElementById('category-filter') as HTMLSelectElement;
+  const modelFilter = document.getElementById('model-filter') as HTMLSelectElement;
+  const statusFilter = document.getElementById('status-filter') as HTMLSelectElement;
+  const refreshBtn = document.getElementById('refresh-btn');
+  const indexAllBtn = document.getElementById('index-all-btn');
+  const searchResultsPanel = document.getElementById('search-results-panel');
+  const searchReasoning = document.getElementById('search-reasoning');
+  const searchResultsList = document.getElementById('search-results-list');
+  const closeSearchBtn = document.getElementById('close-search-btn');
+
+  // Stats elements
+  const totalCount = document.getElementById('total-count');
+  const activeCount = document.getElementById('active-count');
+  const indexedCount = document.getElementById('indexed-count');
+  const categoriesCount = document.getElementById('categories-count');
+
+  // Functions
+  async function fetchSchematics() {
+    const params = new URLSearchParams();
+    if (categoryFilter?.value) params.set('category', categoryFilter.value);
+    if (modelFilter?.value) params.set('model', modelFilter.value);
+    if (statusFilter?.value) params.set('status', statusFilter.value);
+
+    const response = await fetch(`${API_BASE}/robots?${params}`);
+    const data = await response.json();
+    return data;
+  }
+
+  async function fetchStats() {
+    const response = await fetch(`${API_BASE}/memory/stats`);
+    return await response.json();
+  }
+
+  async function fetchCategories() {
+    const response = await fetch(`${API_BASE}/categories`);
+    return await response.json();
+  }
+
+  async function fetchModels() {
+    const response = await fetch(`${API_BASE}/models`);
+    return await response.json();
+  }
+
+  async function performSearch(query: string) {
+    const response = await fetch(`${API_BASE}/search`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query,
+        filters: {},
+        top_k: 10,
+      }),
+    });
+    return await response.json();
+  }
+
+  async function indexSchematic(id: string) {
+    const response = await fetch(`${API_BASE}/robots/${id}/index`, {
+      method: 'POST',
+    });
+    return await response.json();
+  }
+
+  async function indexAllSchematics() {
+    const response = await fetch(`${API_BASE}/robots/index-all`, {
+      method: 'POST',
+    });
+    return await response.json();
+  }
+
+  function renderSchematics(items: any[]) {
+    if (!schematicsGrid) return;
+
+    if (items.length === 0) {
+      schematicsGrid.innerHTML = '';
+      emptyState!.style.display = 'block';
+      return;
+    }
+
+    emptyState!.style.display = 'none';
+    schematicsGrid.innerHTML = items.map(s => `
+      <div class="card schematic-card" data-id="${s.id}">
+        <div class="card-header">
+          <div class="flex gap-md" style="align-items: center;">
+            <img src="/assets/robot-${s.status === 'active' ? 'active' : s.status === 'deprecated' ? 'offline' : 'maintenance'}.svg" alt="${s.status}" width="32" height="32" />
+            <div>
+              <h3 class="card-title" style="font-size: 1rem;">${s.model} - ${s.name}</h3>
+              <p class="text-muted" style="margin: 0; font-size: 0.75rem;">${s.id}</p>
+            </div>
+          </div>
+          <span class="badge badge-${s.status === 'active' ? 'active' : s.status === 'deprecated' ? 'deprecated' : 'draft'}">${s.status}</span>
+        </div>
+        <div style="margin-bottom: var(--space-sm);">
+          <strong>${s.component}</strong>
+          <span class="text-muted">(${s.version})</span>
+        </div>
+        <p class="text-muted" style="font-size: 0.875rem; margin-bottom: var(--space-md);">
+          ${s.summary.length > 100 ? s.summary.slice(0, 100) + '...' : s.summary}
+        </p>
+        <div class="flex flex-between">
+          <span class="badge" style="background: var(--bg-secondary); color: var(--text-secondary);">${s.category}</span>
+          <button class="btn btn-outline index-btn" style="padding: 4px 12px; font-size: 0.75rem;" data-id="${s.id}">Index</button>
+        </div>
+      </div>
+    `).join('');
+
+    // Add click handlers for index buttons
+    document.querySelectorAll('.index-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const id = (btn as HTMLElement).dataset.id;
+        if (id) {
+          btn.textContent = '...';
+          await indexSchematic(id);
+          btn.textContent = 'Done';
+          setTimeout(() => { btn.textContent = 'Index'; }, 1500);
+          await loadStats();
+        }
+      });
+    });
+  }
+
+  function renderStats(stats: any) {
+    if (totalCount) totalCount.textContent = stats.total_schematics || '-';
+    if (activeCount) activeCount.textContent = stats.status_counts?.active || '-';
+    if (indexedCount) indexedCount.textContent = stats.indexed_count || '-';
+    if (categoriesCount) categoriesCount.textContent = Object.keys(stats.categories || {}).length.toString();
+  }
+
+  function populateFilters() {
+    if (categoryFilter) {
+      const currentVal = categoryFilter.value;
+      categoryFilter.innerHTML = '<option value="">All Categories</option>' +
+        categories.map(c => `<option value="${c}">${c}</option>`).join('');
+      categoryFilter.value = currentVal;
+    }
+
+    if (modelFilter) {
+      const currentVal = modelFilter.value;
+      modelFilter.innerHTML = '<option value="">All Models</option>' +
+        models.map(m => `<option value="${m}">${m}</option>`).join('');
+      modelFilter.value = currentVal;
+    }
+  }
+
+  async function loadData() {
+    loadingState!.style.display = 'flex';
+    emptyState!.style.display = 'none';
+
+    try {
+      const [schematicsData, categoriesData, modelsData] = await Promise.all([
+        fetchSchematics(),
+        fetchCategories(),
+        fetchModels(),
+      ]);
+
+      schematics = schematicsData.items;
+      categories = categoriesData;
+      models = modelsData;
+
+      populateFilters();
+      renderSchematics(schematics);
+    } catch (error) {
+      console.error('Failed to load data:', error);
+      emptyState!.style.display = 'block';
+    } finally {
+      loadingState!.style.display = 'none';
+    }
+  }
+
+  async function loadStats() {
+    try {
+      const stats = await fetchStats();
+      renderStats(stats);
+    } catch (error) {
+      console.error('Failed to load stats:', error);
+    }
+  }
+
+  // Event Handlers
+  searchBtn?.addEventListener('click', async () => {
+    const query = searchInput?.value?.trim();
+    if (!query) return;
+
+    searchBtn.textContent = 'Searching...';
+    try {
+      const results = await performSearch(query);
+
+      if (searchResultsPanel && searchReasoning && searchResultsList) {
+        searchResultsPanel.style.display = 'block';
+
+        if (results.reasoning) {
+          searchReasoning.style.display = 'block';
+          searchReasoning.textContent = results.reasoning;
+        } else {
+          searchReasoning.style.display = 'none';
+        }
+
+        searchResultsList.innerHTML = results.results.map((r: any) => `
+          <div class="flex flex-between" style="padding: var(--space-md); border-bottom: 1px solid #E0E0E0;">
+            <div>
+              <strong>${r.schematic.model} - ${r.schematic.name}</strong>
+              <span class="text-muted">(${r.schematic.id})</span>
+              <p class="text-muted" style="margin: var(--space-xs) 0 0; font-size: 0.875rem;">
+                ${r.schematic.component} - ${r.schematic.summary.slice(0, 80)}...
+              </p>
+            </div>
+            <div class="text-right">
+              <div style="font-weight: 600; color: var(--warnerco-blue);">${(r.score * 100).toFixed(0)}%</div>
+              <div class="text-muted" style="font-size: 0.75rem;">relevance</div>
+            </div>
+          </div>
+        `).join('') || '<p class="text-muted text-center">No results found.</p>';
+      }
+    } catch (error) {
+      console.error('Search failed:', error);
+    } finally {
+      searchBtn.textContent = 'Search';
+    }
+  });
+
+  searchInput?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') searchBtn?.click();
+  });
+
+  closeSearchBtn?.addEventListener('click', () => {
+    if (searchResultsPanel) searchResultsPanel.style.display = 'none';
+  });
+
+  [categoryFilter, modelFilter, statusFilter].forEach(filter => {
+    filter?.addEventListener('change', loadData);
+  });
+
+  refreshBtn?.addEventListener('click', () => {
+    loadData();
+    loadStats();
+  });
+
+  indexAllBtn?.addEventListener('click', async () => {
+    if (indexAllBtn) {
+      indexAllBtn.textContent = 'Indexing...';
+      (indexAllBtn as HTMLButtonElement).disabled = true;
+    }
+    try {
+      await indexAllSchematics();
+      await loadStats();
+    } catch (error) {
+      console.error('Index all failed:', error);
+    } finally {
+      if (indexAllBtn) {
+        indexAllBtn.textContent = 'Index All';
+        (indexAllBtn as HTMLButtonElement).disabled = false;
+      }
+    }
+  });
+
+  // Initial load
+  loadData();
+  loadStats();
+</script>

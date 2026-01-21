@@ -1,0 +1,69 @@
+---
+interface Props {
+  id: string;
+  model: string;
+  name: string;
+  component: string;
+  category: string;
+  status: string;
+  version: string;
+  summary: string;
+}
+
+const { id, model, name, component, category, status, version, summary } = Astro.props;
+
+const statusClass = status === 'active' ? 'badge-active'
+  : status === 'deprecated' ? 'badge-deprecated'
+  : status === 'draft' ? 'badge-draft'
+  : 'badge-maintenance';
+
+const statusIcon = status === 'active' ? '/assets/robot-active.svg'
+  : status === 'deprecated' ? '/assets/robot-offline.svg'
+  : '/assets/robot-maintenance.svg';
+---
+
+<div class="card schematic-card" data-id={id}>
+  <div class="card-header">
+    <div class="flex gap-md" style="align-items: center;">
+      <img src={statusIcon} alt={status} width="32" height="32" />
+      <div>
+        <h3 class="card-title">{model} - {name}</h3>
+        <p class="text-muted" style="margin: 0; font-size: 0.875rem;">{id}</p>
+      </div>
+    </div>
+    <span class:list={["badge", statusClass]}>{status}</span>
+  </div>
+
+  <div style="margin-bottom: var(--space-md);">
+    <strong>{component}</strong>
+    <span class="text-muted">({version})</span>
+  </div>
+
+  <p class="text-muted" style="font-size: 0.875rem; margin-bottom: var(--space-md);">
+    {summary.length > 120 ? summary.slice(0, 120) + '...' : summary}
+  </p>
+
+  <div class="flex flex-between">
+    <span class="badge" style="background: var(--bg-secondary); color: var(--text-secondary);">
+      {category}
+    </span>
+    <button class="btn btn-outline btn-sm index-btn" data-id={id}>
+      Index
+    </button>
+  </div>
+</div>
+
+<style>
+  .schematic-card {
+    cursor: pointer;
+  }
+
+  .schematic-card:hover {
+    border-color: var(--warnerco-blue);
+  }
+
+  .btn-sm {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: 0.75rem;
+  }
+</style>

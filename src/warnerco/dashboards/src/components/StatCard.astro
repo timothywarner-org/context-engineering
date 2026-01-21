@@ -1,0 +1,29 @@
+---
+interface Props {
+  value: string | number;
+  label: string;
+  icon?: string;
+  variant?: 'default' | 'success' | 'warning' | 'info';
+}
+
+const { value, label, icon, variant = 'default' } = Astro.props;
+
+const variantColors: Record<string, string> = {
+  default: 'var(--warnerco-blue)',
+  success: 'var(--success-green)',
+  warning: 'var(--warning-orange)',
+  info: 'var(--warnerco-blue-light)',
+};
+---
+
+<div class="card stat-card">
+  {icon && (
+    <div class="stat-icon" style={`color: ${variantColors[variant]}`}>
+      <Fragment set:html={icon} />
+    </div>
+  )}
+  <div class="stat-value" style={`color: ${variantColors[variant]}`}>
+    {value}
+  </div>
+  <div class="stat-label">{label}</div>
+</div>

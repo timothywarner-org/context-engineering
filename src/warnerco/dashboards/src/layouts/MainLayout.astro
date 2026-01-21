@@ -1,0 +1,47 @@
+---
+interface Props {
+  title: string;
+  activePage?: 'schematics' | 'memory';
+}
+
+const { title, activePage } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{title} | WARNERCO Robotics Schematica</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="stylesheet" href="/dash/styles/global.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-container">
+      <a href="/dash/" class="nav-brand">
+        <img src="/assets/warnerco-logo.svg" alt="WARNERCO" class="nav-logo">
+      </a>
+      <div class="nav-links">
+        <a href="/dash/schematics/" class:list={["nav-link", { active: activePage === 'schematics' }]}>
+          Schematics
+        </a>
+        <a href="/dash/memory/" class:list={["nav-link", { active: activePage === 'memory' }]}>
+          Memory
+        </a>
+        <a href="/docs" class="nav-link" target="_blank">
+          API Docs
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container" style="padding-top: var(--space-xl); padding-bottom: var(--space-2xl);">
+    <slot />
+  </main>
+
+  <footer style="text-align: center; padding: var(--space-lg); color: var(--text-muted); font-size: 0.875rem;">
+    WARNERCO Robotics Schematica &copy; 2025 | Educational Demonstration
+  </footer>
+</body>
+</html>

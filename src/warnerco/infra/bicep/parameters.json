@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environment": {
+      "value": "classroom"
+    },
+    "enableWaf": {
+      "value": false
+    },
+    "enableAiSearch": {
+      "value": false
+    },
+    "replicaMin": {
+      "value": 0
+    },
+    "replicaMax": {
+      "value": 3
+    },
+    "containerImage": {
+      "value": "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
+    }
+  }
+}

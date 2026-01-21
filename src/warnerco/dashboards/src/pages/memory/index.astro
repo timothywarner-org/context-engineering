@@ -1,0 +1,284 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+---
+
+<MainLayout title="Memory Dashboard" activePage="memory">
+  <div class="flex flex-between mb-lg">
+    <h1>Memory Dashboard</h1>
+    <div class="flex gap-md">
+      <label class="flex gap-sm" style="align-items: center;">
+        <input type="checkbox" id="auto-refresh" />
+        <span>Auto-refresh</span>
+      </label>
+      <button class="btn btn-secondary" id="refresh-btn">Refresh</button>
+    </div>
+  </div>
+
+  <!-- Memory Stats -->
+  <div class="grid grid-4 mb-lg" id="memory-stats">
+    <div class="card stat-card">
+      <div class="stat-value" id="backend-name">-</div>
+      <div class="stat-label">Backend</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-value" id="total-schematics">-</div>
+      <div class="stat-label">Total Schematics</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-value" style="color: var(--success-green);" id="indexed-count">-</div>
+      <div class="stat-label">Indexed</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-value" style="color: var(--warnerco-blue);" id="chunk-count">-</div>
+      <div class="stat-label">Chunks</div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="grid grid-2 mb-lg">
+    <!-- Category Distribution -->
+    <div class="card">
+      <h3 class="card-title mb-md">Category Distribution</h3>
+      <div id="category-chart">
+        <div class="empty-state" style="padding: var(--space-lg);">
+          <div class="loader"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Distribution -->
+    <div class="card">
+      <h3 class="card-title mb-md">Status Distribution</h3>
+      <div id="status-chart">
+        <div class="empty-state" style="padding: var(--space-lg);">
+          <div class="loader"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Index Coverage -->
+  <div class="card mb-lg">
+    <div class="card-header">
+      <h3 class="card-title">Index Coverage</h3>
+      <span class="text-muted" id="coverage-percent">0%</span>
+    </div>
+    <div class="progress" style="height: 20px; border-radius: 10px;">
+      <div class="progress-bar" id="coverage-bar" style="width: 0%;"></div>
+    </div>
+    <p class="text-muted mt-sm" style="font-size: 0.875rem;">
+      <span id="indexed-of-total">0 of 0</span> schematics indexed for semantic search
+    </p>
+  </div>
+
+  <!-- Recent Hits -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Recent Queries</h3>
+      <span class="badge badge-active" id="hits-count">0 queries</span>
+    </div>
+
+    <div class="table-container">
+      <table id="hits-table">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Query</th>
+            <th>Results</th>
+            <th>Duration</th>
+            <th>Backend</th>
+          </tr>
+        </thead>
+        <tbody id="hits-tbody">
+          <tr>
+            <td colspan="5" class="text-center text-muted">Loading...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</MainLayout>
+
+<script>
+  const API_BASE = '/api';
+
+  // State
+  let autoRefresh = false;
+  let refreshInterval: number | null = null;
+
+  // DOM Elements
+  const backendName = document.getElementById('backend-name');
+  const totalSchematics = document.getElementById('total-schematics');
+  const indexedCount = document.getElementById('indexed-count');
+  const chunkCount = document.getElementById('chunk-count');
+  const categoryChart = document.getElementById('category-chart');
+  const statusChart = document.getElementById('status-chart');
+  const coveragePercent = document.getElementById('coverage-percent');
+  const coverageBar = document.getElementById('coverage-bar');
+  const indexedOfTotal = document.getElementById('indexed-of-total');
+  const hitsTbody = document.getElementById('hits-tbody');
+  const hitsCount = document.getElementById('hits-count');
+  const refreshBtn = document.getElementById('refresh-btn');
+  const autoRefreshCheckbox = document.getElementById('auto-refresh') as HTMLInputElement;
+
+  // Functions
+  async function fetchStats() {
+    const response = await fetch(`${API_BASE}/memory/stats`);
+    return await response.json();
+  }
+
+  async function fetchHits() {
+    const response = await fetch(`${API_BASE}/memory/hits?limit=20`);
+    return await response.json();
+  }
+
+  function renderStats(stats: any) {
+    if (backendName) backendName.textContent = stats.backend || '-';
+    if (totalSchematics) totalSchematics.textContent = stats.total_schematics || '0';
+    if (indexedCount) indexedCount.textContent = stats.indexed_count || '0';
+    if (chunkCount) chunkCount.textContent = stats.chunk_count || '0';
+
+    // Coverage
+    const total = stats.total_schematics || 1;
+    const indexed = stats.indexed_count || 0;
+    const percent = Math.round((indexed / total) * 100);
+
+    if (coveragePercent) coveragePercent.textContent = `${percent}%`;
+    if (coverageBar) coverageBar.style.width = `${percent}%`;
+    if (indexedOfTotal) indexedOfTotal.textContent = `${indexed} of ${total}`;
+
+    // Category Chart
+    if (categoryChart) {
+      const categories = stats.categories || {};
+      const entries = Object.entries(categories).sort((a: any, b: any) => b[1] - a[1]);
+
+      if (entries.length === 0) {
+        categoryChart.innerHTML = '<p class="text-muted text-center">No data available</p>';
+      } else {
+        const maxCount = Math.max(...entries.map((e: any) => e[1]));
+        categoryChart.innerHTML = entries.map(([name, count]: any) => `
+          <div style="margin-bottom: var(--space-sm);">
+            <div class="flex flex-between" style="margin-bottom: 4px;">
+              <span style="font-size: 0.875rem;">${name}</span>
+              <span class="text-muted" style="font-size: 0.875rem;">${count}</span>
+            </div>
+            <div class="progress" style="height: 8px;">
+              <div class="progress-bar" style="width: ${(count / maxCount) * 100}%;"></div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    // Status Chart
+    if (statusChart) {
+      const statuses = stats.status_counts || {};
+      const statusColors: Record<string, string> = {
+        active: 'var(--success-green)',
+        deprecated: 'var(--neutral-gray)',
+        draft: 'var(--warnerco-blue)',
+        maintenance: 'var(--warning-orange)',
+      };
+
+      const entries = Object.entries(statuses);
+      const total = entries.reduce((sum: number, [, count]: any) => sum + count, 0) || 1;
+
+      if (entries.length === 0) {
+        statusChart.innerHTML = '<p class="text-muted text-center">No data available</p>';
+      } else {
+        statusChart.innerHTML = `
+          <div style="display: flex; gap: var(--space-lg); justify-content: center; flex-wrap: wrap;">
+            ${entries.map(([name, count]: any) => `
+              <div style="text-align: center;">
+                <div style="font-size: 2rem; font-weight: 700; color: ${statusColors[name] || 'var(--text-primary)'};">
+                  ${count}
+                </div>
+                <div class="text-muted" style="font-size: 0.75rem; text-transform: uppercase;">
+                  ${name}
+                </div>
+                <div class="text-muted" style="font-size: 0.75rem;">
+                  ${Math.round((count / total) * 100)}%
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+    }
+  }
+
+  function renderHits(hits: any[]) {
+    if (hitsCount) hitsCount.textContent = `${hits.length} queries`;
+
+    if (!hitsTbody) return;
+
+    if (hits.length === 0) {
+      hitsTbody.innerHTML = `
+        <tr>
+          <td colspan="5" class="text-center text-muted">No recent queries</td>
+        </tr>
+      `;
+      return;
+    }
+
+    hitsTbody.innerHTML = hits.map(hit => {
+      const date = new Date(hit.timestamp);
+      const timeStr = date.toLocaleTimeString();
+
+      return `
+        <tr>
+          <td style="white-space: nowrap; font-size: 0.875rem;">${timeStr}</td>
+          <td>
+            <div style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+              ${hit.query}
+            </div>
+          </td>
+          <td>
+            <span class="badge badge-${hit.robot_ids.length > 0 ? 'active' : 'deprecated'}">
+              ${hit.robot_ids.length} results
+            </span>
+          </td>
+          <td style="font-family: monospace; font-size: 0.875rem;">
+            ${hit.duration_ms.toFixed(1)}ms
+          </td>
+          <td>
+            <span class="badge" style="background: var(--bg-secondary); color: var(--text-secondary);">
+              ${hit.backend}
+            </span>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  async function loadData() {
+    try {
+      const [stats, hits] = await Promise.all([
+        fetchStats(),
+        fetchHits(),
+      ]);
+
+      renderStats(stats);
+      renderHits(hits);
+    } catch (error) {
+      console.error('Failed to load memory data:', error);
+    }
+  }
+
+  // Event Handlers
+  refreshBtn?.addEventListener('click', loadData);
+
+  autoRefreshCheckbox?.addEventListener('change', () => {
+    autoRefresh = autoRefreshCheckbox.checked;
+
+    if (autoRefresh && !refreshInterval) {
+      refreshInterval = window.setInterval(loadData, 5000);
+    } else if (!autoRefresh && refreshInterval) {
+      clearInterval(refreshInterval);
+      refreshInterval = null;
+    }
+  });
+
+  // Initial load
+  loadData();
+</script>
