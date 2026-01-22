@@ -1,83 +1,143 @@
 # WARNERCO Robotics Schematica - LangGraph RAG Flow
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#2d5016', 'primaryTextColor': '#fff', 'primaryBorderColor': '#1a3009', 'lineColor': '#4a5568', 'fontFamily': 'JetBrains Mono, monospace'}}}%%
 flowchart LR
-    subgraph Input["Query Input"]
-        Q["Natural Language<br/>Query"]
-        F["Filters<br/>(category, model)"]
-        K["top_k<br/>parameter"]
+    subgraph Input["<b>INPUT</b>"]
+        direction TB
+        Q["<b>query</b><br/>string"]
+        F["<b>filters</b><br/>category, model"]
+        K["<b>top_k</b><br/>int"]
     end
 
-    subgraph Flow["LangGraph RAG Flow"]
+    subgraph Pipeline["<b>LANGGRAPH 5-NODE PIPELINE</b>"]
         direction LR
 
-        N1["1. parse_intent<br/>━━━━━━━━━━<br/>Classify query type"]
-        N2["2. retrieve<br/>━━━━━━━━━━<br/>Fetch from memory"]
-        N3["3. compress_context<br/>━━━━━━━━━━<br/>Minimize tokens"]
-        N4["4. reason<br/>━━━━━━━━━━<br/>LLM generation"]
-        N5["5. respond<br/>━━━━━━━━━━<br/>Format output"]
+        N1["<b>1. PARSE INTENT</b><br/><br/>Classify query type<br/>Extract entities<br/>Set strategy"]
+
+        N2["<b>2. RETRIEVE</b><br/><br/>Query memory backend<br/>Apply filters<br/>Score candidates"]
+
+        N3["<b>3. COMPRESS</b><br/><br/>Extract key fields<br/>Minimize tokens<br/>Preserve context"]
+
+        N4["<b>4. REASON</b><br/><br/>Call Azure OpenAI<br/>Generate insights<br/>Synthesize response"]
+
+        N5["<b>5. RESPOND</b><br/><br/>Format output<br/>Add metadata<br/>Return result"]
+
+        N1 ==> N2 ==> N3 ==> N4 ==> N5
     end
 
-    subgraph Intents["Intent Classification"]
+    subgraph Intents["<b>INTENT TYPES</b>"]
         direction TB
-        I1["LOOKUP<br/>Direct ID/name fetch"]
-        I2["DIAGNOSTIC<br/>Troubleshooting queries"]
-        I3["ANALYTICS<br/>Stats & aggregations"]
-        I4["SEARCH<br/>Semantic matching"]
+        I1["<b>LOOKUP</b><br/>Direct fetch by ID/name"]
+        I2["<b>DIAGNOSTIC</b><br/>Troubleshooting queries"]
+        I3["<b>ANALYTICS</b><br/>Stats and aggregations"]
+        I4["<b>SEARCH</b><br/>Semantic matching"]
     end
 
-    subgraph State["GraphState"]
+    subgraph State["<b>GRAPH STATE</b>"]
         direction TB
-        S1["query: string"]
-        S2["intent: QueryIntent"]
-        S3["candidates: SearchResult[]"]
-        S4["compressed_context: string"]
-        S5["response: dict"]
-        S6["timings: dict"]
+        S["<b>TypedDict</b><br/><br/>query: str<br/>intent: QueryIntent<br/>filters: dict<br/>candidates: list<br/>compressed: str<br/>reasoning: str<br/>response: dict<br/>timings: dict"]
     end
 
-    subgraph Output["Response"]
-        R["QueryResponse<br/>━━━━━━━━━━<br/>success<br/>intent<br/>results<br/>reasoning<br/>query_time_ms"]
+    subgraph Output["<b>OUTPUT</b>"]
+        R["<b>QueryResponse</b><br/><br/>success: bool<br/>intent: str<br/>results: list<br/>reasoning: str<br/>query_time_ms: int"]
     end
 
+    %% Main flow
     Q --> N1
     F --> N1
     K --> N1
-
-    N1 --> N2
-    N2 --> N3
-    N3 --> N4
-    N4 --> N5
     N5 --> R
 
-    N1 -.->|classifies| Intents
-    N1 -.->|updates| S2
-    N2 -.->|updates| S3
-    N3 -.->|updates| S4
-    N4 -.->|calls LLM| S5
-    N5 -.->|formats| S5
+    %% Side connections
+    N1 -.->|"classifies"| Intents
+    Pipeline -.->|"tracks"| State
 
-    classDef inputNode fill:#4a90d9,stroke:#2e5984,color:#fff
-    classDef flowNode fill:#50b890,stroke:#2e8b57,color:#fff
-    classDef intentNode fill:#f39c12,stroke:#d68910,color:#fff
-    classDef stateNode fill:#9b59b6,stroke:#6c3483,color:#fff
-    classDef outputNode fill:#e74c3c,stroke:#c0392b,color:#fff
+    %% Styling with high contrast
+    classDef inputNode fill:#1e40af,stroke:#1e3a8a,color:#fff,stroke-width:2px
+    classDef pipeNode fill:#166534,stroke:#14532d,color:#fff,stroke-width:3px
+    classDef intentNode fill:#9a3412,stroke:#7c2d12,color:#fff,stroke-width:2px
+    classDef stateNode fill:#6b21a8,stroke:#581c87,color:#fff,stroke-width:2px
+    classDef outputNode fill:#be123c,stroke:#9f1239,color:#fff,stroke-width:2px
 
     class Q,F,K inputNode
-    class N1,N2,N3,N4,N5 flowNode
+    class N1,N2,N3,N4,N5 pipeNode
     class I1,I2,I3,I4 intentNode
-    class S1,S2,S3,S4,S5,S6 stateNode
+    class S stateNode
     class R outputNode
 ```
 
-## Description
+## Pipeline Details
 
-This diagram illustrates the 5-node LangGraph RAG (Retrieval-Augmented Generation) flow:
+### Node 1: Parse Intent
+Analyzes the incoming query to determine the best retrieval strategy.
 
-1. **parse_intent**: Classifies the query into one of four intent types (LOOKUP, DIAGNOSTIC, ANALYTICS, SEARCH)
-2. **retrieve**: Fetches candidate schematics from the memory backend based on intent
-3. **compress_context**: Minimizes token usage by extracting only relevant fields
-4. **reason**: Calls Azure OpenAI (gpt-4o-mini) for intelligent response generation
-5. **respond**: Formats the final output for dashboards and MCP consumers
+| Intent | Description | Strategy |
+|--------|-------------|----------|
+| **LOOKUP** | Direct ID or name reference | Exact match, bypass semantic |
+| **DIAGNOSTIC** | "Why is X failing?" | Include specs, prioritize recent |
+| **ANALYTICS** | "How many sensors?" | Aggregate, count operations |
+| **SEARCH** | General semantic query | Vector similarity, ranking |
 
-The GraphState TypedDict tracks query, intent, candidates, compressed context, response, and timing telemetry throughout the flow.
+### Node 2: Retrieve
+Fetches candidates from the active memory backend.
+
+```python
+# Chroma (semantic)
+results = collection.query(
+    query_texts=[compressed_query],
+    n_results=top_k,
+    where=filters
+)
+
+# JSON (keyword fallback)
+results = [s for s in schematics if matches_filters(s, filters)]
+```
+
+### Node 3: Compress Context
+Reduces token usage while preserving essential information.
+
+- Extracts: `id`, `name`, `summary`, `category`
+- Omits: full specifications, URLs, verbose metadata
+- Target: <2000 tokens for LLM context
+
+### Node 4: Reason
+Calls Azure OpenAI with compressed context.
+
+```python
+response = await client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": f"Query: {query}\nContext: {compressed}"}
+    ]
+)
+```
+
+### Node 5: Respond
+Formats the final response with metadata.
+
+```python
+return QueryResponse(
+    success=True,
+    intent=state["intent"],
+    results=state["candidates"],
+    reasoning=state["reasoning"],
+    query_time_ms=elapsed
+)
+```
+
+## State Management
+
+The `GraphState` TypedDict maintains context across all nodes:
+
+| Field | Type | Updated By |
+|-------|------|------------|
+| `query` | str | Input |
+| `intent` | QueryIntent | Node 1 |
+| `filters` | dict | Input |
+| `candidates` | list[SearchResult] | Node 2 |
+| `compressed_context` | str | Node 3 |
+| `reasoning` | str | Node 4 |
+| `response` | dict | Node 5 |
+| `timings` | dict | All nodes |

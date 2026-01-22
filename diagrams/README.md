@@ -1,6 +1,8 @@
-# MCP Architecture Diagrams
+# MCP Architecture Diagrams (Course Reference)
 
-This directory contains comprehensive Mermaid architecture diagrams for both MCP servers in the Context Engineering course.
+This directory contains **conceptual reference diagrams** for the Context Engineering with MCP course. These diagrams illustrate MCP architecture patterns using two teaching examples (CoreText MCP and Stoic MCP).
+
+> **Note**: For the **working implementation** diagrams, see [`docs/diagrams/`](../docs/diagrams/) which documents the actual WARNERCO Robotics Schematica system.
 
 ## Available Diagrams
 
