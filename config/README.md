@@ -7,17 +7,34 @@ Sample configuration files for integrating MCP servers with AI clients.
 | File | Description |
 |------|-------------|
 | `claude_desktop_config.json` | Sample Claude Desktop MCP configuration |
-| `mcp.json` | Sample VS Code GitHub Copilot MCP configuration |
 
-## Usage
+## Claude Desktop Configuration
 
-These are **sample** configurations. Copy them to the appropriate location and customize paths for your system:
+Copy `claude_desktop_config.json` to the appropriate location for your OS:
 
-**Claude Desktop** (copy to):
-- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
-- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 
-**VS Code** (copy to):
-- `.vscode/mcp.json` in your workspace
+After copying, update the paths in the configuration to match your local installation:
 
-See [reference/CONFIG_GUIDE.md](../reference/CONFIG_GUIDE.md) for detailed setup instructions.
+```json
+{
+  "mcpServers": {
+    "coretext": {
+      "command": "node",
+      "args": ["C:/path/to/context-engineering/mcp-servers/coretext-mcp/src/index.js"]
+    }
+  }
+}
+```
+
+Restart Claude Desktop after modifying the configuration.
+
+## VS Code Configuration
+
+For VS Code MCP configuration examples, see the `examples/` directory:
+
+- `examples/vscode_settings.json` - VS Code settings example
+- `examples/claude_code_mcp.json` - Claude Code MCP configuration example
+
+VS Code configurations are placed in `.vscode/mcp.json` within your workspace.

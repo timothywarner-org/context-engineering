@@ -8,6 +8,8 @@
 
 This directory contains comprehensive demonstration materials for presenting both MCP servers (CoreText and Stoic) in local development and Azure production environments.
 
+> **Note**: The coretext-mcp and stoic-mcp servers are conceptual teaching examples designed to illustrate MCP patterns and best practices. They serve as valuable reference implementations for understanding MCP architecture, tool design, and Azure deployment strategies.
+
 ### Documentation Files
 
 | File | Lines | Size | Purpose |
@@ -409,7 +411,7 @@ No prior MCP experience required - that's what this course teaches!
 
 ## 📝 License & Usage
 
-**Course Materials**: © 2025 Timothy Warner
+**Course Materials**: © 2026 Timothy Warner
 
 **Usage Rights**:
 - ✅ Use for learning and education
@@ -439,7 +441,10 @@ When sharing or building on these materials, please attribute:
 
 ## 📅 Version History
 
-- **v1.0** (October 30, 2025) - Initial comprehensive demo materials
+- **v1.1** (January 2026) - Updated documentation and conceptual notes
+  - Updated dates and version references
+  - Clarified coretext-mcp and stoic-mcp as conceptual teaching examples
+- **v1.0** (October 2025) - Initial comprehensive demo materials
   - Complete 4-part demo script (2,168 lines)
   - Printable quick reference card (447 lines)
   - This README for navigation

@@ -34,11 +34,25 @@ Agentic robot schematics system with semantic memory. A classroom prototype demo
 ### Prerequisites
 
 - Python 3.11+
-- Poetry (`curl -sSL https://install.python-poetry.org | python3 -`)
+- [uv](https://docs.astral.sh/uv/) (recommended) or Poetry
 - Node.js 18+ (for dashboard builds)
 - Azure CLI (for deployment)
 
 ### Local Development
+
+```bash
+cd src/warnerco/backend
+uv sync                                    # Install dependencies
+uv run uvicorn app.main:app --reload       # Start server (http://localhost:8000)
+```
+
+The server starts at:
+- **API**: http://localhost:8000
+- **API Docs**: http://localhost:8000/docs
+- **Dashboard**: http://localhost:8000/dash/
+- **MCP Endpoint**: http://localhost:8000/mcp
+
+### Using Scripts
 
 **Windows (PowerShell):**
 ```powershell
@@ -52,12 +66,6 @@ cd src/warnerco/scripts
 chmod +x *.sh
 ./run-local.sh
 ```
-
-The server starts at:
-- **API**: http://localhost:8000
-- **API Docs**: http://localhost:8000/docs
-- **Dashboard**: http://localhost:8000/dash/
-- **MCP Endpoint**: http://localhost:8000/mcp
 
 ### Build Dashboards
 
@@ -85,10 +93,14 @@ src/warnerco/
 │   │   ├── config.py          # Settings management
 │   │   ├── main.py            # FastAPI application
 │   │   └── mcp_tools.py       # FastMCP tool definitions
+│   ├── data/
+│   │   ├── schematics/        # JSON source of truth (25 robot schematics)
+│   │   └── chroma/            # Local vector database
 │   ├── static/
 │   │   ├── assets/            # Logo, favicon, robot icons
 │   │   └── dash/              # Built Astro dashboard (output)
-│   ├── pyproject.toml         # Poetry dependencies
+│   ├── scripts/               # Indexing utilities
+│   ├── pyproject.toml         # uv/Poetry dependencies
 │   └── .env.example           # Environment template
 ├── dashboards/                 # Astro static site project
 │   ├── src/
@@ -98,9 +110,6 @@ src/warnerco/
 │   │   └── styles/            # Global CSS
 │   ├── astro.config.mjs       # Astro configuration
 │   └── package.json
-├── data/
-│   ├── schematics/            # JSON source of truth
-│   └── chroma/                # Local vector database
 ├── infra/
 │   └── bicep/                 # Azure IaC templates
 │       ├── main.bicep
@@ -146,20 +155,32 @@ src/warnerco/
 
 Set via `MEMORY_BACKEND` environment variable:
 
-### `json` (Default for testing)
+### `json` (Default - fastest startup)
 - Reads/writes JSON files directly
 - Keyword-based search fallback
 - No external dependencies
 
-### `chroma` (Default for development)
+### `chroma` (Recommended for development)
 - Local vector embeddings
 - Semantic similarity search
 - Persists to `data/chroma/`
 
-### `azure_search` (Production)
+### `azure_search` (Production/Enterprise)
 - Azure AI Search integration
 - Enterprise-grade semantic search
 - Requires `AZURE_SEARCH_ENDPOINT` and `AZURE_SEARCH_KEY`
+
+### Index Schematics
+
+```bash
+cd src/warnerco/backend
+
+# Chroma (local vectors)
+uv run python -c "from app.adapters.chroma_store import ChromaMemoryStore; import asyncio; asyncio.run(ChromaMemoryStore().index_all())"
+
+# Azure AI Search (enterprise vectors)
+uv run python scripts/index_azure_search.py
+```
 
 ## LangGraph Flow
 
@@ -238,7 +259,29 @@ AZURE_SEARCH_INDEX=warnerco-schematics
 
 ## Development Commands
 
-### Backend
+### Backend (using uv - recommended)
+
+```bash
+cd src/warnerco/backend
+
+# Install dependencies
+uv sync
+
+# Run development server
+uv run uvicorn app.main:app --reload
+
+# Run MCP stdio server (for Claude Desktop)
+uv run warnerco-mcp
+
+# Format code
+uv run black .
+uv run ruff check --fix .
+
+# Run tests
+uv run pytest
+```
+
+### Backend (using Poetry - alternative)
 
 ```bash
 cd src/warnerco/backend
@@ -248,9 +291,6 @@ poetry install
 
 # Run development server
 poetry run uvicorn app.main:app --reload
-
-# Run with uv (faster)
-uv run uvicorn app.main:app --reload
 
 # Format code
 poetry run black .
@@ -298,7 +338,7 @@ The system includes 25 sample robot schematics across 8 robot models:
 
 ```bash
 cd src/warnerco/backend
-npx @modelcontextprotocol/inspector poetry run uvicorn app.main:app
+npx @modelcontextprotocol/inspector uv run uvicorn app.main:app
 ```
 
 Opens web UI at http://localhost:5173 to test MCP tools interactively.
@@ -314,8 +354,8 @@ Add to `claude_desktop_config.json`:
 {
   "mcpServers": {
     "warnerco-schematica": {
-      "command": "poetry",
-      "args": ["run", "uvicorn", "app.main:app"],
+      "command": "uv",
+      "args": ["run", "warnerco-mcp"],
       "cwd": "C:/github/context-engineering/src/warnerco/backend"
     }
   }
@@ -330,8 +370,8 @@ Create `.vscode/mcp.json` in your workspace:
 {
   "mcpServers": {
     "warnerco-schematica": {
-      "command": "poetry",
-      "args": ["run", "uvicorn", "app.main:app"],
+      "command": "uv",
+      "args": ["run", "warnerco-mcp"],
       "cwd": "${workspaceFolder}/src/warnerco/backend"
     }
   }

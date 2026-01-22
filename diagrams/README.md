@@ -191,10 +191,10 @@ These diagrams are maintained alongside the codebase. When architecture changes:
 ## Questions or Issues?
 
 For questions about the diagrams or suggestions for improvements:
-- Open an issue in the [GitHub repository](https://github.com/timothywarner-org/context-engineering-2)
+- Open an issue in the [GitHub repository](https://github.com/timothywarner-org/context-engineering)
 - Contact Tim Warner: [techtrainertim.com](https://techtrainertim.com)
 
 ## License
 
 These diagrams are part of the Context Engineering with MCP course materials.
-© 2025 Timothy Warner. For educational use.
+© 2026 Timothy Warner. For educational use.

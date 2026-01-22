@@ -2,19 +2,19 @@
 
 These progressive labs will take you from building your first MCP server to deploying production-ready AI memory systems.
 
+**Note**: This course is a work-in-progress. Additional labs are planned and will be released over time.
+
 ## Lab Structure
 
 Each lab includes:
-- 📝 **README.md** - Lab objectives and instructions
-- 🏗️ **starter/** - Starting code template
-- ✅ **solution/** - Reference solution
-- 🧪 **tests/** - Validation scripts (where applicable)
+- **README.md** - Lab objectives and instructions
+- **starter/** - Starting code template
+- **solution/** - Reference solution
+- **tests/** - Validation scripts (where applicable)
 
-## Learning Path
+## Available Labs
 
-### Beginner Track
-
-#### Lab 01: Hello MCP (30 minutes)
+### Lab 01: Hello MCP (30 minutes)
 **Objective**: Create your first MCP server with a single tool
 
 **What you'll learn**:
@@ -27,107 +27,55 @@ Each lab includes:
 
 ---
 
-#### Lab 02: Tool Calling Patterns (45 minutes)
-**Objective**: Build a multi-tool MCP server with parameter validation
+## Coming Soon
 
-**What you'll learn**:
+The following labs are planned for future releases:
+
+### Beginner Track
+
+**Lab 02: Tool Calling Patterns** (45 minutes)
 - Multiple tool registration
 - Input schema validation with JSON Schema
 - Error handling in tool handlers
 - Returning structured data
 
-**Prerequisites**: Lab 01
-
-**Start**: [lab-02-tool-calling/](./lab-02-tool-calling/)
-
----
-
-#### Lab 03: Resources and Context (45 minutes)
-**Objective**: Add MCP resources to expose dynamic data
-
-**What you'll learn**:
+**Lab 03: Resources and Context** (45 minutes)
 - Resource registration and URI schemes
 - Dynamic resource generation
 - Combining tools and resources
 - Resource templating
 
-**Prerequisites**: Lab 02
-
-**Start**: [lab-03-resources/](./lab-03-resources/)
-
----
-
 ### Intermediate Track
 
-#### Lab 04: Memory Patterns (60 minutes)
-**Objective**: Implement episodic and semantic memory storage
-
-**What you'll learn**:
+**Lab 04: Memory Patterns** (60 minutes)
 - Memory architecture patterns
 - Persistent storage with JSON files
 - Memory retrieval and search
 - Context window optimization
 
-**Prerequisites**: Lab 03
-
-**Start**: [lab-04-memory-patterns/](./lab-04-memory-patterns/)
-
----
-
-#### Lab 05: Production Deployment (60 minutes)
-**Objective**: Containerize and deploy your MCP server to Azure
-
-**What you'll learn**:
+**Lab 05: Production Deployment** (60 minutes)
 - Docker containerization
 - Azure Container Apps deployment
 - Environment configuration
 - Health checks and monitoring
 
-**Prerequisites**: Lab 04, Azure account
-
-**Start**: [lab-05-production-deployment/](./lab-05-production-deployment/)
-
----
-
 ### Advanced Track
 
-#### Lab 06: Advanced Patterns (90 minutes)
-**Objective**: Implement vector search and multi-agent orchestration
-
-**What you'll learn**:
+**Lab 06: Advanced Patterns** (90 minutes)
 - Vector database integration
 - Semantic search with embeddings
 - Multi-agent coordination
 - MCP sampling (AI completions within context)
 
-**Prerequisites**: Lab 05
-
-**Start**: [lab-06-advanced-patterns/](./lab-06-advanced-patterns/)
-
 ---
 
 ## Quick Start
 
-### Setup All Labs
-
-```bash
-# From the repository root
-cd labs
-
-# Install dependencies for all labs
-for dir in lab-*/; do
-  if [ -f "$dir/starter/package.json" ]; then
-    echo "Installing dependencies for $dir..."
-    (cd "$dir/starter" && npm install)
-  fi
-done
-```
-
-### Running a Lab
+### Running Lab 01
 
 ```bash
 # Navigate to the lab
-cd lab-01-hello-mcp
+cd labs/lab-01-hello-mcp
 
 # Read the instructions
 cat README.md
@@ -144,14 +92,12 @@ cd ../solution
 
 ### Testing Your Solution
 
-Most labs include validation tests:
-
 ```bash
 # In the lab's starter/ directory
 npm test
 
-# Or run the validation script
-node test-solution.js
+# Or test with MCP Inspector
+npx @modelcontextprotocol/inspector node src/index.js
 ```
 
 ---
@@ -161,11 +107,8 @@ node test-solution.js
 Track your progress:
 
 - [ ] **Lab 01**: Hello MCP - Build your first MCP server
-- [ ] **Lab 02**: Tool Calling - Multi-tool server with validation
-- [ ] **Lab 03**: Resources - Dynamic data exposure
-- [ ] **Lab 04**: Memory Patterns - Persistent AI memory
-- [ ] **Lab 05**: Production Deployment - Azure Container Apps
-- [ ] **Lab 06**: Advanced Patterns - Vector search & orchestration
+
+*More labs coming soon!*
 
 ---
 
@@ -230,12 +173,14 @@ npm install
 
 ## Beyond the Labs
 
-### Next Steps After Completing All Labs
+### Next Steps After Completing Lab 01
 
-1. **Combine patterns** - build a server with multiple advanced features
-2. **Explore integrations** - connect to real databases or APIs
-3. **Deploy to production** - use the patterns in real projects
-4. **Share your work** - contribute examples to the community
+While waiting for additional labs, you can:
+
+1. **Explore the example servers** - Study `mcp-servers/coretext-mcp` and `mcp-servers/stoic-mcp` in this repository
+2. **Read the MCP specification** - Deepen your understanding of the protocol
+3. **Experiment with tools and resources** - Extend your Lab 01 server with additional features
+4. **Try the WARNERCO Schematica example** - See a production-grade MCP implementation in `src/warnerco/backend`
 
 ### Resources
 
@@ -256,6 +201,6 @@ Found an issue or have an improvement?
 
 ---
 
-**Happy Learning!** 🚀
+**Happy Learning!**
 
 *Remember: The goal is not just to complete the labs, but to understand the patterns so you can apply them in real-world scenarios.*

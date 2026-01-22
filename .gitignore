@@ -4,6 +4,7 @@ settings.local.json
 
 # MCP cruft
 mcp.json
+*.zip
 
 # Logs
 logs
