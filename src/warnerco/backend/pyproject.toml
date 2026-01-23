@@ -17,6 +17,7 @@ dependencies = [
     "httpx>=0.28.0",
     "python-multipart>=0.0.17",
     "python-dotenv>=1.0.0",
+    "networkx>=3.0",
 ]
 
 [project.optional-dependencies]
@@ -60,6 +61,7 @@ chromadb = "^0.5.0"
 httpx = "^0.28.0"
 python-multipart = "^0.0.17"
 python-dotenv = "^1.0.0"
+networkx = "^3.0"
 
 [tool.poetry.group.azure.dependencies]
 azure-search-documents = "^11.5.0"

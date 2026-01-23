@@ -1,6 +1,16 @@
-"""LangGraph flow for retrieval-augmented reasoning about robot schematics."""
+"""LangGraph flow for retrieval-augmented reasoning about robot schematics.
+
+This module implements a 6-node RAG pipeline with Knowledge Graph integration:
+
+    parse_intent -> query_graph -> retrieve -> compress_context -> reason -> respond
+
+The query_graph node enriches the context with relationship data from the
+Knowledge Graph, enabling the LLM to understand connections between entities
+that vector search alone cannot capture.
+"""
 
 import json
+import re
 import uuid
 from datetime import datetime
 from enum import Enum
@@ -9,6 +19,7 @@ from typing import Any, Annotated, Dict, List, Optional, TypedDict
 from pydantic import BaseModel, Field
 
 from app.adapters import get_memory_store
+from app.adapters.graph_store import get_graph_store
 from app.config import settings
 from app.models import SearchResult
 
@@ -32,6 +43,7 @@ class GraphState(TypedDict):
 
     # Processing
     intent: Optional[QueryIntent]
+    graph_context: List[str]  # Context from Knowledge Graph
     candidates: List[SearchResult]
     compressed_context: str
 
@@ -89,6 +101,135 @@ def parse_intent(state: GraphState) -> GraphState:
     return state
 
 
+def extract_entities(query: str) -> List[str]:
+    """Extract entity mentions from a query string.
+
+    This function identifies references to:
+    - Schematic IDs (WRN-XXXXX pattern)
+    - Model IDs (WC-XXX pattern)
+    - Status keywords (active, deprecated, etc.)
+    - Category keywords (sensors, power, etc.)
+    - Component keywords (hydraulic, sensor, etc.)
+
+    Args:
+        query: The search query string
+
+    Returns:
+        List of entity IDs found in the query
+    """
+    query_lower = query.lower()
+    query_upper = query.upper()
+    mentioned_entities = []
+
+    # 1. Check for schematic IDs (WRN-XXXXX pattern)
+    id_matches = re.findall(r"WRN-\d+", query_upper)
+    mentioned_entities.extend(id_matches)
+
+    # 2. Check for model IDs (WC-XXX pattern)
+    model_matches = re.findall(r"WC-\d+", query_upper)
+    for model in model_matches:
+        mentioned_entities.append(f"model:{model}")
+
+    # 3. Check for status keywords
+    status_keywords = ["active", "deprecated", "draft", "offline", "maintenance"]
+    for status in status_keywords:
+        if status in query_lower:
+            mentioned_entities.append(f"status:{status}")
+
+    # 4. Check for category keywords
+    category_keywords = [
+        "sensors", "power", "control", "mobility", "communication",
+        "thermal", "safety", "actuators", "manipulation", "tooling",
+        "structural", "mechanical", "environmental"
+    ]
+    for category in category_keywords:
+        if category in query_lower:
+            mentioned_entities.append(f"category:{category}")
+
+    # 5. Check for component keywords
+    component_keywords = {
+        "hydraulic": "component:hydraulic_system",
+        "sensor": "component:sensor_array",
+        "motor": "component:motor_system",
+        "battery": "component:power_system",
+        "thermal": "component:thermal_system",
+        "lidar": "component:lidar_system",
+        "camera": "component:vision_system",
+        "wireless": "component:communication_system",
+        "safety": "component:safety_system",
+        "gripper": "component:manipulation_system",
+        "welding": "component:welding_system",
+        "navigation": "component:navigation_system",
+    }
+    for keyword, component_id in component_keywords.items():
+        if keyword in query_lower:
+            mentioned_entities.append(component_id)
+
+    return mentioned_entities
+
+
+async def query_graph(state: GraphState) -> GraphState:
+    """Query the Knowledge Graph for related entities.
+
+    Node 2: Query Graph
+
+    For DIAGNOSTIC and LOOKUP intents, this node extracts entity mentions
+    from the query and retrieves 1-hop neighbors from the Knowledge Graph.
+    This provides relationship context that complements vector search.
+    """
+    graph_context: List[str] = []
+
+    # Only query graph for relevant intents
+    if state["intent"] not in (QueryIntent.DIAGNOSTIC, QueryIntent.LOOKUP, QueryIntent.SEARCH):
+        state["graph_context"] = graph_context
+        state["timings"]["query_graph"] = _elapsed_ms(state["start_time"])
+        return state
+
+    try:
+        graph_store = get_graph_store()
+
+        # Extract entity mentions using the helper function
+        mentioned_entities = extract_entities(state["query"])
+
+        # Query the graph for each mentioned entity
+        for entity_id in mentioned_entities[:5]:  # Limit to avoid over-fetching
+            # Get entity info
+            entity = await graph_store.get_entity(entity_id)
+            if entity:
+                graph_context.append(f"Entity: {entity.name} ({entity.entity_type})")
+
+            # Get 1-hop neighbors
+            neighbors = await graph_store.get_neighbors(entity_id, direction="both")
+            if neighbors:
+                # Get relationship details
+                outgoing = await graph_store.get_related(entity_id)
+                for rel in outgoing[:3]:  # Limit relationships
+                    target_entity = await graph_store.get_entity(rel.object)
+                    target_name = target_entity.name if target_entity else rel.object
+                    graph_context.append(f"  -> {rel.predicate} -> {target_name}")
+
+                incoming = await graph_store.get_subjects(entity_id)
+                for rel in incoming[:3]:
+                    source_entity = await graph_store.get_entity(rel.subject)
+                    source_name = source_entity.name if source_entity else rel.subject
+                    graph_context.append(f"  <- {rel.predicate} <- {source_name}")
+
+        # Search for entities matching query keywords
+        if not mentioned_entities:
+            # Try searching by keywords in the query
+            search_results = await graph_store.search_entities(state["query"])
+            for entity in search_results[:3]:
+                graph_context.append(f"Related: {entity.name} ({entity.entity_type})")
+
+    except Exception as e:
+        # Graph query failures should not break the pipeline
+        print(f"Graph query error (non-fatal): {e}", flush=True)
+
+    state["graph_context"] = graph_context
+    state["timings"]["query_graph"] = _elapsed_ms(state["start_time"])
+    return state
+
+
 async def retrieve(state: GraphState) -> GraphState:
     """Retrieve candidate schematics from memory backend.
 
@@ -140,17 +281,34 @@ async def retrieve(state: GraphState) -> GraphState:
 def compress_context(state: GraphState) -> GraphState:
     """Minimize token bloat by extracting only needed fields.
 
-    Node 3: Compress Context
+    Node 4: Compress Context
+
+    Combines vector search results with Knowledge Graph context.
     """
+    context_parts = []
+
+    # Include graph context if available
+    graph_context = state.get("graph_context", [])
+    if graph_context:
+        context_parts.append("=== Knowledge Graph Context ===")
+        context_parts.extend(graph_context)
+        context_parts.append("")
+
     if not state["candidates"]:
-        state["compressed_context"] = "No matching schematics found."
+        if context_parts:
+            context_parts.append("=== Search Results ===")
+            context_parts.append("No matching schematics found in vector search.")
+            state["compressed_context"] = "\n".join(context_parts)
+        else:
+            state["compressed_context"] = "No matching schematics found."
         state["timings"]["compress_context"] = _elapsed_ms(state["start_time"])
         return state
 
     # Build compressed context based on intent
+    context_parts.append("=== Search Results ===")
+
     if state["intent"] == QueryIntent.LOOKUP:
         # Full details for lookup
-        contexts = []
         for result in state["candidates"][:3]:
             s = result.schematic
             context = f"""
@@ -160,8 +318,7 @@ Category: {s.category} | Status: {s.status.value}
 Summary: {s.summary}
 Specs: {json.dumps(s.specifications) if s.specifications else 'N/A'}
 """
-            contexts.append(context.strip())
-        state["compressed_context"] = "\n\n".join(contexts)
+            context_parts.append(context.strip())
 
     elif state["intent"] == QueryIntent.ANALYTICS:
         # Aggregate data for analytics
@@ -174,22 +331,21 @@ Specs: {json.dumps(s.specifications) if s.specifications else 'N/A'}
             models[s.model] = models.get(s.model, 0) + 1
             statuses[s.status.value] = statuses.get(s.status.value, 0) + 1
 
-        state["compressed_context"] = f"""
+        context_parts.append(f"""
 Found {len(state['candidates'])} matching schematics.
 Categories: {json.dumps(categories)}
 Models: {json.dumps(models)}
 Statuses: {json.dumps(statuses)}
-"""
+""")
 
     else:
         # Concise summaries for search/diagnostic
-        contexts = []
         for result in state["candidates"][:5]:
             s = result.schematic
             context = f"[{s.id}] {s.model}/{s.name}: {s.component} ({s.category}) - {s.summary[:100]}..."
-            contexts.append(context)
-        state["compressed_context"] = "\n".join(contexts)
+            context_parts.append(context)
 
+    state["compressed_context"] = "\n".join(context_parts)
     state["timings"]["compress_context"] = _elapsed_ms(state["start_time"])
     return state
 
@@ -197,7 +353,7 @@ Statuses: {json.dumps(statuses)}
 async def reason(state: GraphState) -> GraphState:
     """Call LLM for reasoning (stub if no LLM configured).
 
-    Node 4: Reason
+    Node 5: Reason
     """
     # If LLM is configured, use it for enhanced reasoning
     if settings.has_llm_config:
@@ -258,7 +414,7 @@ Provide a concise, technical response that directly addresses the query."""
 def respond(state: GraphState) -> GraphState:
     """Format final response for dashboards and MCP.
 
-    Node 5: Respond
+    Node 6: Respond
     """
     total_time = _elapsed_ms(state["start_time"])
 
@@ -278,6 +434,7 @@ def respond(state: GraphState) -> GraphState:
             }
             for r in state["candidates"]
         ],
+        "graph_context": state.get("graph_context", []),
         "context_summary": state["compressed_context"],
         "total_matches": len(state["candidates"]),
         "query_time_ms": total_time,
@@ -303,14 +460,21 @@ class SchematicaGraph:
         self._graph = None
 
     async def _build_graph(self):
-        """Build the LangGraph workflow."""
+        """Build the LangGraph workflow.
+
+        The workflow follows this 6-node pipeline:
+        parse_intent -> query_graph -> retrieve -> compress_context -> reason -> respond
+
+        The query_graph node enriches context with Knowledge Graph relationships.
+        """
         try:
             from langgraph.graph import StateGraph, END
 
             workflow = StateGraph(GraphState)
 
-            # Add nodes
+            # Add nodes (6-node pipeline)
             workflow.add_node("parse_intent", parse_intent)
+            workflow.add_node("query_graph", query_graph)
             workflow.add_node("retrieve", retrieve)
             workflow.add_node("compress_context", compress_context)
             workflow.add_node("reason", reason)
@@ -318,7 +482,8 @@ class SchematicaGraph:
 
             # Define edges
             workflow.set_entry_point("parse_intent")
-            workflow.add_edge("parse_intent", "retrieve")
+            workflow.add_edge("parse_intent", "query_graph")
+            workflow.add_edge("query_graph", "retrieve")
             workflow.add_edge("retrieve", "compress_context")
             workflow.add_edge("compress_context", "reason")
             workflow.add_edge("reason", "respond")
@@ -345,6 +510,7 @@ class SchematicaGraph:
             "filters": filters,
             "top_k": top_k,
             "intent": None,
+            "graph_context": [],
             "candidates": [],
             "compressed_context": "",
             "response": {},
@@ -358,8 +524,9 @@ class SchematicaGraph:
             result = await self._graph.ainvoke(initial_state)
             return result["response"]
         else:
-            # Fallback: run nodes sequentially
+            # Fallback: run nodes sequentially (6-node pipeline)
             state = parse_intent(initial_state)
+            state = await query_graph(state)
             state = await retrieve(state)
             state = compress_context(state)
             state = await reason(state)

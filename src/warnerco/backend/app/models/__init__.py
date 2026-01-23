@@ -12,7 +12,18 @@ from app.models.schematic import (
     RetrievalHit,
 )
 
+from app.models.graph import (
+    Entity,
+    Relationship,
+    GraphQueryResult,
+    GraphStats,
+    PREDICATES,
+    VALID_PREDICATES,
+    ENTITY_TYPES,
+)
+
 __all__ = [
+    # Schematic models
     "Schematic",
     "SchematicCreate",
     "SchematicUpdate",
@@ -22,4 +33,12 @@ __all__ = [
     "SearchResult",
     "MemoryStats",
     "RetrievalHit",
+    # Graph models
+    "Entity",
+    "Relationship",
+    "GraphQueryResult",
+    "GraphStats",
+    "PREDICATES",
+    "VALID_PREDICATES",
+    "ENTITY_TYPES",
 ]

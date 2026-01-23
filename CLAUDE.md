@@ -130,10 +130,13 @@ Resources use URI scheme: `memory://overview`, `memory://context-stream`
 
 ### WARNERCO Schematica
 - `src/warnerco/backend/app/main.py` - FastAPI application
-- `src/warnerco/backend/app/mcp_tools.py` - FastMCP tool definitions
-- `src/warnerco/backend/app/langgraph/flow.py` - 5-node RAG orchestration
-- `src/warnerco/backend/app/adapters/` - Memory backends (JSON, Chroma, Azure)
+- `src/warnerco/backend/app/mcp_tools.py` - FastMCP tool definitions (including graph tools)
+- `src/warnerco/backend/app/langgraph/flow.py` - 6-node hybrid RAG orchestration
+- `src/warnerco/backend/app/adapters/` - Memory backends (JSON, Chroma, Azure, Graph)
+- `src/warnerco/backend/app/models/graph.py` - Entity and Relationship models
+- `src/warnerco/backend/app/adapters/graph_store.py` - SQLite + NetworkX graph store
 - `src/warnerco/backend/data/schematics/schematics.json` - Source of truth (25 robot schematics)
+- `src/warnerco/backend/scripts/index_graph.py` - Graph indexing script
 
 ### Configuration
 - `config/claude_desktop_config.json` - Sample Claude Desktop configuration
@@ -238,15 +241,19 @@ cp .env.example .env
 ┌─────────────────────────────────────────────────────────────┐
 │                     FastAPI + FastMCP                       │
 ├─────────────────────────────────────────────────────────────┤
-│  LangGraph Flow (5-node RAG)                                │
-│  parse_intent → retrieve → compress_context → reason → respond │
+│  LangGraph Flow (6-node Hybrid RAG)                         │
+│  parse_intent → query_graph → retrieve → compress → reason → respond │
 ├─────────────────────────────────────────────────────────────┤
-│  3-Tier Memory                                              │
-│  JSON (source) → Chroma (vectors) → Azure AI Search (enterprise) │
+│  Hybrid Memory Layer                                        │
+│  ┌─────────────────────┐  ┌─────────────────────┐          │
+│  │ Vector Store        │  │ Graph Store         │          │
+│  │ JSON → Chroma →     │  │ SQLite + NetworkX   │          │
+│  │ Azure AI Search     │  │ (Knowledge Graph)   │          │
+│  └─────────────────────┘  └─────────────────────┘          │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**MCP Tools**: `warn_list_robots`, `warn_get_robot`, `warn_semantic_search`, `warn_memory_stats`
+**MCP Tools**: `warn_list_robots`, `warn_get_robot`, `warn_semantic_search`, `warn_memory_stats`, `warn_add_relationship`, `warn_graph_neighbors`, `warn_graph_path`, `warn_graph_stats`
 
 **API Endpoints**:
 | Method | Path | Description |
@@ -256,6 +263,48 @@ cp .env.example .env
 | POST | `/api/search` | Semantic search |
 | GET | `/api/memory/stats` | Backend stats |
 | GET | `/docs` | OpenAPI docs |
+| GET | `/api/graph/stats` | Graph statistics |
+| GET | `/api/graph/neighbors/{id}` | Entity neighbors |
+
+### Graph Memory (Knowledge Graph Layer)
+
+WARNERCO Schematica includes an optional Graph Memory layer demonstrating hybrid RAG architectures. It runs alongside the vector store to enable relationship-based queries.
+
+**Why Graph Memory?** Vector search finds *similar* things; graph queries find *connected* things. Use both for comprehensive retrieval.
+
+**Components**:
+
+| File | Purpose |
+|------|---------|
+| `app/models/graph.py` | Entity and Relationship Pydantic models |
+| `app/adapters/graph_store.py` | SQLite persistence + NetworkX traversal |
+| `scripts/index_graph.py` | Populate graph from schematics.json |
+| `data/graph.db` | SQLite database (created by indexing) |
+
+**MCP Graph Tools**:
+
+| Tool | Description |
+|------|-------------|
+| `warn_add_relationship` | Create triplet (subject, predicate, object) |
+| `warn_graph_neighbors` | Get connected entities (in/out/both) |
+| `warn_graph_path` | Find shortest path between entities |
+| `warn_graph_stats` | Node count, edge count, density |
+
+**Supported Predicates**: `depends_on`, `contains`, `has_status`, `manufactured_by`, `compatible_with`, `related_to`
+
+**Index the Graph**:
+
+```bash
+cd src/warnerco/backend
+uv run python scripts/index_graph.py
+```
+
+**LangGraph Integration**: The `query_graph` node (Node 2 in the pipeline) enriches retrieval context with graph relationships before vector search. It activates for DIAGNOSTIC and ANALYTICS intents, or when queries mention explicit relationships.
+
+**Documentation**:
+- [Graph Memory Architecture](docs/diagrams/graph-memory-architecture.md) - Technical design
+- [Graph Memory Tutorial](docs/tutorials/graph-memory-tutorial.md) - Hands-on walkthrough
+- [Graph API Reference](docs/api/graph-api.md) - Complete tool documentation
 
 ## Claude Code Agents and Skills
 

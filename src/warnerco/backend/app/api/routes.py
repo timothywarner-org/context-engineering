@@ -228,3 +228,156 @@ async def get_models():
     schematics = await memory.list_schematics(limit=1000)
     models = sorted(set(s.model for s in schematics))
     return models
+
+
+# =============================================================================
+# Knowledge Graph Endpoints
+# =============================================================================
+
+
+class GraphStatsResponse(BaseModel):
+    """Knowledge Graph statistics response."""
+
+    entity_count: int
+    relationship_count: int
+    entity_types: Dict[str, int]
+    predicate_counts: Dict[str, int]
+
+
+class GraphNeighborsResponse(BaseModel):
+    """Knowledge Graph neighbors response."""
+
+    entity_id: str
+    direction: str
+    neighbors: List[str]
+    relationships: List[Dict[str, str]]
+
+
+class GraphPathResponse(BaseModel):
+    """Knowledge Graph path response."""
+
+    source: str
+    target: str
+    path: Optional[List[str]]
+    path_length: int
+
+
+@router.get("/graph/stats", response_model=GraphStatsResponse, tags=["Graph"])
+async def graph_stats():
+    """Get knowledge graph statistics.
+
+    Returns counts of entities and relationships by type.
+    Useful for monitoring graph coverage.
+    """
+    from app.adapters.graph_store import get_graph_store
+
+    try:
+        graph_store = get_graph_store()
+        stats = await graph_store.stats()
+
+        return GraphStatsResponse(
+            entity_count=stats.entity_count,
+            relationship_count=stats.relationship_count,
+            entity_types=stats.entity_types,
+            predicate_counts=stats.predicate_counts,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Graph error: {str(e)}")
+
+
+@router.get("/graph/neighbors/{entity_id}", response_model=GraphNeighborsResponse, tags=["Graph"])
+async def graph_neighbors(
+    entity_id: str,
+    direction: str = Query("both", description="Direction: outgoing, incoming, or both"),
+):
+    """Get neighbors of an entity in the knowledge graph.
+
+    Returns all entities connected to the given entity.
+
+    Args:
+        entity_id: The entity to find neighbors for (e.g., WRN-00001, model:WC-100)
+        direction: Direction to search (outgoing, incoming, or both)
+    """
+    from app.adapters.graph_store import get_graph_store
+
+    if direction not in ("outgoing", "incoming", "both"):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid direction. Must be 'outgoing', 'incoming', or 'both'",
+        )
+
+    try:
+        graph_store = get_graph_store()
+
+        # Get neighbor IDs
+        neighbors = await graph_store.get_neighbors(entity_id, direction)
+
+        # Get relationship details
+        relationships = []
+
+        if direction in ("outgoing", "both"):
+            outgoing = await graph_store.get_related(entity_id)
+            for rel in outgoing:
+                relationships.append({
+                    "direction": "outgoing",
+                    "predicate": rel.predicate,
+                    "target": rel.object,
+                })
+
+        if direction in ("incoming", "both"):
+            incoming = await graph_store.get_subjects(entity_id)
+            for rel in incoming:
+                relationships.append({
+                    "direction": "incoming",
+                    "predicate": rel.predicate,
+                    "source": rel.subject,
+                })
+
+        return GraphNeighborsResponse(
+            entity_id=entity_id,
+            direction=direction,
+            neighbors=neighbors,
+            relationships=relationships,
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Graph error: {str(e)}")
+
+
+@router.get("/graph/path", response_model=GraphPathResponse, tags=["Graph"])
+async def graph_path(
+    source: str = Query(..., description="Source entity ID"),
+    target: str = Query(..., description="Target entity ID"),
+):
+    """Find the shortest path between two entities.
+
+    Uses graph traversal to find how two entities are connected.
+
+    Args:
+        source: Starting entity ID
+        target: Ending entity ID
+    """
+    from app.adapters.graph_store import get_graph_store
+
+    try:
+        graph_store = get_graph_store()
+
+        path = await graph_store.shortest_path(source, target)
+
+        if path:
+            return GraphPathResponse(
+                source=source,
+                target=target,
+                path=path,
+                path_length=len(path) - 1,
+            )
+        else:
+            return GraphPathResponse(
+                source=source,
+                target=target,
+                path=None,
+                path_length=-1,
+            )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Graph error: {str(e)}")

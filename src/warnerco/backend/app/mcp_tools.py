@@ -2960,6 +2960,318 @@ Use the `warn_list_robots` tool to see available schematics.
 
 
 # =============================================================================
+# KNOWLEDGE GRAPH TOOLS
+# =============================================================================
+# These tools provide access to the Knowledge Graph memory layer.
+# The Knowledge Graph complements vector search by capturing relationships
+# between entities that semantic similarity alone cannot represent.
+#
+# Use cases:
+# - Finding compatible schematics for a given model
+# - Understanding component dependencies
+# - Exploring the schematic taxonomy by category or status
+
+
+class GraphNeighborsResult(BaseModel):
+    """Result of a graph neighbors query."""
+
+    entity_id: str = Field(description="The queried entity ID")
+    direction: str = Field(description="Direction searched (outgoing, incoming, both)")
+    neighbors: List[str] = Field(description="List of neighbor entity IDs")
+    relationships: List[Dict[str, str]] = Field(
+        description="List of relationships with predicate and target"
+    )
+
+
+class GraphPathResult(BaseModel):
+    """Result of a shortest path query."""
+
+    source: str = Field(description="Source entity ID")
+    target: str = Field(description="Target entity ID")
+    path: Optional[List[str]] = Field(description="Path as list of entity IDs, or null if no path")
+    path_length: int = Field(description="Number of hops in path (-1 if no path)")
+
+
+class GraphStatsResult(BaseModel):
+    """Statistics about the knowledge graph."""
+
+    entity_count: int = Field(description="Total number of entities")
+    relationship_count: int = Field(description="Total number of relationships")
+    entity_types: Dict[str, int] = Field(description="Count by entity type")
+    predicate_counts: Dict[str, int] = Field(description="Count by predicate type")
+
+
+class AddRelationshipResult(BaseModel):
+    """Result of adding a relationship."""
+
+    success: bool = Field(description="Whether the relationship was added")
+    message: str = Field(description="Status message")
+    relationship: Optional[Dict[str, str]] = Field(
+        description="The added relationship (subject, predicate, object)"
+    )
+
+
+@mcp.tool()
+async def warn_add_relationship(
+    subject: str,
+    predicate: str,
+    object: str,
+    metadata: Optional[Dict[str, Any]] = None,
+) -> AddRelationshipResult:
+    """Add a relationship between two entities in the knowledge graph.
+
+    Creates a directed edge (triplet) connecting a subject entity to an object
+    entity via a predicate. This enables traversal and relationship queries.
+
+    Args:
+        subject: Source entity ID. Can be a schematic ID (WRN-00001),
+            component ID (component:hydraulic_system), or other entity.
+        predicate: Relationship type. Must be one of:
+            - "depends_on" - Subject depends on object
+            - "contains" - Subject contains object (component)
+            - "has_status" - Subject has object as status
+            - "manufactured_by" - Subject is manufactured by object
+            - "compatible_with" - Subject is compatible with object
+            - "related_to" - General relationship
+            - "has_category" - Subject belongs to category
+            - "belongs_to_model" - Subject belongs to robot model
+            - "has_tag" - Subject has tag
+        object: Target entity ID.
+        metadata: Optional dictionary of additional properties for the relationship.
+
+    Returns:
+        AddRelationshipResult containing:
+            - success: True if relationship was added
+            - message: Status message
+            - relationship: The added relationship details
+
+    Example:
+        >>> # Mark WRN-00006 as containing a hydraulic system
+        >>> await warn_add_relationship(
+        ...     subject="WRN-00006",
+        ...     predicate="contains",
+        ...     object="component:hydraulic_system"
+        ... )
+    """
+    from app.adapters.graph_store import get_graph_store
+    from app.models.graph import Relationship, VALID_PREDICATES
+
+    # Validate predicate
+    if predicate not in VALID_PREDICATES:
+        return AddRelationshipResult(
+            success=False,
+            message=f"Invalid predicate '{predicate}'. Must be one of: {', '.join(sorted(VALID_PREDICATES))}",
+            relationship=None,
+        )
+
+    try:
+        graph_store = get_graph_store()
+
+        rel = Relationship(
+            subject=subject,
+            predicate=predicate,
+            object=object,
+            metadata=metadata,
+        )
+
+        success = await graph_store.add_relationship(rel)
+
+        return AddRelationshipResult(
+            success=success,
+            message="Relationship added successfully" if success else "Relationship already exists or failed to add",
+            relationship={
+                "subject": subject,
+                "predicate": predicate,
+                "object": object,
+            },
+        )
+
+    except Exception as e:
+        return AddRelationshipResult(
+            success=False,
+            message=f"Error adding relationship: {str(e)}",
+            relationship=None,
+        )
+
+
+@mcp.tool()
+async def warn_graph_neighbors(
+    entity_id: str,
+    direction: str = "both",
+) -> GraphNeighborsResult:
+    """Get all entities connected to the given entity in the knowledge graph.
+
+    Retrieves neighbors (connected entities) of a node in the graph. This is
+    useful for exploring relationships and understanding entity context.
+
+    Args:
+        entity_id: The entity to find neighbors for. Examples:
+            - Schematic ID: "WRN-00001"
+            - Model ID: "model:WC-100"
+            - Category: "category:sensors"
+            - Component: "component:hydraulic_system"
+            - Status: "status:active"
+            - Tag: "tag:precision"
+        direction: Direction of relationships to follow:
+            - "outgoing" - Only edges where entity_id is the subject (entity -> neighbor)
+            - "incoming" - Only edges where entity_id is the object (neighbor -> entity)
+            - "both" - All connected entities regardless of direction (default)
+
+    Returns:
+        GraphNeighborsResult containing:
+            - entity_id: The queried entity
+            - direction: Direction searched
+            - neighbors: List of neighbor entity IDs
+            - relationships: Detailed relationship info with predicates
+
+    Example:
+        >>> # Find what WRN-00001 is connected to
+        >>> result = await warn_graph_neighbors("WRN-00001", direction="outgoing")
+        >>> # Result shows: status:active (has_status), category:sensors (has_category), etc.
+    """
+    from app.adapters.graph_store import get_graph_store
+
+    try:
+        graph_store = get_graph_store()
+
+        # Get neighbor IDs
+        neighbors = await graph_store.get_neighbors(entity_id, direction)
+
+        # Get relationship details
+        relationships = []
+
+        if direction in ("outgoing", "both"):
+            outgoing = await graph_store.get_related(entity_id)
+            for rel in outgoing:
+                relationships.append({
+                    "direction": "outgoing",
+                    "predicate": rel.predicate,
+                    "target": rel.object,
+                })
+
+        if direction in ("incoming", "both"):
+            incoming = await graph_store.get_subjects(entity_id)
+            for rel in incoming:
+                relationships.append({
+                    "direction": "incoming",
+                    "predicate": rel.predicate,
+                    "source": rel.subject,
+                })
+
+        return GraphNeighborsResult(
+            entity_id=entity_id,
+            direction=direction,
+            neighbors=neighbors,
+            relationships=relationships,
+        )
+
+    except Exception as e:
+        return GraphNeighborsResult(
+            entity_id=entity_id,
+            direction=direction,
+            neighbors=[],
+            relationships=[],
+        )
+
+
+@mcp.tool()
+async def warn_graph_path(
+    source: str,
+    target: str,
+) -> GraphPathResult:
+    """Find the shortest path between two entities in the knowledge graph.
+
+    Uses graph traversal to find the shortest path connecting two entities.
+    This helps understand how entities are related through intermediate nodes.
+
+    Args:
+        source: Starting entity ID (e.g., "WRN-00001", "model:WC-100")
+        target: Ending entity ID (e.g., "component:hydraulic_system", "status:active")
+
+    Returns:
+        GraphPathResult containing:
+            - source: Source entity ID
+            - target: Target entity ID
+            - path: List of entity IDs forming the path (null if no path exists)
+            - path_length: Number of hops (-1 if no path)
+
+    Example:
+        >>> # Find path from schematic to a component
+        >>> result = await warn_graph_path("WRN-00006", "component:hydraulic_system")
+        >>> # Result: path=["WRN-00006", "component:hydraulic_system"], path_length=1
+    """
+    from app.adapters.graph_store import get_graph_store
+
+    try:
+        graph_store = get_graph_store()
+
+        path = await graph_store.shortest_path(source, target)
+
+        if path:
+            return GraphPathResult(
+                source=source,
+                target=target,
+                path=path,
+                path_length=len(path) - 1,  # Number of edges
+            )
+        else:
+            return GraphPathResult(
+                source=source,
+                target=target,
+                path=None,
+                path_length=-1,
+            )
+
+    except Exception as e:
+        return GraphPathResult(
+            source=source,
+            target=target,
+            path=None,
+            path_length=-1,
+        )
+
+
+@mcp.tool()
+async def warn_graph_stats() -> GraphStatsResult:
+    """Get statistics about the knowledge graph.
+
+    Returns counts of entities and relationships, broken down by type.
+    Useful for understanding the graph structure and coverage.
+
+    Returns:
+        GraphStatsResult containing:
+            - entity_count: Total number of entities (nodes)
+            - relationship_count: Total number of relationships (edges)
+            - entity_types: Count by entity type (schematic, component, status, etc.)
+            - predicate_counts: Count by predicate type (has_status, contains, etc.)
+
+    Example:
+        >>> stats = await warn_graph_stats()
+        >>> print(f"Graph has {stats.entity_count} entities and {stats.relationship_count} relationships")
+    """
+    from app.adapters.graph_store import get_graph_store
+
+    try:
+        graph_store = get_graph_store()
+        stats = await graph_store.stats()
+
+        return GraphStatsResult(
+            entity_count=stats.entity_count,
+            relationship_count=stats.relationship_count,
+            entity_types=stats.entity_types,
+            predicate_counts=stats.predicate_counts,
+        )
+
+    except Exception as e:
+        return GraphStatsResult(
+            entity_count=0,
+            relationship_count=0,
+            entity_types={},
+            predicate_counts={},
+        )
+
+
+# =============================================================================
 # MODULE EXPORTS
 # =============================================================================
 # The mcp instance is the main export. It is used by:

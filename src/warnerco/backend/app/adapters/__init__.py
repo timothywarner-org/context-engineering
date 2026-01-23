@@ -5,11 +5,16 @@ from app.adapters.json_store import RawJsonStore
 from app.adapters.chroma_store import ChromaMemoryStore
 from app.adapters.azure_search_store import AzureAiSearchMemoryStore
 from app.adapters.factory import get_memory_store
+from app.adapters.graph_store import GraphStore, get_graph_store
 
 __all__ = [
+    # Memory stores
     "MemoryStore",
     "RawJsonStore",
     "ChromaMemoryStore",
     "AzureAiSearchMemoryStore",
     "get_memory_store",
+    # Knowledge Graph
+    "GraphStore",
+    "get_graph_store",
 ]

@@ -21,12 +21,13 @@ flowchart TB
     end
 
     subgraph MCP["<b>MCP PRIMITIVES</b>"]
-        subgraph Tools["<b>11 Tools</b>"]
+        subgraph Tools["<b>15 Tools</b>"]
             direction TB
             T_DATA["<b>Data Tools</b><br/>list_robots | get_robot<br/>semantic_search | memory_stats"]
             T_MOD["<b>Modification Tools</b><br/>index_schematic | compare_schematics"]
             T_CRUD["<b>CRUD Tools</b><br/>create | update | delete"]
             T_INT["<b>Interactive Tools</b><br/>guided_search | feedback_loop"]
+            T_GRAPH["<b>Graph Tools</b><br/>add_relationship | graph_neighbors<br/>graph_path | graph_stats"]
         end
 
         subgraph Resources["<b>10 Resources</b>"]
@@ -43,23 +44,29 @@ flowchart TB
         end
     end
 
-    subgraph Orchestration["<b>LANGGRAPH RAG PIPELINE</b>"]
+    subgraph Orchestration["<b>LANGGRAPH HYBRID RAG PIPELINE</b>"]
         direction LR
         LG1["parse<br/>intent"]
-        LG2["retrieve<br/>data"]
-        LG3["compress<br/>context"]
-        LG4["reason<br/>LLM"]
-        LG5["respond<br/>format"]
-        LG1 --> LG2 --> LG3 --> LG4 --> LG5
+        LG2["query<br/>graph"]
+        LG3["retrieve<br/>vectors"]
+        LG4["compress<br/>context"]
+        LG5["reason<br/>LLM"]
+        LG6["respond<br/>format"]
+        LG1 --> LG2 --> LG3 --> LG4 --> LG5 --> LG6
     end
 
-    subgraph Memory["<b>3-TIER MEMORY LAYER</b>"]
+    subgraph Memory["<b>HYBRID MEMORY LAYER</b>"]
         direction LR
-        JSON[("<b>JSON</b><br/>Source of Truth<br/>Keyword Search")]
-        CHROMA[("<b>ChromaDB</b><br/>Local Vectors<br/>Semantic Search")]
-        AZURE[("<b>Azure AI Search</b><br/>Enterprise Scale<br/>Hybrid Search")]
-        JSON -.-|"index"| CHROMA
-        CHROMA -.-|"scale"| AZURE
+        subgraph VectorTier["<b>Vector Store</b>"]
+            JSON[("<b>JSON</b><br/>Source of Truth")]
+            CHROMA[("<b>ChromaDB</b><br/>Local Vectors")]
+            AZURE[("<b>Azure Search</b><br/>Enterprise")]
+            JSON -.-|"index"| CHROMA
+            CHROMA -.-|"scale"| AZURE
+        end
+        subgraph GraphTier["<b>Graph Store</b>"]
+            GRAPH[("<b>SQLite +<br/>NetworkX</b><br/>Knowledge Graph")]
+        end
     end
 
     subgraph AI["<b>AI SERVICES</b>"]
@@ -91,11 +98,14 @@ flowchart TB
     classDef memBox fill:#b8860b,stroke:#8b6508,color:#fff,stroke-width:2px
     classDef aiBox fill:#8b0000,stroke:#5c0000,color:#fff,stroke-width:2px
 
+    classDef graphBox fill:#7c3aed,stroke:#5b21b6,color:#fff,stroke-width:2px
+
     class CD,VSC,DASH,API clientBox
     class ROUTES,MCP_EP,STATIC serverBox
-    class T_DATA,T_MOD,T_CRUD,T_INT,R_MEM,R_CAT,R_HELP,R_META,P_ALL mcpBox
-    class LG1,LG2,LG3,LG4,LG5 orchBox
+    class T_DATA,T_MOD,T_CRUD,T_INT,T_GRAPH,R_MEM,R_CAT,R_HELP,R_META,P_ALL mcpBox
+    class LG1,LG2,LG3,LG4,LG5,LG6 orchBox
     class JSON,CHROMA,AZURE memBox
+    class GRAPH graphBox
     class AOAI aiBox
 ```
 
@@ -114,16 +124,27 @@ flowchart TB
   - `/dash/*` - Static file serving for dashboards
 
 ### MCP Primitives (v2.0)
+
 | Primitive | Count | Purpose |
 |-----------|-------|---------|
-| **Tools** | 11 | Executable actions (CRUD, search, interactive) |
+| **Tools** | 15 | Executable actions (CRUD, search, interactive, graph) |
 | **Resources** | 10 | Read-only data (memory, catalog, help, meta) |
 | **Prompts** | 5 | Reusable templates (diagnostic, comparison, etc.) |
 
-### LangGraph RAG Pipeline
-5-node flow: `parse_intent` → `retrieve` → `compress_context` → `reason` → `respond`
+### LangGraph Hybrid RAG Pipeline
 
-### 3-Tier Memory
+6-node flow: `parse_intent` -> `query_graph` -> `retrieve` -> `compress_context` -> `reason` -> `respond`
+
+The `query_graph` node enriches retrieval context with relationship data from the knowledge graph before vector search.
+
+### Hybrid Memory Layer
+
+**Vector Store** (similarity search):
 1. **JSON**: Zero-config, keyword search (development)
 2. **ChromaDB**: Local vectors, semantic search (staging)
 3. **Azure AI Search**: Enterprise hybrid search (production)
+
+**Graph Store** (relationship queries):
+- **SQLite + NetworkX**: Knowledge graph for entity relationships, dependency tracking, and path finding
+
+See [Graph Memory Architecture](./graph-memory-architecture.md) for details.
