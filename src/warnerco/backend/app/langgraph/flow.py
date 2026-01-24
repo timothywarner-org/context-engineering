@@ -12,7 +12,7 @@ that vector search alone cannot capture.
 import json
 import re
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Annotated, Dict, List, Optional, TypedDict
 
@@ -418,6 +418,9 @@ def respond(state: GraphState) -> GraphState:
     """
     total_time = _elapsed_ms(state["start_time"])
 
+    # Preserve reasoning from previous node before overwriting response dict
+    reasoning = state["response"].get("reasoning", "")
+
     state["response"] = {
         "success": state["error"] is None,
         "intent": state["intent"].value if state["intent"] else "unknown",
@@ -438,7 +441,7 @@ def respond(state: GraphState) -> GraphState:
         "context_summary": state["compressed_context"],
         "total_matches": len(state["candidates"]),
         "query_time_ms": total_time,
-        "reasoning": state["response"].get("reasoning", ""),
+        "reasoning": reasoning,
         "error": state["error"],
         "timings": state["timings"],
     }
@@ -449,7 +452,7 @@ def respond(state: GraphState) -> GraphState:
 def _elapsed_ms(start_time: str) -> float:
     """Calculate elapsed milliseconds from ISO timestamp."""
     start = datetime.fromisoformat(start_time)
-    return (datetime.utcnow() - start).total_seconds() * 1000
+    return (datetime.now(timezone.utc) - start).total_seconds() * 1000
 
 
 class SchematicaGraph:
@@ -515,7 +518,7 @@ class SchematicaGraph:
             "compressed_context": "",
             "response": {},
             "error": None,
-            "start_time": datetime.utcnow().isoformat(),
+            "start_time": datetime.now(timezone.utc).isoformat(),
             "timings": {},
         }
 

@@ -1,22 +1,22 @@
-# Student Setup Guide - MCP in Practice
+# Student Setup Guide - Context Engineering with MCP
 
 Welcome! This guide will help you prepare your environment **before** the training session begins.
 
-## 🎯 Setup Goals
+## Setup Goals
 
 By the end of this guide, you'll have:
 
-- ✅ Node.js 20+ installed and verified
-- ✅ Python 3.9+ installed (optional, for Python examples)
-- ✅ Docker Desktop running
-- ✅ Claude Desktop or compatible MCP client configured
-- ✅ Repository cloned and dependencies installed
-- ✅ Environment validated with test script
+- Node.js 20+ installed and verified
+- Python 3.11+ with uv package manager installed
+- Docker Desktop running (optional, for Azure deployment labs)
+- Claude Desktop or VS Code with GitHub Copilot configured
+- Repository cloned and WARNERCO Schematica running
+- Environment validated with test commands
 
-## ⏱️ Time Required
+## Time Required
 
 - **Basic Setup**: 30-45 minutes
-- **Full Setup** (with Docker): 60 minutes
+- **Full Setup** (with Docker and Azure): 60 minutes
 
 ---
 
@@ -71,42 +71,43 @@ npm --version
 
 ---
 
-## Step 2: Install Python 3.9+ (Optional)
+## Step 2: Install Python 3.11+ with uv Package Manager
 
-**Note**: Only needed if you want to explore the Python-based MCP servers.
+**Note**: Python with uv is required for the WARNERCO Schematica server (the primary teaching example).
 
 ### Windows
 
 ```powershell
-
 # Download from python.org or use winget
-
 winget install Python.Python.3.12
 
-# Verify
+# Verify Python
+python --version  # Should show 3.11 or higher
 
-python --version
-pip --version
+# Install uv package manager
+irm https://astral.sh/uv/install.ps1 | iex
 
+# Restart your terminal, then verify uv
+uv --version
 ```
 
 ### macOS/Linux
 
 ```bash
-
 # macOS
-
 brew install python@3.12
 
 # Ubuntu/Debian
-
 sudo apt update && sudo apt install python3.12 python3-pip
 
-# Verify
-
+# Verify Python
 python3 --version
-pip3 --version
 
+# Install uv package manager
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Restart your terminal, then verify uv
+uv --version
 ```
 
 ---
@@ -178,207 +179,176 @@ npx @modelcontextprotocol/inspector
 ## Step 5: Clone Repository
 
 ```bash
-
 # Clone the course repository
-
 git clone https://github.com/timothywarner-org/context-engineering.git
 cd context-engineering
 
 # Verify structure
-
 ls -la
 
-# You should see: coretext-mcp/, stoic-mcp/, README.md, etc.
-
-
+# You should see:
+# - src/warnerco/     # WARNERCO Schematica (primary teaching example)
+# - labs/             # Hands-on labs
+# - docs/             # Student documentation
+# - config/           # Sample MCP client configurations
+# - .claude/          # Claude Code agents and skills
 ```
 
 ---
 
 ## Step 6: Install Dependencies
 
-### CoreText MCP (JavaScript - Primary Example)
+### WARNERCO Schematica (Python/FastMCP - Primary Teaching Example)
 
 ```bash
-cd coretext-mcp
+cd src/warnerco/backend
+uv sync
+
+# This installs all dependencies including:
+# - FastMCP (Python MCP framework)
+# - FastAPI (REST API server)
+# - LangGraph (RAG orchestration)
+# - ChromaDB (local vector search)
+```
+
+### Lab 01: Hello MCP (JavaScript)
+
+```bash
+cd labs/lab-01-hello-mcp/starter
 npm install
 
 # Verify installation
-
 npm list @modelcontextprotocol/sdk
-
 # Should show version 1.x.x
-
-
-```
-
-### Stoic MCP (TypeScript - Advanced Example)
-
-```bash
-cd ../stoic-mcp
-npm install
-
-cd local
-npm install
-npm run build
-
-# Verify build
-
-ls dist/
-
-# Should see index.js
-
-
-```
-
-### Context Journal MCP (Python - Optional)
-
-```bash
-cd ../context_journal_mcp_local
-pip install -r requirements.txt
-
-# Or using virtual environment (recommended)
-
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-
 ```
 
 ---
 
 ## Step 7: Configure Environment Variables
 
-### CoreText MCP
+### WARNERCO Schematica
 
 ```bash
-cd coretext-mcp
+cd src/warnerco/backend
 cp .env.example .env
 
 # Edit .env with your preferred editor
-# Add your Deepseek API key (optional - server works without it)
-
-
+# Default settings work for local development
 ```
 
-**Get Deepseek API Key** (Optional):
+**Key Environment Variables** (all optional for local development):
 
-1. Visit <https://platform.deepseek.com/>
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `MEMORY_BACKEND` | `json` | Memory backend: `json`, `chroma`, or `azure_search` |
+| `DEBUG` | `true` | Enable debug logging |
 
-2. Sign up for free account
+**For Azure deployment** (covered in advanced labs):
+- `AZURE_OPENAI_ENDPOINT` - Azure OpenAI service URL
+- `AZURE_OPENAI_API_KEY` - Azure OpenAI API key
+- `AZURE_SEARCH_ENDPOINT` - Azure AI Search URL
+- `AZURE_SEARCH_KEY` - Azure AI Search key
 
-3. Generate API key
+**Note**: The server works fully without any API keys using the JSON backend.
 
-4. Add to `.env`: `DEEPSEEK_API_KEY=your_key_here`
+---
 
-**Note**: The servers work in **fallback mode** without an API key.
+## Step 8: Configure MCP Client (Optional)
 
-### Stoic MCP
+**Note**: We will do this together during the training, but you can prepare the file.
+
+### Option A: Claude Desktop
+
+**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+
+Example configuration for WARNERCO Schematica:
+
+```json
+{
+  "mcpServers": {
+    "warnerco-schematica": {
+      "command": "uv",
+      "args": ["run", "warnerco-mcp"],
+      "cwd": "C:/github/context-engineering/src/warnerco/backend",
+      "env": {
+        "MEMORY_BACKEND": "json"
+      }
+    }
+  }
+}
+```
+
+### Option B: VS Code with GitHub Copilot
+
+The repository includes a pre-configured `.vscode/mcp.json` file. Simply open the repo in VS Code and the MCP server will be available to GitHub Copilot.
+
+See [docs/TUTORIAL_GITHUB_COPILOT.md](TUTORIAL_GITHUB_COPILOT.md) for detailed instructions.
+
+---
+
+## Step 9: Verify Installation
+
+Test that everything is working before the training session.
+
+### Test WARNERCO Schematica HTTP Server
 
 ```bash
-cd stoic-mcp/local
-cp .env.example .env
+cd src/warnerco/backend
 
-# Add Deepseek key if desired (optional)
+# Start the FastAPI server
+uv run uvicorn app.main:app --reload
 
+# Server should start on http://localhost:8000
+# Open http://localhost:8000/docs in your browser to see the API documentation
+# Press Ctrl+C to stop
+```
 
+### Test WARNERCO Schematica MCP Server
+
+```bash
+cd src/warnerco/backend
+
+# Start with MCP Inspector (opens browser at http://localhost:5173)
+npx @modelcontextprotocol/inspector uv run warnerco-mcp
+
+# You should see 4+ tools listed: warn_list_robots, warn_get_robot, etc.
+# Press Ctrl+C to stop
+```
+
+### Test Lab 01 (JavaScript MCP)
+
+```bash
+cd labs/lab-01-hello-mcp/starter
+npm install
+npx @modelcontextprotocol/inspector node src/index.js
+
+# You should see basic MCP tools listed
+# Press Ctrl+C to stop
 ```
 
 ---
 
-## Step 8: Configure Claude Desktop (Optional)
-
-**Note**: We'll do this together during the training, but you can prepare the file:
-
-### Windows
-
-```powershell
-
-# Configuration file location:
-# %APPDATA%\Claude\claude_desktop_config.json
-
-# Example content (update paths to match your system):
-
-
-```
-
-### macOS/Linux
-
-```bash
-
-# Configuration file location:
-# ~/Library/Application Support/Claude/claude_desktop_config.json
-
-
-```
-
-### Sample Configuration
-
-Create a backup of the provided sample:
-
-```bash
-cp claude_desktop_config.json ~/Documents/claude_desktop_config_backup.json
-
-```
-
----
-
-## Step 9: Run Validation Script
-
-We'll create a validation script together during the course, but you can test manually:
-
-### Test CoreText MCP
-
-```bash
-cd coretext-mcp
-node src/index.js &
-
-# Server should start without errors
-
-# In another terminal:
-
-node src/test-client.js
-
-# Should show successful tool calls
-
-# Kill the server
-
-pkill -f "node src/index.js"
-
-```
-
-### Test Stoic MCP
-
-```bash
-cd stoic-mcp/local
-node dist/index.js &
-
-# Should start without errors
-# Kill with Ctrl+C
-
-
-```
-
----
-
-## ✅ Pre-Course Checklist
+## Pre-Course Checklist
 
 Complete this checklist **before** the training:
 
 - [ ] Node.js 20+ installed (`node --version`)
 - [ ] npm working (`npm --version`)
-- [ ] Python 3.9+ installed (optional, `python3 --version`)
-- [ ] Docker Desktop running (`docker ps`)
+- [ ] Python 3.11+ installed (`python --version` or `python3 --version`)
+- [ ] uv package manager installed (`uv --version`)
+- [ ] Docker Desktop running (optional, `docker ps`)
 - [ ] Repository cloned (`cd context-engineering`)
-- [ ] CoreText dependencies installed (`cd coretext-mcp && npm list`)
-- [ ] Stoic MCP built (`cd stoic-mcp/local && ls dist/index.js`)
-- [ ] .env files created from examples
-- [ ] Claude Desktop or MCP client installed
-- [ ] Can manually start and stop MCP servers
+- [ ] WARNERCO Schematica dependencies installed (`cd src/warnerco/backend && uv sync`)
+- [ ] WARNERCO server starts (`uv run uvicorn app.main:app --reload`)
+- [ ] API docs accessible at http://localhost:8000/docs
+- [ ] MCP Inspector works (`npx @modelcontextprotocol/inspector uv run warnerco-mcp`)
+- [ ] Claude Desktop or VS Code with GitHub Copilot installed
 
 ---
 
-## 🆘 Troubleshooting Before the Course
+## Troubleshooting Before the Course
 
 ### Issue: "npm install" fails with permission errors
 
@@ -442,7 +412,7 @@ taskkill /PID <PID> /F
 
 ---
 
-## 📚 Optional Pre-Reading
+## Optional Pre-Reading
 
 If you want to get a head start:
 
@@ -451,72 +421,64 @@ If you want to get a head start:
 2. **Protocol Overview**: <https://modelcontextprotocol.io/docs/concepts/overview>
 
 3. **Quick Browse**:
-
    - `README.md` - Project overview
-   - `DEMO_QUICK_REFERENCE.md` - Quick reference
-   - `coretext-mcp/README.md` - CoreText server overview
+   - `CLAUDE.md` - Comprehensive development guide
+   - `docs/TUTORIAL_DASHBOARDS.md` - Dashboard walkthrough
 
 ---
 
-## 💡 What to Expect During Training
+## What to Expect During Training
 
-During the 4-hour course, we'll:
+During the 4-hour course, we will:
 
-1. **Segment 1** (60 min): MCP fundamentals, tool calling, your first MCP server
+1. **Segment 1** (60 min): MCP fundamentals, tool calling, your first MCP server with Lab 01
 
-2. **Segment 2** (60 min): Memory patterns, resources, context engineering
+2. **Segment 2** (60 min): Memory patterns, resources, context engineering with WARNERCO Schematica
 
-3. **Segment 3** (60 min): Production deployment, Azure Container Apps, monitoring
+3. **Segment 3** (60 min): Production deployment, Azure Container Apps, semantic search with ChromaDB
 
-4. **Segment 4** (60 min): Advanced patterns, multi-agent orchestration, real-world use cases
+4. **Segment 4** (60 min): Advanced patterns, Graph Memory, hybrid RAG, LangGraph orchestration
 
-You'll be running code, testing MCP servers, and deploying to Azure (optional).
+You will be running code, testing MCP tools, and exploring the dashboards throughout.
 
 ---
 
-## 🎓 Day-of-Training Quick Start
+## Day-of-Training Quick Start
 
 On training day, verify everything works:
 
 ```bash
+# Terminal 1: Start WARNERCO Schematica HTTP server
+cd context-engineering/src/warnerco/backend
+uv run uvicorn app.main:app --reload
 
-# Quick validation (run these in separate terminals)
+# Terminal 2 (optional): Open browser
+# Visit http://localhost:8000/docs to see API documentation
+# Visit http://localhost:8000/dash/ to see dashboards
 
-# Terminal 1: Start CoreText MCP
-
-cd context-engineering/coretext-mcp
-node src/index.js
-
-# Terminal 2: Test it
-
-cd context-engineering/coretext-mcp
-node src/test-client.js
-
-# Success? You're ready! 🚀
-
-
+# Success? You are ready!
 ```
 
 ---
 
-## 🤝 Getting Help
+## Getting Help
 
-- **Before Training**: Check the troubleshooting section above
+- **Before Training**: Check the troubleshooting section above or [TROUBLESHOOTING_FAQ.md](TROUBLESHOOTING_FAQ.md)
 - **During Training**: Ask questions in the live session
-- **After Training**: Refer to `POST_COURSE_RESOURCES.md`
+- **After Training**: Refer to [POST_COURSE_RESOURCES.md](POST_COURSE_RESOURCES.md)
 
 ---
 
 ## Next Steps
 
-Once you've completed this setup:
+Once you have completed this setup:
 
-1. ✅ Mark all checklist items as complete
+1. Mark all checklist items as complete
 
-2. 📧 If you encounter issues, note them to ask during the session
+2. If you encounter issues, note them to ask during the session
 
-3. 🧘 Relax - you're prepared!
+3. Explore the OpenAPI docs at http://localhost:8000/docs to familiarize yourself with the API
 
-See you in the training! 🎯
+See you in the training!
 
 

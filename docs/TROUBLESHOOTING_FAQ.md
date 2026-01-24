@@ -1,52 +1,120 @@
-# Troubleshooting FAQ - MCP in Practice
+# Troubleshooting FAQ - Context Engineering with MCP
 
-This FAQ addresses the most common issues students encounter during the course. Bookmark this page!
+This FAQ addresses the most common issues students encounter during the course. Bookmark this page.
 
-## 🔍 Quick Diagnosis
+## Quick Diagnosis
 
-**Start here if you're stuck:**
+**Start here if you are stuck:**
 
 ```bash
+# For WARNERCO Schematica (Python)
+cd src/warnerco/backend
+python --version   # Should show 3.11+
+uv --version       # Should show 0.4+
+uv sync            # Reinstall dependencies
 
-# Run this diagnostic command in the problematic directory
-
+# For Lab 01 (JavaScript)
+cd labs/lab-01-hello-mcp/starter
 node --version && npm --version && npm list @modelcontextprotocol/sdk
-
 ```
 
 Expected output:
-
-- Node: v20.x.x or higher
-- npm: 9.x.x or higher
-- MCP SDK: 1.x.x
+- Python: 3.11.x or higher
+- uv: 0.4.x or higher
+- Node: v20.x.x or higher (for labs)
+- MCP SDK: 1.x.x (for labs)
 
 ---
 
-## 📂 Table of Contents
+## Table of Contents
 
-1. [Installation & Setup Issues](#installation--setup-issues)
-
-2. [MCP Server Won't Start](#mcp-server-wont-start)
-
-3. [Connection & Communication Issues](#connection--communication-issues)
-
-4. [Tool Call Failures](#tool-call-failures)
-
-5. [Claude Desktop Integration](#claude-desktop-integration)
-
-6. [Docker & Container Issues](#docker--container-issues)
-
-7. [Azure Deployment Problems](#azure-deployment-problems)
-
-8. [Performance & Memory Issues](#performance--memory-issues)
-
-9. [API Key & Authentication](#api-key--authentication)
-
+1. [Installation and Setup Issues](#installation--setup-issues)
+2. [WARNERCO Schematica Issues](#warnerco-schematica-issues)
+3. [MCP Server Will Not Start](#mcp-server-wont-start)
+4. [Connection and Communication Issues](#connection--communication-issues)
+5. [Tool Call Failures](#tool-call-failures)
+6. [Claude Desktop Integration](#claude-desktop-integration)
+7. [Docker and Container Issues](#docker--container-issues)
+8. [Azure Deployment Problems](#azure-deployment-problems)
+9. [Performance and Memory Issues](#performance--memory-issues)
 10. [Development Workflow](#development-workflow)
 
 ---
 
-## Installation & Setup Issues
+## WARNERCO Schematica Issues
+
+### Q: uv command not found
+
+**Problem**: uv package manager is not installed.
+
+**Solution**:
+
+```powershell
+# Windows (PowerShell)
+irm https://astral.sh/uv/install.ps1 | iex
+
+# macOS/Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Restart your terminal after installation
+uv --version
+```
+
+### Q: WARNERCO server fails with ModuleNotFoundError
+
+**Problem**: Dependencies not installed or outdated.
+
+**Solution**:
+
+```bash
+cd src/warnerco/backend
+uv sync --force-reinstall
+```
+
+### Q: Server starts but API returns empty results
+
+**Problem**: Schematics data file missing or corrupted.
+
+**Solution**:
+
+```bash
+# Verify the schematics file exists and is valid
+cat src/warnerco/backend/data/schematics/schematics.json | python -m json.tool
+
+# Should show 25 schematic objects
+```
+
+### Q: ChromaDB index errors
+
+**Problem**: ChromaDB collection corrupted or outdated.
+
+**Solution**:
+
+```powershell
+# Delete existing Chroma data and re-index
+Remove-Item -Recurse -Force src/warnerco/backend/data/chroma
+cd src/warnerco/backend
+uv run python -c "from app.adapters.chroma_store import ChromaMemoryStore; import asyncio; asyncio.run(ChromaMemoryStore().index_all())"
+```
+
+### Q: Port 8000 already in use
+
+**Problem**: Another process is using port 8000.
+
+**Solution**:
+
+```powershell
+# Windows - find and kill process on port 8000
+netstat -ano | findstr :8000
+taskkill /PID <PID> /F
+
+# macOS/Linux
+lsof -ti:8000 | xargs kill -9
+```
+
+---
+
+## Installation and Setup Issues
 
 ### Q: "npm install" fails with EACCES permission error
 
@@ -267,7 +335,7 @@ const { foo } = require('./utils');  // Works
 
 ## Connection & Communication Issues
 
-### Q: MCP Inspector can't connect to server
+### Q: MCP Inspector cannot connect to server
 
 **Problem**: Server not exposing the right transport or Inspector misconfigured.
 
@@ -276,31 +344,24 @@ const { foo } = require('./utils');  // Works
 1. **Verify server is running:**
 
 ```bash
-
-# Check process
-
-ps aux | grep "node.*index.js"
-
+# For WARNERCO Schematica (Python)
+cd src/warnerco/backend
+uv run warnerco-mcp
+# Should start and wait for MCP messages
 ```
 
 2. **Check transport type:**
-
-   - CoreText/Stoic use **stdio** (not HTTP)
+   - WARNERCO Schematica uses **stdio** transport
    - Inspector needs to connect via command, not URL
 
-3. **Correct Inspector setup:**
+3. **Correct Inspector setup for WARNERCO:**
 
 ```bash
+# Start Inspector with the server command
+cd src/warnerco/backend
+npx @modelcontextprotocol/inspector uv run warnerco-mcp
 
-# Start Inspector
-
-npx @modelcontextprotocol/inspector
-
-# In Inspector UI, use "Command" mode:
-# Command: node
-# Args: /absolute/path/to/context-engineering/coretext-mcp/src/index.js
-
-
+# Opens browser at http://localhost:5173 (or http://localhost:6274)
 ```
 
 ### Q: Claude Desktop shows "Server disconnected"
@@ -333,36 +394,32 @@ tail -f ~/.config/Claude/logs/mcp*.log
 ```json
 {
   "mcpServers": {
-    "coretext": {
-      "command": "node",
-      "args": ["/absolute/path/to/coretext-mcp/src/index.js"],
+    "warnerco-schematica": {
+      "command": "uv",
+      "args": ["run", "warnerco-mcp"],
+      "cwd": "C:/github/context-engineering/src/warnerco/backend",
       "env": {
-        "DEEPSEEK_API_KEY": "optional-key-here"
+        "MEMORY_BACKEND": "json"
       }
     }
   }
 }
-
 ```
 
 2. **Common config mistakes:**
-
-   - ❌ Relative paths instead of absolute
-   - ❌ Backslashes not escaped on Windows: `C:\Users\...` → `C:\\Users\\...`
-   - ❌ Trailing commas in JSON
-   - ❌ Missing `node` command (just providing the .js file)
+   - Relative paths instead of absolute
+   - Backslashes not escaped on Windows: `C:\Users\...` should be `C:/Users/...` or `C:\\Users\\...`
+   - Trailing commas in JSON
+   - Missing `cwd` field (WARNERCO needs to run from its directory)
 
 3. **Test server manually:**
 
 ```bash
-
 # Run the exact command from config
+cd C:/github/context-engineering/src/warnerco/backend
+uv run warnerco-mcp
 
-node /absolute/path/to/coretext-mcp/src/index.js
-
-# Should start without errors
-
-
+# Should start without errors (waiting for stdio input)
 ```
 
 ### Q: Tools not appearing in Claude Desktop
@@ -561,17 +618,17 @@ tail -f ~/Library/Logs/Claude/mcp*.log  # macOS
 ```json
 {
   "mcpServers": {
-    "coretext": {
-      "command": "node",
-      "args": ["/path/to/coretext-mcp/src/index.js"]
+    "warnerco-schematica": {
+      "command": "uv",
+      "args": ["run", "warnerco-mcp"],
+      "cwd": "C:/github/context-engineering/src/warnerco/backend"
     },
-    "stoic": {
+    "lab-01": {
       "command": "node",
-      "args": ["/path/to/stoic-mcp/local/dist/index.js"]
+      "args": ["C:/github/context-engineering/labs/lab-01-hello-mcp/solution/src/index.js"]
     }
   }
 }
-
 ```
 
 Claude has access to tools from **both** servers.
@@ -1098,23 +1155,25 @@ test();
 
 ---
 
-## 🆘 Still Stuck?
+## Still Stuck?
 
-If your issue isn't covered here:
+If your issue is not covered here:
 
 1. **Check server logs** - most issues show up there
 
-2. **Review DEMO_SCRIPT.md** - see working examples
+2. **Review TUTORIAL_DASHBOARDS.md** - see working examples with the dashboards
 
-3. **Check coretext-mcp/PORT_FIXES.md** - port-related issues
+3. **Review TUTORIAL_MCP_INSPECTOR.md** - debugging with MCP Inspector
 
-4. **Search GitHub issues** - may already be solved
+4. **Check the OpenAPI docs** - http://localhost:8000/docs shows all API endpoints
 
-5. **Ask during training** - that's what we're here for!
+5. **Search GitHub issues** - may already be solved
+
+6. **Ask during training** - that is what we are here for!
 
 ---
 
-## 📝 Contributing to This FAQ
+## Contributing to This FAQ
 
 Found a solution to a problem not listed here? Please:
 

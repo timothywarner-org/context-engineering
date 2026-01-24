@@ -2,7 +2,7 @@
 
 <img src="images/cover.png" alt="Context Engineering with MCP Course Cover" width="700"/>
 
-Welcome to the training hub for mastering **Context Engineering with Model Context Protocol (MCP)**. This comprehensive course teaches you to implement production-ready semantic memory systems for AI assistants using Python, JavaScript, TypeScript, and multiple vector database backends.
+Welcome to the training hub for mastering **Context Engineering with Model Context Protocol (MCP)**. This course teaches you to implement production-ready semantic memory systems for AI assistants using Python, FastAPI, FastMCP, and LangGraph.
 
 ---
 
@@ -11,9 +11,9 @@ Welcome to the training hub for mastering **Context Engineering with Model Conte
 | Segment | Topic | Focus |
 |---------|-------|-------|
 | **1** | All About Context | Token economics, context loss types, why RAG isn't enough |
-| **2** | All About MCP | FastMCP, FastAPI, tools, resources, prompts |
-| **3** | Semantic Memory Stores | JSON, ChromaDB, Azure AI Search implementations |
-| **4** | MCP in Production | Claude Code, VS Code, GitHub Copilot, LangGraph |
+| **2** | All About MCP | FastMCP, FastAPI, tools, resources, prompts, elicitations |
+| **3** | Semantic Memory Stores | JSON, ChromaDB, Azure AI Search, Graph Memory |
+| **4** | MCP in Production | Claude Desktop, Claude Code, VS Code, GitHub Copilot, LangGraph |
 
 **Total Duration:** 4 hours (with 10-minute breaks)
 
@@ -23,12 +23,12 @@ Welcome to the training hub for mastering **Context Engineering with Model Conte
 
 ### Prerequisites
 
-- Python 3.11+ (for WARNERCO Schematica and Python MCP servers)
-- Node.js 20+ (for JavaScript/TypeScript MCP servers and labs)
+- Python 3.11+ (for WARNERCO Schematica)
+- Node.js 20+ (for Lab 01 and MCP Inspector)
 - [uv](https://docs.astral.sh/uv/) package manager (recommended for Python)
 - Claude Desktop or Claude Code
 
-### Option 1: Hello MCP Lab (Beginner)
+### Option 1: Hello MCP Lab (Beginner Entry Point)
 
 The hands-on lab is the fastest way to build your first MCP server.
 
@@ -47,7 +47,7 @@ npx @modelcontextprotocol/inspector node src/index.js
 # Opens http://localhost:5173
 ```
 
-### Option 2: WARNERCO Schematica (Advanced)
+### Option 2: WARNERCO Schematica (Flagship Teaching App)
 
 The full-featured FastAPI + FastMCP + LangGraph application demonstrates production patterns.
 
@@ -72,74 +72,58 @@ uv run warnerco-mcp
 
 ```
 context-engineering/
-├── .claude/                        # Claude Code extensions
-│   ├── agents/                     # Custom agents
-│   │   ├── azure-principal-architect/
-│   │   └── python-mcp-server-expert/
-│   ├── skills/                     # Custom skills
-│   │   ├── mcp-server-builder/
-│   │   └── warnerco-schematica/
-│   └── settings.local.json
-├── .github/                        # GitHub configuration
-│   ├── agents/                     # GitHub Copilot agents
-│   ├── chatmodes/                  # Copilot chat modes
-│   ├── instructions/               # Copilot instructions
-│   ├── skills/                     # Copilot skills
-│   ├── workflows/                  # CI/CD workflows
-│   └── copilot-instructions.md
-├── config/                         # Sample MCP client configurations
-│   ├── claude_desktop_config.json  # Claude Desktop example
+├── src/warnerco/                   # WARNERCO Robotics Schematica (Primary)
+│   ├── backend/                    # FastAPI + FastMCP + LangGraph
+│   │   ├── app/                    # Application code
+│   │   │   ├── adapters/           # Memory backends (JSON, Chroma, Azure, Graph)
+│   │   │   ├── langgraph/          # 6-node hybrid RAG pipeline
+│   │   │   ├── models/             # Pydantic models
+│   │   │   ├── main.py             # FastAPI application
+│   │   │   └── mcp_tools.py        # FastMCP tool definitions
+│   │   ├── data/                   # JSON schematics + vector stores
+│   │   ├── scripts/                # Indexing utilities
+│   │   ├── static/                 # SPA dashboards
+│   │   └── tests/                  # Test suite
+│   ├── dashboards/                 # Dashboard assets
+│   ├── infra/                      # Azure deployment (Bicep)
 │   └── README.md
-├── diagrams/                       # Architecture diagrams (Mermaid)
-│   ├── coretext-mcp-azure.md
-│   ├── coretext-mcp-local.md
-│   ├── stoic-mcp-azure.md
-│   ├── stoic-mcp-local.md
-│   └── INDEX.md
-├── docs/                           # Student materials
-│   ├── STUDENT_SETUP_GUIDE.md      # Pre-course setup instructions
-│   ├── TROUBLESHOOTING_FAQ.md      # Common issues and fixes
-│   ├── POST_COURSE_RESOURCES.md    # Continued learning
-│   └── diagrams/                   # System architecture SVGs
-│       ├── system-overview.svg
-│       ├── langgraph-flow.svg
-│       └── azure-deploy.svg
-├── examples/                       # Configuration examples
-│   ├── claude_code_mcp.json        # Claude Code MCP config
-│   └── vscode_settings.json        # VS Code settings
-├── images/                         # Course images
-│   └── cover.png
-├── infra/                          # Azure IaC templates (empty)
-├── instructor/                     # Instructor materials
-│   ├── DEMO_SCRIPT.md              # Live demo walkthrough
-│   ├── DEMO_QUICK_REFERENCE.md     # Quick reference card
-│   ├── RUNBOOK.md                  # Operational runbook
-│   ├── course-plan-jan-2026.md     # Detailed course plan
-│   └── *.pptx                      # Slide decks
-├── labs/                           # Hands-on exercises
+├── labs/                           # Hands-on Exercises
 │   ├── lab-01-hello-mcp/           # Build your first MCP server
 │   │   ├── starter/                # Starting point
 │   │   └── solution/               # Completed version
 │   └── README.md
+├── docs/                           # Student Materials
+│   ├── STUDENT_SETUP_GUIDE.md      # Pre-course setup instructions
+│   ├── TROUBLESHOOTING_FAQ.md      # Common issues and fixes
+│   ├── POST_COURSE_RESOURCES.md    # Continued learning
+│   ├── TUTORIAL_MCP_INSPECTOR.md   # MCP Inspector guide
+│   ├── TUTORIAL_GITHUB_COPILOT.md  # Copilot integration
+│   ├── TUTORIAL_DASHBOARDS.md      # Dashboard usage
+│   ├── diagrams/                   # Architecture diagrams (SVG + Mermaid)
+│   ├── tutorials/                  # Step-by-step tutorials
+│   └── api/                        # API reference docs
+├── diagrams/                       # High-level architecture (Mermaid)
+├── instructor/                     # Instructor Materials
+│   ├── course-plan-jan-2026.md     # Detailed course plan
+│   ├── DEMO_SCRIPT.md              # Live demo walkthrough
+│   ├── DEMO_QUICK_REFERENCE.md     # Quick reference card
+│   ├── RUNBOOK.md                  # Operational runbook
+│   └── *.pptx                      # Slide decks
+├── config/                         # Sample MCP client configurations
+├── examples/                       # Configuration examples
 ├── reference/                      # External reference implementations
-│   ├── globomantics-robot-fleet-main/
-│   ├── globomantics-robotics-api-main/
-│   └── schematica-main/
-├── scripts/                        # Utility scripts (empty)
-├── src/warnerco/                   # WARNERCO Robotics Schematica
-│   ├── backend/                    # FastAPI + FastMCP + LangGraph
-│   │   ├── app/                    # Application code
-│   │   ├── data/                   # JSON schematics + Chroma vectors
-│   │   ├── static/                 # SPA dashboards
-│   │   └── scripts/                # Indexing utilities
-│   ├── dashboards/                 # Dashboard assets
-│   ├── data/                       # Shared data files
-│   ├── infra/                      # Azure deployment
-│   ├── scripts/                    # Utility scripts
-│   └── README.md
+├── .claude/                        # Claude Code extensions
+│   ├── agents/                     # Custom agents
+│   └── skills/                     # Custom skills
+├── .github/                        # GitHub Copilot configuration
+│   ├── agents/                     # Copilot agents
+│   ├── chatmodes/                  # Copilot chat modes
+│   └── copilot-instructions.md
+├── scripts/                        # Utility scripts
+├── images/                         # Course images
 ├── CLAUDE.md                       # Claude Code instructions
 ├── GEMINI.md                       # Gemini instructions
-├── AGENTS.md                       # Agent documentation
+├── AGENTS.md                       # Agent guidelines
 └── requirements.txt                # Root Python dependencies
 ```
 
@@ -186,6 +170,7 @@ Implement multiple storage backends with the WARNERCO Schematica pattern:
 | JSON | Prototyping | Zero setup, keyword search |
 | ChromaDB | Local development | Auto embeddings, semantic search |
 | Azure AI Search | Production | Enterprise scale, multi-tenant |
+| Graph (SQLite + NetworkX) | Relationship queries | Connected entities, paths |
 
 ```python
 # WARNERCO Schematica memory backend pattern
@@ -231,19 +216,6 @@ Configure Claude Desktop, Claude Code, and VS Code:
 
 ---
 
-## Memory Store Comparison
-
-| Feature | JSON | ChromaDB | Azure AI Search |
-|---------|------|----------|-----------------|
-| Setup | None | `pip install` | Azure subscription |
-| Semantic Search | No | Yes | Yes |
-| Full-Text Search | Keyword only | No | Yes |
-| Scale | <1K | <100K | Millions |
-| Cost | Free | Free | Pay-per-use |
-| Best For | Prototyping | Local dev | Production |
-
----
-
 ## WARNERCO Schematica Architecture
 
 The flagship teaching application demonstrates production MCP patterns:
@@ -252,11 +224,15 @@ The flagship teaching application demonstrates production MCP patterns:
 +---------------------------------------------------------------+
 |                     FastAPI + FastMCP                         |
 +---------------------------------------------------------------+
-|  LangGraph Flow (5-node RAG)                                  |
-|  parse_intent -> retrieve -> compress_context -> reason -> respond |
+|  LangGraph Flow (6-node Hybrid RAG)                           |
+|  parse_intent -> query_graph -> retrieve -> compress -> reason -> respond |
 +---------------------------------------------------------------+
-|  3-Tier Memory                                                |
-|  JSON (source) -> Chroma (vectors) -> Azure AI Search (enterprise) |
+|  Hybrid Memory Layer                                          |
+|  +--------------------------+  +--------------------------+   |
+|  | Vector Store             |  | Graph Store              |   |
+|  | JSON -> Chroma ->        |  | SQLite + NetworkX        |   |
+|  | Azure AI Search          |  | (Knowledge Graph)        |   |
+|  +--------------------------+  +--------------------------+   |
 +---------------------------------------------------------------+
 ```
 
@@ -268,6 +244,10 @@ The flagship teaching application demonstrates production MCP patterns:
 | `warn_get_robot` | Get schematic by ID |
 | `warn_semantic_search` | Semantic search across schematics |
 | `warn_memory_stats` | Backend statistics |
+| `warn_add_relationship` | Create graph triplet (subject, predicate, object) |
+| `warn_graph_neighbors` | Get connected entities |
+| `warn_graph_path` | Find shortest path between entities |
+| `warn_graph_stats` | Graph node/edge counts |
 
 **API Endpoints:**
 
@@ -277,7 +257,23 @@ The flagship teaching application demonstrates production MCP patterns:
 | GET | `/api/robots/{id}` | Get by ID |
 | POST | `/api/search` | Semantic search |
 | GET | `/api/memory/stats` | Backend stats |
+| GET | `/api/graph/stats` | Graph statistics |
+| GET | `/api/graph/neighbors/{id}` | Entity neighbors |
 | GET | `/docs` | OpenAPI documentation |
+
+---
+
+## Memory Store Comparison
+
+| Feature | JSON | ChromaDB | Azure AI Search | Graph |
+|---------|------|----------|-----------------|-------|
+| Setup | None | `pip install` | Azure subscription | SQLite |
+| Semantic Search | No | Yes | Yes | No |
+| Relationship Queries | No | No | No | Yes |
+| Full-Text Search | Keyword only | No | Yes | No |
+| Scale | <1K | <100K | Millions | <100K |
+| Cost | Free | Free | Pay-per-use | Free |
+| Best For | Prototyping | Local dev | Production | Connections |
 
 ---
 
@@ -303,7 +299,7 @@ The MCP Inspector is the primary debugging tool for MCP servers:
 # Test any MCP server
 npx @modelcontextprotocol/inspector node path/to/server.js
 
-# Test Python servers
+# Test WARNERCO Schematica
 npx @modelcontextprotocol/inspector uv run warnerco-mcp
 
 # Opens web UI at http://localhost:5173

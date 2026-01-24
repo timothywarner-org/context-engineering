@@ -23,12 +23,17 @@ Before starting, ensure you have:
 ### Quick Setup Check
 
 ```bash
+# Navigate to the WARNERCO backend (from repository root)
 cd src/warnerco/backend
-uv sync                                    # Install dependencies
-uv run uvicorn app.main:app --reload       # Start server at http://localhost:8000
+
+# Install dependencies
+uv sync
+
+# Start the HTTP server
+uv run uvicorn app.main:app --reload
 ```
 
-Visit `http://localhost:8000/docs` to confirm the API is running.
+Visit http://localhost:8000/docs to confirm the API is running.
 
 ## Part 1: Understanding Knowledge Graphs (10 minutes)
 
@@ -94,6 +99,7 @@ Relationship Types (Predicates):
 The `index_graph.py` script reads `schematics.json` and creates the knowledge graph.
 
 ```bash
+# From repository root
 cd src/warnerco/backend
 uv run python scripts/index_graph.py
 ```

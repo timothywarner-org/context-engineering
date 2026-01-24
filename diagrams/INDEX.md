@@ -1,173 +1,148 @@
-# MCP Architecture Diagrams - Quick Reference
+# WARNERCO Schematica - Architecture Diagrams
 
-## 📊 Diagram Index
+## Primary Diagram Location
 
-### CoreText MCP Server
+The main architecture diagrams for this course are in **[docs/diagrams/](../docs/diagrams/)**. This folder contains supplementary reference material.
 
-| Deployment | File | Focus | Key Components |
-|------------|------|-------|----------------|
-| **Local** | [coretext-mcp-local.md](coretext-mcp-local.md) | Development setup with JSON storage | 8 tools, 3 resources, DeepSeek API, stdio transport |
-| **Azure** | [coretext-mcp-azure.md](coretext-mcp-azure.md) | Production deployment on Azure | Container Apps, Cosmos DB, Key Vault, $3-10/month |
+## WARNERCO Robotics Schematica
 
-### Stoic MCP Server
+The course centers on **WARNERCO Robotics Schematica**, a production MCP server demonstrating:
 
-| Deployment | File | Focus | Key Components |
-|------------|------|-------|----------------|
-| **Local** | [stoic-mcp-local.md](stoic-mcp-local.md) | TypeScript dev setup with quotes | 9 tools, bulk import, theme detection, AI generation |
-| **Azure** | [stoic-mcp-azure.md](stoic-mcp-azure.md) | Production with dual Cosmos containers | 2 containers (quotes+metadata), multi-stage Docker |
+- FastAPI + FastMCP server architecture
+- LangGraph 6-node hybrid RAG pipeline
+- 3-tier memory backends (JSON, ChromaDB, Azure AI Search)
+- Knowledge graph integration (SQLite + NetworkX)
 
-## 🎯 Choose Your Diagram
+### Diagram Index
 
-### By Learning Goal
+| Diagram | Location | Description |
+|---------|----------|-------------|
+| **System Overview** | [docs/diagrams/system-overview.md](../docs/diagrams/system-overview.md) | Full architecture diagram |
+| **LangGraph Flow** | [docs/diagrams/langgraph-flow.md](../docs/diagrams/langgraph-flow.md) | 6-node RAG pipeline |
+| **Azure Deployment** | [docs/diagrams/azure-deploy.md](../docs/diagrams/azure-deploy.md) | Production Azure resources |
+| **MCP Primitives** | [docs/diagrams/mcp-primitives.md](../docs/diagrams/mcp-primitives.md) | 15 tools, 10 resources, 5 prompts |
+| **Graph Memory** | [docs/diagrams/graph-memory-architecture.md](../docs/diagrams/graph-memory-architecture.md) | Knowledge graph integration |
 
-**"I want to understand MCP basics"**
-→ Start with [coretext-mcp-local.md](coretext-mcp-local.md)
-- Simplest architecture
-- Clear MCP protocol flow
-- Easy to understand components
+### Quick Reference
 
-**"I want to build my first MCP server"**
-→ Review [stoic-mcp-local.md](stoic-mcp-local.md)
-- TypeScript implementation
-- Complete CRUD operations
-- AI integration patterns
+```
+WARNERCO Schematica Architecture
+================================
 
-**"I want to deploy to Azure"**
-→ Compare [coretext-mcp-azure.md](coretext-mcp-azure.md) + [stoic-mcp-azure.md](stoic-mcp-azure.md)
-- See Azure resource patterns
-- Understand cost structures
-- Learn security best practices
+CLIENT LAYER
+  Claude Desktop (MCP stdio)
+  VS Code + GitHub Copilot
+  Web Dashboards (Astro SPA)
+  REST API Clients
 
-**"I want to migrate local → cloud"**
-→ Read both local + Azure versions side-by-side
-- [CoreText Local](coretext-mcp-local.md) → [CoreText Azure](coretext-mcp-azure.md)
-- [Stoic Local](stoic-mcp-local.md) → [Stoic Azure](stoic-mcp-azure.md)
+APPLICATION LAYER
+  FastAPI Server (:8000)
+    /api/* - REST endpoints
+    /mcp   - FastMCP HTTP endpoint
+    /dash  - Static dashboards
 
-### By Role
+MCP PRIMITIVES (v2.0)
+  15 Tools: CRUD, search, graph, interactive
+  10 Resources: memory://, catalog://, help://, schematic://
+   5 Prompts: diagnostic, comparison, maintenance, etc.
 
-**Students**
-1. Local diagrams during course segments 1-2
-2. Azure diagrams during course segment 3
-3. Both for segment 4 (advanced patterns)
+LANGGRAPH 6-NODE PIPELINE
+  parse_intent -> query_graph -> retrieve -> compress -> reason -> respond
 
-**Developers**
-1. Local diagrams for prototyping
-2. Azure diagrams for production planning
-3. Compare both for migration strategies
+HYBRID MEMORY LAYER
+  Vector Store: JSON -> ChromaDB -> Azure AI Search
+  Graph Store:  SQLite + NetworkX (Knowledge Graph)
 
-**Architects**
-1. Azure diagrams for infrastructure design
-2. Cost sections for budgeting
-3. Security sections for compliance
+AI SERVICES
+  Azure OpenAI: gpt-4o-mini, text-embedding-ada-002
+```
 
-**DevOps Engineers**
-1. Azure diagrams for deployment automation
-2. Bicep template references
-3. Monitoring and observability sections
+## MCP Tools Summary
 
-## 📋 Quick Stats
+### Data Tools
+| Tool | Description |
+|------|-------------|
+| `warn_list_robots` | List all robot schematics with optional filters |
+| `warn_get_robot` | Get detailed schematic by ID |
+| `warn_semantic_search` | Natural language search with LangGraph RAG |
+| `warn_memory_stats` | Memory backend statistics |
 
-| Metric | Total |
-|--------|-------|
-| **Diagrams** | 4 comprehensive |
-| **Lines of documentation** | 2,285 |
-| **Directory size** | 76 KB |
-| **Azure resources documented** | 7 per server |
-| **Tools documented** | 17 total (8 CoreText + 9 Stoic) |
-| **Code examples** | 85+ (Bash, JSON, TypeScript, KQL) |
+### Modification Tools
+| Tool | Description |
+|------|-------------|
+| `warn_index_schematic` | Index a schematic for search |
+| `warn_compare_schematics` | Compare two schematics |
+| `warn_create_schematic` | Create new schematic |
+| `warn_update_schematic` | Update existing schematic |
+| `warn_delete_schematic` | Delete schematic |
 
-## 🔍 Find Specific Information
+### Interactive Tools
+| Tool | Description |
+|------|-------------|
+| `warn_guided_search` | Multi-turn guided search with elicitations |
+| `warn_feedback_loop` | Collect user feedback on schematics |
 
-### Architecture Components
+### Graph Tools
+| Tool | Description |
+|------|-------------|
+| `warn_add_relationship` | Create triplet in knowledge graph |
+| `warn_graph_neighbors` | Find connected entities |
+| `warn_graph_path` | Shortest path between entities |
+| `warn_graph_stats` | Graph metrics (nodes, edges, density) |
 
-- **MCP Protocol**: All diagrams → Server Core sections
-- **Storage**: Local → Storage Layer, Azure → Data Layer
-- **AI Integration**: All diagrams → AI/Enrichment sections
-- **Authentication**: Azure diagrams → Identity & Access
-- **Deployment**: Azure diagrams → Deployment Pipeline
+## LangGraph 6-Node Pipeline
 
-### Operations
+```
+1. PARSE_INTENT    - Classify query (lookup, diagnostic, analytics, search)
+2. QUERY_GRAPH     - Enrich context with knowledge graph relationships
+3. RETRIEVE        - Vector search with semantic similarity
+4. COMPRESS        - Minimize token bloat, combine vector + graph context
+5. REASON          - LLM synthesis (Azure OpenAI or stub)
+6. RESPOND         - Format response for MCP/dashboard
+```
 
-- **Development setup**: Local diagrams → Development Workflow
-- **Testing**: Local diagrams → Testing sections
-- **Deployment**: Azure diagrams → Deployment Process
-- **Monitoring**: Azure diagrams → Observability sections
-- **Cost optimization**: Azure diagrams → Cost Breakdown
+## Memory Backends
 
-### Technologies
+### Development (JSON)
+- Zero configuration
+- Keyword search
+- Source: `data/schematics/schematics.json`
 
-- **TypeScript**: [stoic-mcp-local.md](stoic-mcp-local.md) → TypeScript Build Process
-- **Docker**: Azure diagrams → Docker Build Process
-- **Cosmos DB**: Azure diagrams → Cosmos DB Schema
-- **Key Vault**: Azure diagrams → Secrets Management
-- **Container Apps**: Azure diagrams → Container Apps sections
+### Staging (ChromaDB)
+- Local vector embeddings
+- Semantic search
+- Index: `uv run python -c "from app.adapters.chroma_store import ChromaMemoryStore; import asyncio; asyncio.run(ChromaMemoryStore().index_all())"`
 
-## 📖 Related Documentation
+### Production (Azure AI Search)
+- Enterprise-scale hybrid search
+- Vector + keyword + semantic ranking
+- Index: `uv run python scripts/index_azure_search.py`
 
-- **[README.md](README.md)** - Directory overview and viewing instructions
-- **[DIAGRAM_SUMMARY.md](DIAGRAM_SUMMARY.md)** - Detailed metrics and validation checklist
-- **[../README.md](../README.md)** - Main course README
-- **[../CLAUDE.md](../CLAUDE.md)** - Project-level AI guidance
+### Knowledge Graph (SQLite + NetworkX)
+- Entity relationships
+- Path finding
+- Index: `uv run python scripts/index_graph.py`
 
-## 🚀 Getting Started
+## Viewing Diagrams
 
-### First Time Here?
+### VS Code (Recommended)
+1. Install [Mermaid Preview extension](https://marketplace.visualstudio.com/items?itemName=vstirbu.vscode-mermaid-preview)
+2. Open any diagram `.md` file
+3. Use preview pane (Ctrl+Shift+V)
 
-1. Read this INDEX.md (you are here!)
-2. Open [README.md](README.md) for viewing instructions
-3. Start with [coretext-mcp-local.md](coretext-mcp-local.md)
-4. Progress through diagrams in order:
-   - CoreText Local → CoreText Azure
-   - Stoic Local → Stoic Azure
+### GitHub
+Diagrams render automatically in GitHub markdown viewer.
 
-### During the Course?
+### Mermaid Live Editor
+Copy Mermaid code blocks to [mermaid.live](https://mermaid.live/) for interactive editing.
 
-**Segment 1** → [coretext-mcp-local.md](coretext-mcp-local.md)
-**Segment 2** → [stoic-mcp-local.md](stoic-mcp-local.md)
-**Segment 3** → [coretext-mcp-azure.md](coretext-mcp-azure.md) + [stoic-mcp-azure.md](stoic-mcp-azure.md)
-**Segment 4** → Compare all four diagrams
+## Related Documentation
 
-### After the Course?
-
-Use as reference material:
-- Implementation patterns
-- Deployment checklists
-- Cost estimation guides
-- Security configurations
-
-## 💡 Pro Tips
-
-1. **View in VS Code** with Mermaid Preview extension for best experience
-2. **Compare side-by-side** local vs Azure for migration understanding
-3. **Follow data flow arrows** to understand request handling
-4. **Check color coding** to identify component types
-5. **Read prose sections** for detailed explanations beyond diagrams
-
-## 🔗 External Resources
-
-- [Mermaid Live Editor](https://mermaid.live/) - Test and modify diagrams
-- [MCP Specification](https://spec.modelcontextprotocol.io/) - Official protocol docs
-- [Azure Free Account](https://azure.microsoft.com/en-us/free/) - $200 credit for 30 days
-- [Course Repository](https://github.com/timothywarner-org/context-engineering-2) - Full source code
-
-## ✅ Diagram Quality
-
-All diagrams are:
-- ✅ Syntax validated (Mermaid 10.x compatible)
-- ✅ Rendered and tested in multiple viewers
-- ✅ Architecturally accurate to source code
-- ✅ Cost estimates verified ($3-10/month range)
-- ✅ Code examples tested and functional
-- ✅ Accessibility considerations included
-
-## 📞 Questions?
-
-- **Technical issues**: Open GitHub issue
-- **Course questions**: Contact instructor (see [main README](../README.md))
-- **Diagram suggestions**: Submit pull request
+- **[CLAUDE.md](../CLAUDE.md)** - Project-level AI guidance
+- **[docs/tutorials/](../docs/tutorials/)** - Hands-on tutorials
+- **[docs/api/](../docs/api/)** - API reference documentation
 
 ---
 
-**Last Updated**: October 30, 2025
-**Version**: 1.0
-**Maintained by**: Tim Warner + Claude Code
+**Course**: O'Reilly Live Training - Context Engineering with MCP
+**Last Updated**: January 2026

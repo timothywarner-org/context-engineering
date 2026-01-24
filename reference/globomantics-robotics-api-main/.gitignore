@@ -1,7 +1,0 @@
-node_modules/
-dist/
-coverage/
-test-results/
-*.log
-.env
-.DS_Store

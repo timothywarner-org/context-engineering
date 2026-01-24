@@ -54,26 +54,24 @@ def temp_schematics_json(sample_schematics):
 # =============================================================================
 
 
-@pytest_asyncio.fixture
-async def graph_store(temp_db_path):
+@pytest.fixture
+def graph_store(temp_db_path):
     """Create a graph store with a temporary database.
 
     Args:
         temp_db_path: Path to temporary database.
 
     Yields:
-        SQLiteGraphStore: An initialized graph store instance.
+        GraphStore: An initialized graph store instance.
 
     Note:
-        This fixture assumes the graph_store module will be created at
-        app/adapters/graph_store.py by the implementation agent.
+        GraphStore initializes the database in __init__ and close() is sync.
     """
-    from app.adapters.graph_store import SQLiteGraphStore
+    from app.adapters.graph_store import GraphStore
 
-    store = SQLiteGraphStore(db_path=temp_db_path)
-    await store.initialize()
+    store = GraphStore(db_path=temp_db_path)
     yield store
-    await store.close()
+    store.close()
 
 
 @pytest_asyncio.fixture
@@ -85,7 +83,7 @@ async def populated_graph_store(graph_store, sample_schematics):
         sample_schematics: Sample schematic data.
 
     Yields:
-        SQLiteGraphStore: Graph store with indexed schematics.
+        GraphStore: Graph store with indexed schematics.
     """
     await graph_store.index_schematics(sample_schematics)
     return graph_store
@@ -96,33 +94,45 @@ async def graph_store_with_relationships(populated_graph_store):
     """Create a graph store with sample relationships for pathfinding tests.
 
     This fixture creates a connected graph structure:
-    - WRN-001 --DEPENDS_ON--> POW-05
-    - WRN-001 --HAS_COMPONENT--> SENSOR-01
-    - WRN-002 --DEPENDS_ON--> POW-05
-    - WRN-002 --HAS_COMPONENT--> SENSOR-02
-    - POW-05 --PROVIDES--> electrical_power
-    - SENSOR-01 --REQUIRES--> electrical_power
+    - WRN-001 --depends_on--> POW-05
+    - WRN-001 --contains--> SENSOR-01
+    - WRN-002 --depends_on--> POW-05
+    - WRN-002 --contains--> SENSOR-02
+    - POW-05 --related_to--> electrical_power
+    - SENSOR-01 --depends_on--> electrical_power
 
     Args:
         populated_graph_store: Graph store with schematics indexed.
 
     Yields:
-        SQLiteGraphStore: Graph store with relationships added.
+        GraphStore: Graph store with relationships added.
     """
+    from app.models.graph import Entity, Relationship
+
     store = populated_graph_store
 
-    # Add relationships
+    # First add entities that don't exist from schematics indexing
+    additional_entities = [
+        Entity(id="POW-05", entity_type="power_supply", name="Power Supply 05"),
+        Entity(id="SENSOR-01", entity_type="component", name="Sensor 01"),
+        Entity(id="SENSOR-02", entity_type="component", name="Sensor 02"),
+        Entity(id="electrical_power", entity_type="resource", name="Electrical Power"),
+    ]
+    for entity in additional_entities:
+        await store.add_entity(entity)
+
+    # Add relationships using valid predicates from VALID_PREDICATES
     relationships = [
-        ("WRN-001", "DEPENDS_ON", "POW-05"),
-        ("WRN-001", "HAS_COMPONENT", "SENSOR-01"),
-        ("WRN-002", "DEPENDS_ON", "POW-05"),
-        ("WRN-002", "HAS_COMPONENT", "SENSOR-02"),
-        ("POW-05", "PROVIDES", "electrical_power"),
-        ("SENSOR-01", "REQUIRES", "electrical_power"),
+        Relationship(subject="WRN-001", predicate="depends_on", object="POW-05"),
+        Relationship(subject="WRN-001", predicate="contains", object="SENSOR-01"),
+        Relationship(subject="WRN-002", predicate="depends_on", object="POW-05"),
+        Relationship(subject="WRN-002", predicate="contains", object="SENSOR-02"),
+        Relationship(subject="POW-05", predicate="related_to", object="electrical_power"),
+        Relationship(subject="SENSOR-01", predicate="depends_on", object="electrical_power"),
     ]
 
-    for subject, predicate, obj in relationships:
-        await store.add_relationship(subject, predicate, obj)
+    for rel in relationships:
+        await store.add_relationship(rel)
 
     return store
 

@@ -1,8 +1,8 @@
-# Post-Course Resources - MCP in Practice
+# Post-Course Resources - Context Engineering with MCP
 
-Congratulations on completing the MCP in Practice course! This guide will help you continue your learning journey and apply what you've learned in real-world scenarios.
+Congratulations on completing the Context Engineering with MCP course! This guide will help you continue your learning journey and apply what you have learned in real-world scenarios.
 
-## 📚 Quick Navigation
+## Quick Navigation
 
 - [What You've Learned](#what-youve-learned)
 - [Learning Paths](#learning-paths)
@@ -48,12 +48,12 @@ Choose your path based on your goals and interests.
 
 #### Immediate Next Steps (Week 1-2)
 
-1. **Refactor Course Projects**
+1. **Extend WARNERCO Schematica**
 
-   - Convert CoreText MCP to TypeScript (use Stoic MCP as reference)
-   - Add comprehensive error handling
-   - Implement logging and monitoring
-   - Add unit tests
+   - Add new MCP tools to `src/warnerco/backend/app/mcp_tools.py`
+   - Create custom prompts for your domain
+   - Add new memory backends (e.g., PostgreSQL, Pinecone)
+   - Implement additional LangGraph nodes
 
 2. **Enhance Security**
 
@@ -75,7 +75,7 @@ Choose your path based on your goals and interests.
 
    - Migrate from JSON to PostgreSQL or Cosmos DB
    - Implement proper indexing
-   - Add database migrations
+   - Configure Azure AI Search for production
    - Set up backups and recovery
 
 5. **Observability**
@@ -96,17 +96,17 @@ Choose your path based on your goals and interests.
 
 7. **Scalability**
 
-   - Implement horizontal scaling
-   - Add load balancing
+   - Implement horizontal scaling with Azure Container Apps
+   - Add load balancing with Azure API Management
    - Optimize for high-throughput scenarios
    - Consider serverless options (Azure Functions)
 
 8. **Advanced Features**
 
    - Multi-tenant support
-   - Vector database integration (Pinecone, ChromaDB)
+   - Graph memory expansion (see `src/warnerco/backend/app/adapters/graph_store.py`)
    - Advanced AI enrichment (embeddings, summaries)
-   - Multi-agent orchestration
+   - Multi-agent orchestration with LangGraph
 
 **Resources**:
 

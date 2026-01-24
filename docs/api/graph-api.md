@@ -468,4 +468,4 @@ All endpoints return consistent error responses:
 
 - [Graph Memory Architecture](../diagrams/graph-memory-architecture.md) - System design
 - [Graph Memory Tutorial](../tutorials/graph-memory-tutorial.md) - Hands-on guide
-- [WARNERCO Schematica Overview](../../CLAUDE.md#warnerco-schematica-architecture) - System context
+- [WARNERCO Schematica Overview](../../CLAUDE.md) - System context in CLAUDE.md

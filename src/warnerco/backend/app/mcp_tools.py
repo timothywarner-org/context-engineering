@@ -1904,7 +1904,7 @@ async def help_tools() -> str:
     """
     return f"""# WARNERCO Schematica - Available Tools
 
-This MCP server provides {11} tools for interacting with robot schematics.
+This MCP server provides 15 tools for interacting with robot schematics.
 
 ---
 
@@ -2295,7 +2295,7 @@ The WARNERCO Schematica MCP server provides access to robot schematic
 documentation through the Model Context Protocol. It demonstrates all
 MCP primitives:
 
-- **11 Tools** - Executable functions for data retrieval, modification, and interaction
+- **15 Tools** - Executable functions for data retrieval, modification, and interaction
 - **10 Resources** - Read-only data sources (static and templated)
 - **5 Prompts** - Reusable prompt templates
 - **2 Elicitation Tools** - Interactive user input (included in tool count)
@@ -2981,6 +2981,7 @@ class GraphNeighborsResult(BaseModel):
     relationships: List[Dict[str, str]] = Field(
         description="List of relationships with predicate and target"
     )
+    error: Optional[str] = Field(default=None, description="Error message if validation failed")
 
 
 class GraphPathResult(BaseModel):
@@ -3129,6 +3130,17 @@ async def warn_graph_neighbors(
         >>> result = await warn_graph_neighbors("WRN-00001", direction="outgoing")
         >>> # Result shows: status:active (has_status), category:sensors (has_category), etc.
     """
+    # Validate direction parameter
+    valid_directions = ("outgoing", "incoming", "both")
+    if direction not in valid_directions:
+        return GraphNeighborsResult(
+            entity_id=entity_id,
+            direction=direction,
+            neighbors=[],
+            relationships=[],
+            error=f"Invalid direction '{direction}'. Must be one of: {', '.join(valid_directions)}",
+        )
+
     from app.adapters.graph_store import get_graph_store
 
     try:
@@ -3166,6 +3178,8 @@ async def warn_graph_neighbors(
         )
 
     except Exception as e:
+        import sys
+        print(f"Error in warn_graph_neighbors: {e}", file=sys.stderr)
         return GraphNeighborsResult(
             entity_id=entity_id,
             direction=direction,
@@ -3223,6 +3237,8 @@ async def warn_graph_path(
             )
 
     except Exception as e:
+        import sys
+        print(f"Error in warn_graph_path: {e}", file=sys.stderr)
         return GraphPathResult(
             source=source,
             target=target,
@@ -3263,6 +3279,8 @@ async def warn_graph_stats() -> GraphStatsResult:
         )
 
     except Exception as e:
+        import sys
+        print(f"Error in warn_graph_stats: {e}", file=sys.stderr)
         return GraphStatsResult(
             entity_count=0,
             relationship_count=0,

@@ -1,9 +1,10 @@
 """Main FastAPI application for WARNERCO Robotics Schematica."""
 
+import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, RedirectResponse
@@ -11,6 +12,24 @@ from fastapi.responses import FileResponse, RedirectResponse
 from app.api import router as api_router
 from app.config import settings
 from app.mcp_tools import mcp
+
+
+def get_cors_origins() -> list[str]:
+    """Get CORS origins from environment or use defaults.
+
+    In production, set CORS_ORIGINS to a comma-separated list of allowed origins.
+    Example: CORS_ORIGINS=https://app.example.com,https://admin.example.com
+
+    Falls back to ["*"] only in development (when debug=True).
+    """
+    cors_env = os.environ.get("CORS_ORIGINS", "")
+    if cors_env:
+        return [origin.strip() for origin in cors_env.split(",") if origin.strip()]
+    # Only allow wildcard in development mode
+    if settings.debug:
+        return ["*"]
+    # Production default: no origins (CORS will block cross-origin requests)
+    return []
 
 
 @asynccontextmanager
@@ -41,10 +60,11 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS middleware
+# CORS middleware - configure CORS_ORIGINS env var for production
+cors_origins = get_cors_origins()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure appropriately for production
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -92,7 +112,7 @@ async def favicon():
     favicon_path = ASSETS_DIR / "favicon.svg"
     if favicon_path.exists():
         return FileResponse(str(favicon_path), media_type="image/svg+xml")
-    return FileResponse(str(ASSETS_DIR / "favicon.svg"), media_type="image/svg+xml")
+    raise HTTPException(status_code=404, detail="Favicon not found")
 
 
 def run_server():

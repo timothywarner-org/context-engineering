@@ -1,8 +1,8 @@
 """Chroma vector database memory store implementation."""
 
 import uuid
-from collections import Counter
-from datetime import datetime
+from collections import Counter, deque
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -31,7 +31,7 @@ class ChromaMemoryStore(MemoryStore):
         """
         self.chroma_path = chroma_path or settings.chroma_path
         self.json_store = RawJsonStore(json_path)
-        self._hits: List[RetrievalHit] = []
+        self._hits: deque[RetrievalHit] = deque(maxlen=100)
         self._collection = None
         self._client = None
         self._initialized = False
@@ -140,7 +140,7 @@ class ChromaMemoryStore(MemoryStore):
     ) -> List[SearchResult]:
         """Perform semantic search using Chroma."""
         await self._ensure_initialized()
-        start_time = datetime.utcnow()
+        start_time = datetime.now(timezone.utc)
 
         try:
             # Build where clause from filters
@@ -187,10 +187,10 @@ class ChromaMemoryStore(MemoryStore):
                     )
 
             # Record telemetry
-            duration_ms = (datetime.utcnow() - start_time).total_seconds() * 1000
+            duration_ms = (datetime.now(timezone.utc) - start_time).total_seconds() * 1000
             hit = RetrievalHit(
                 id=str(uuid.uuid4()),
-                timestamp=datetime.utcnow().isoformat(),
+                timestamp=datetime.now(timezone.utc).isoformat(),
                 query=query,
                 robot_ids=[r.schematic.id for r in search_results],
                 chunk_ids=ids,
@@ -199,8 +199,6 @@ class ChromaMemoryStore(MemoryStore):
                 backend=self.backend_name,
             )
             self._hits.append(hit)
-            if len(self._hits) > 100:
-                self._hits = self._hits[-100:]
 
             return search_results
 
@@ -232,7 +230,7 @@ class ChromaMemoryStore(MemoryStore):
 
     async def get_recent_hits(self, limit: int = 20) -> List[RetrievalHit]:
         """Get recent retrieval telemetry."""
-        return self._hits[-limit:][::-1]
+        return list(self._hits)[-limit:][::-1]
 
     @property
     def backend_name(self) -> str:

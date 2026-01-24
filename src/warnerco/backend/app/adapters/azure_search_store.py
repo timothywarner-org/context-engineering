@@ -1,8 +1,8 @@
 """Azure AI Search memory store implementation."""
 
 import uuid
-from collections import Counter
-from datetime import datetime
+from collections import Counter, deque
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from app.adapters.base import MemoryStore
@@ -20,7 +20,7 @@ class AzureAiSearchMemoryStore(MemoryStore):
     def __init__(self):
         """Initialize the Azure AI Search store."""
         self.json_store = RawJsonStore()
-        self._hits: List[RetrievalHit] = []
+        self._hits: deque[RetrievalHit] = deque(maxlen=100)
         self._client = None
         self._index_client = None
         self._initialized = False
@@ -185,7 +185,7 @@ class AzureAiSearchMemoryStore(MemoryStore):
     ) -> List[SearchResult]:
         """Perform semantic search using Azure AI Search."""
         await self._ensure_initialized()
-        start_time = datetime.utcnow()
+        start_time = datetime.now(timezone.utc)
 
         try:
             # Build filter expression
@@ -224,10 +224,10 @@ class AzureAiSearchMemoryStore(MemoryStore):
                     )
 
             # Record telemetry
-            duration_ms = (datetime.utcnow() - start_time).total_seconds() * 1000
+            duration_ms = (datetime.now(timezone.utc) - start_time).total_seconds() * 1000
             hit = RetrievalHit(
                 id=str(uuid.uuid4()),
-                timestamp=datetime.utcnow().isoformat(),
+                timestamp=datetime.now(timezone.utc).isoformat(),
                 query=query,
                 robot_ids=[r.schematic.id for r in search_results],
                 chunk_ids=[r.chunk_id for r in search_results if r.chunk_id],
@@ -236,8 +236,6 @@ class AzureAiSearchMemoryStore(MemoryStore):
                 backend=self.backend_name,
             )
             self._hits.append(hit)
-            if len(self._hits) > 100:
-                self._hits = self._hits[-100:]
 
             return search_results
 
@@ -270,7 +268,7 @@ class AzureAiSearchMemoryStore(MemoryStore):
 
     async def get_recent_hits(self, limit: int = 20) -> List[RetrievalHit]:
         """Get recent retrieval telemetry."""
-        return self._hits[-limit:][::-1]
+        return list(self._hits)[-limit:][::-1]
 
     @property
     def backend_name(self) -> str:

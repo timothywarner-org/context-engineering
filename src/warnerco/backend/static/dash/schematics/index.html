@@ -133,6 +133,17 @@
     let categories = new Set();
     let models = new Set();
 
+    // Escape HTML to prevent XSS attacks
+    function escapeHtml(unsafe) {
+      if (unsafe == null) return '';
+      return String(unsafe)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
       await loadStats();
       await loadSchematics();
@@ -152,7 +163,7 @@
         Object.keys(stats.categories || {}).sort().forEach(cat => {
           const option = document.createElement('option');
           option.value = cat;
-          option.textContent = `${cat} (${stats.categories[cat]})`;
+          option.textContent = `${escapeHtml(cat)} (${stats.categories[cat]})`;
           categorySelect.appendChild(option);
         });
       } catch (err) {
@@ -172,7 +183,7 @@
         [...models].sort().forEach(model => {
           const option = document.createElement('option');
           option.value = model;
-          option.textContent = model;
+          option.textContent = escapeHtml(model);
           modelSelect.appendChild(option);
         });
 
@@ -193,22 +204,22 @@
       }
 
       grid.innerHTML = schematics.map(s => `
-        <div class="schematic-card" data-id="${s.id}">
+        <div class="schematic-card" data-id="${escapeHtml(s.id)}">
           <div class="schematic-header">
             <div>
-              <div class="schematic-model">${s.model}</div>
-              <div class="schematic-name">${s.name}</div>
-              <div class="schematic-component">${s.component}</div>
+              <div class="schematic-model">${escapeHtml(s.model)}</div>
+              <div class="schematic-name">${escapeHtml(s.name)}</div>
+              <div class="schematic-component">${escapeHtml(s.component)}</div>
             </div>
-            <span class="badge ${getStatusBadge(s.status)}">${s.status}</span>
+            <span class="badge ${getStatusBadge(s.status)}">${escapeHtml(s.status)}</span>
           </div>
-          <p class="schematic-summary">${truncate(s.summary, 120)}</p>
+          <p class="schematic-summary">${escapeHtml(truncate(s.summary, 120))}</p>
           <div class="flex flex-between" style="align-items: center;">
-            <span class="badge badge-neutral">${s.category}</span>
-            <span class="text-muted" style="font-size: 0.75rem;">${s.version}</span>
+            <span class="badge badge-neutral">${escapeHtml(s.category)}</span>
+            <span class="text-muted" style="font-size: 0.75rem;">${escapeHtml(s.version)}</span>
           </div>
           <div class="schematic-tags">
-            ${(s.tags || []).slice(0, 3).map(t => `<span class="schematic-tag">${t}</span>`).join('')}
+            ${(s.tags || []).slice(0, 3).map(t => `<span class="schematic-tag">${escapeHtml(t)}</span>`).join('')}
           </div>
         </div>
       `).join('');
@@ -253,15 +264,15 @@
             <div class="search-result">
               <div class="flex flex-between mb-sm">
                 <div>
-                  <span class="schematic-model">${r.model}</span>
-                  <strong style="margin-left: var(--space-sm);">${r.name}</strong>
+                  <span class="schematic-model">${escapeHtml(r.model)}</span>
+                  <strong style="margin-left: var(--space-sm);">${escapeHtml(r.name)}</strong>
                 </div>
                 <span class="search-score">${(r.score * 100).toFixed(1)}% match</span>
               </div>
-              <p class="text-secondary" style="margin: 0;">${r.summary}</p>
+              <p class="text-secondary" style="margin: 0;">${escapeHtml(r.summary)}</p>
               <div class="flex gap-sm mt-sm">
-                <span class="badge badge-neutral">${r.category}</span>
-                <span class="badge ${getStatusBadge(r.status)}">${r.status}</span>
+                <span class="badge badge-neutral">${escapeHtml(r.category)}</span>
+                <span class="badge ${getStatusBadge(r.status)}">${escapeHtml(r.status)}</span>
               </div>
             </div>
           `).join('');
@@ -283,22 +294,28 @@
 
     function showDetail(schematic) {
       const modal = document.getElementById('detailModal');
-      document.getElementById('modalModel').textContent = schematic.model;
-      document.getElementById('modalName').textContent = schematic.name;
-      document.getElementById('modalComponent').textContent = schematic.component + ' (' + schematic.version + ')';
-      document.getElementById('modalStatus').innerHTML = `<span class="badge ${getStatusBadge(schematic.status)}">${schematic.status}</span>`;
-      document.getElementById('modalSummary').textContent = schematic.summary;
-      document.getElementById('modalUrl').href = schematic.url;
-      document.getElementById('modalVerified').textContent = schematic.last_verified ? `Last verified: ${schematic.last_verified}` : '';
+      document.getElementById('modalModel').textContent = escapeHtml(schematic.model);
+      document.getElementById('modalName').textContent = escapeHtml(schematic.name);
+      document.getElementById('modalComponent').textContent = escapeHtml(schematic.component) + ' (' + escapeHtml(schematic.version) + ')';
+      document.getElementById('modalStatus').innerHTML = `<span class="badge ${getStatusBadge(schematic.status)}">${escapeHtml(schematic.status)}</span>`;
+      document.getElementById('modalSummary').textContent = escapeHtml(schematic.summary);
+      // Validate URL before setting href to prevent javascript: URLs
+      const url = schematic.url || '';
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        document.getElementById('modalUrl').href = url;
+      } else {
+        document.getElementById('modalUrl').href = '#';
+      }
+      document.getElementById('modalVerified').textContent = schematic.last_verified ? `Last verified: ${escapeHtml(schematic.last_verified)}` : '';
 
       const specsDiv = document.getElementById('modalSpecs');
       if (schematic.specifications && Object.keys(schematic.specifications).length > 0) {
-        specsDiv.innerHTML = `<table class="table"><tbody>${Object.entries(schematic.specifications).map(([k, v]) => `<tr><td style="font-weight: 500;">${k}</td><td>${v}</td></tr>`).join('')}</tbody></table>`;
+        specsDiv.innerHTML = `<table class="table"><tbody>${Object.entries(schematic.specifications).map(([k, v]) => `<tr><td style="font-weight: 500;">${escapeHtml(k)}</td><td>${escapeHtml(v)}</td></tr>`).join('')}</tbody></table>`;
       } else {
         specsDiv.innerHTML = '<p class="text-muted">No specifications available</p>';
       }
 
-      document.getElementById('modalTags').innerHTML = (schematic.tags || []).map(t => `<span class="schematic-tag">${t}</span>`).join('');
+      document.getElementById('modalTags').innerHTML = (schematic.tags || []).map(t => `<span class="schematic-tag">${escapeHtml(t)}</span>`).join('');
       modal.classList.remove('hidden');
       modal.style.display = 'flex';
     }

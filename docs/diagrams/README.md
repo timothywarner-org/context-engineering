@@ -101,4 +101,4 @@ When updating diagrams:
 ---
 
 *Diagrams maintained for Context Engineering with MCP course.*
-*Last updated: January 2026*
+*Last updated: January 2025*

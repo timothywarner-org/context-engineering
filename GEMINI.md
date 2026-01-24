@@ -4,97 +4,71 @@ This document provides guidance for using Gemini Code Assistant with the `contex
 
 ## Project Overview
 
-This repository contains all the course materials, including slides, labs, and reference implementations for the "Context Engineering with Model Context Protocol (MCP)" course. It's designed to be a hands-on learning environment for understanding and implementing persistent memory and tool-calling capabilities for AI models.
+This repository contains all the course materials, including slides, labs, and the flagship teaching application for the "Context Engineering with Model Context Protocol (MCP)" course. It's designed to be a hands-on learning environment for understanding and implementing persistent memory and tool-calling capabilities for AI models.
 
 The primary technologies used are:
 
-*   **Node.js, TypeScript, and Python**: For the MCP server implementations.
-*   **Model Context Protocol (MCP)**: The core protocol for communication between AI models and external tools/memory.
-*   **Azure**: For cloud deployment examples.
-*   **DeepSeek API**: For AI-powered enrichment of memory entries.
+- **Python**: FastAPI, FastMCP, LangGraph, Pydantic
+- **Node.js**: MCP TypeScript SDK for Lab 01
+- **Model Context Protocol (MCP)**: The core protocol for communication between AI models and external tools/memory
+- **Vector Databases**: ChromaDB (local), Azure AI Search (production)
+- **Graph Database**: SQLite + NetworkX for knowledge graph
 
 ## Course Structure
 
-The course is divided into four main segments, as detailed in `instructor/course-plan-jan-2026.md`:
+The course is divided into four 50-minute segments:
 
-1.  **Understanding Context**: Covers the fundamentals of AI memory and context windows.
-2.  **Building Local MCP Servers**: Hands-on labs to build your first MCP servers.
-3.  **Azure Deployment**: Deploying MCP servers to a cloud environment.
-4.  **Advanced Patterns**: Explores multi-agent memory architectures and other advanced topics.
+1. **Understanding Context**: Covers the fundamentals of AI memory and context windows
+2. **MCP Server Development**: Hands-on labs building MCP servers with FastMCP
+3. **Semantic Memory Stores**: JSON, ChromaDB, Azure AI Search, Graph Memory implementations
+4. **MCP in Production**: Claude Desktop, Claude Code, VS Code, GitHub Copilot integration
 
 ## Key Projects and Learning Resources
 
-*   `mcp-servers/coretext-mcp`: A JavaScript-based MCP server that serves as the primary teaching example. It implements CRUD operations for a memory store and includes AI enrichment features.
-*   `mcp-servers/stoic-mcp`: A more advanced TypeScript-based MCP server with a local and Azure workspace.
-*   `mcp-servers/context_journal_mcp_local`: A Python-based MCP server.
-*   `labs/lab-01-hello-mcp`: A hands-on lab for students to build their first MCP server.
-*   `instructor/`: Contains the course plan, slides, and other materials for instructors.
-*   `docs/`: Contains student-facing documentation, including setup guides and FAQs.
+- `src/warnerco/backend/` - **WARNERCO Schematica**: The flagship FastAPI + FastMCP + LangGraph teaching application demonstrating hybrid RAG with vector and graph memory
+- `labs/lab-01-hello-mcp/` - Hands-on lab for students to build their first MCP server (Node.js)
+- `docs/` - Student-facing documentation, including setup guides, tutorials, and API reference
+- `instructor/` - Course plan, demo scripts, and teaching materials
 
 ## Building and Running
 
-### `coretext-mcp` (JavaScript)
+### WARNERCO Schematica (Primary Teaching App)
 
-This is the main teaching example.
+```bash
+cd src/warnerco/backend
+uv sync                                    # Install dependencies
+uv run uvicorn app.main:app --reload       # Start FastAPI server (http://localhost:8000)
+uv run warnerco-mcp                        # MCP stdio server (for Claude Desktop)
+```
 
-*   **Run the server**:
-    ```bash
-    cd mcp-servers/coretext-mcp
-    npm install
-    npm start
-    ```
-*   **Run in development mode (with auto-reload)**:
-    ```bash
-    npm run dev
-    ```
-*   **Test with MCP Inspector**:
-    ```bash
-    npm run inspector
-    ```
-*   **Run the test client**:
-    ```bash
-    npm test
-    ```
+**Memory Backends** (set `MEMORY_BACKEND` in `.env`):
+- `json` - Fastest startup, keyword search (default)
+- `chroma` - Local semantic search (recommended for dev)
+- `azure_search` - Enterprise deployment
 
-### `stoic-mcp` (TypeScript)
+### Lab 01 - Hello MCP (Beginner Entry Point)
 
-This is a more advanced example using TypeScript and monorepo workspaces.
-
-*   **Build the server**:
-    ```bash
-    cd mcp-servers/stoic-mcp
-    npm install
-    npm run build
-    ```
-*   **Run the local server**:
-    ```bash
-    cd mcp-servers/stoic-mcp/local
-    npm start
-    ```
-
-### `context_journal_mcp_local` (Python)
-
-*   **Run the server**:
-    ```bash
-    cd mcp-servers/context_journal_mcp_local
-    pip install -r requirements.txt
-    python context_journal_mcp.py
-    ```
+```bash
+cd labs/lab-01-hello-mcp/starter
+npm install
+npm start
+npx @modelcontextprotocol/inspector node src/index.js  # Test with Inspector
+```
 
 ## Development Conventions
 
-*   **Coding Style**:
-    *   JavaScript/TypeScript: 2-space indentation, ES modules.
-    *   Python: 4-space indentation.
-*   **Naming Conventions**:
-    *   Follow existing patterns, e.g., `src/index.js`, `src/index.ts`.
-    *   Documentation files are often in `UPPER_SNAKE.md` format.
-*   **Logging**: Use `console.error()` for logging in MCP servers, as `stdout` is reserved for the MCP protocol.
-*   **Testing**:
-    *   The `coretext-mcp` server has an automated test client (`npm test`).
-    *   Other servers can be tested manually with the MCP Inspector (`npm run inspector`).
-*   **Commits**: Use short, imperative, sentence-case commit messages.
-*   **Security**: Do not commit secrets. Use `.env.example` files as templates and create `.env` files locally.
+- **Coding Style**:
+  - JavaScript/TypeScript: 2-space indentation, ES modules
+  - Python: 4-space indentation, snake_case filenames
+- **Naming Conventions**:
+  - Follow existing patterns: `main.py`, `mcp_tools.py`, `flow.py`
+  - Documentation files in `UPPER_SNAKE.md` format
+- **Logging**: Use `console.error()` for logging in MCP servers, as `stdout` is reserved for the MCP protocol
+- **Testing**:
+  - WARNERCO Schematica: `uv run pytest` in `src/warnerco/backend`
+  - MCP servers: Test with MCP Inspector (`npx @modelcontextprotocol/inspector`)
+- **Commits**: Use short, imperative, sentence-case commit messages
+- **Security**: Do not commit secrets. Use `.env.example` files as templates
 
 ---
-*This file was generated by an AI assistant to provide context for future interactions.*
+*This file provides context for Gemini Code Assistant interactions with this repository.*

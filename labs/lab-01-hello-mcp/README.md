@@ -2,9 +2,9 @@
 
 **Duration**: 30 minutes
 **Difficulty**: Beginner
-**Prerequisites**: Node.js 20+, completed STUDENT_SETUP_GUIDE.md
+**Prerequisites**: Node.js 20+, completed [STUDENT_SETUP_GUIDE.md](../../docs/STUDENT_SETUP_GUIDE.md)
 
-## 🎯 Learning Objectives
+## Learning Objectives
 
 By the end of this lab, you will:
 
@@ -14,7 +14,7 @@ By the end of this lab, you will:
 4. Test your server with MCP Inspector
 5. Debug MCP communication using console logging
 
-## 📚 Concepts Covered
+## Concepts Covered
 
 - MCP server initialization
 - Tool registration and JSON Schema
@@ -22,7 +22,7 @@ By the end of this lab, you will:
 - Tool handler functions and response format
 - Testing with MCP Inspector
 
-## 🏗️ What You'll Build
+## What You Will Build
 
 A simple "calculator" MCP server with a single tool that adds two numbers.
 
@@ -39,7 +39,7 @@ Tool Response: "The sum of 5 and 3 is 8"
 
 ---
 
-## 📝 Instructions
+## Instructions
 
 ### Step 1: Understand the Starter Code
 
@@ -259,7 +259,7 @@ Expected result: An error message about invalid input types.
 
 ---
 
-## ✅ Success Criteria
+## Success Criteria
 
 Your lab is complete when:
 
@@ -272,7 +272,7 @@ Your lab is complete when:
 
 ---
 
-## 🧪 Testing
+## Testing
 
 Run the included test to validate your implementation:
 
@@ -297,7 +297,7 @@ All tests passed!
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Issue: "Cannot find module '@modelcontextprotocol/sdk'"
 
@@ -328,7 +328,7 @@ npm install
 
 ---
 
-## 📖 Key Takeaways
+## Key Takeaways
 
 1. **MCP servers follow a standard structure**:
    - Initialize server
@@ -355,7 +355,7 @@ npm install
 
 ---
 
-## 🚀 Going Further (Optional)
+## Going Further (Optional)
 
 If you finish early, try these challenges:
 
@@ -404,7 +404,7 @@ Then ask Claude: "Can you add 42 and 58 for me?"
 
 ---
 
-## 📚 Additional Resources
+## Additional Resources
 
 - **MCP Specification**: <https://spec.modelcontextprotocol.io/>
 - **JSON Schema**: <https://json-schema.org/understanding-json-schema/>
@@ -412,14 +412,16 @@ Then ask Claude: "Can you add 42 and 58 for me?"
 
 ---
 
-## Next Lab
+## Next Steps
 
-Once you've completed this lab, move on to:
+Once you have completed this lab:
 
-**[Lab 02: Tool Calling Patterns](../lab-02-tool-calling/)** - Build a multi-tool server with complex schemas
+1. **Explore WARNERCO Schematica** - See `src/warnerco/backend/` for a production-grade Python MCP implementation using FastMCP
+2. **Try the dashboards** - Run WARNERCO and visit http://localhost:8000/dash/
+3. **Study the Graph Memory tutorial** - See `docs/tutorials/graph-memory-tutorial.md` for advanced concepts
 
 ---
 
-**Time to build!** 🔨
+**Time to build!**
 
 Start with the starter code, complete the TODOs, and test your implementation. Check the solution if you get stuck, but try solving it yourself first!

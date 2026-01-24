@@ -2,8 +2,8 @@
 
 import json
 import uuid
-from collections import Counter
-from datetime import datetime
+from collections import Counter, deque
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -27,7 +27,7 @@ class RawJsonStore(MemoryStore):
         """
         self.json_path = json_path or settings.json_path
         self._schematics: Dict[str, Schematic] = {}
-        self._hits: List[RetrievalHit] = []
+        self._hits: deque[RetrievalHit] = deque(maxlen=100)
         self._last_update: Optional[str] = None
         self._load_schematics()
 
@@ -44,7 +44,7 @@ class RawJsonStore(MemoryStore):
             self._schematics = {
                 item["id"]: Schematic(**item) for item in data
             }
-            self._last_update = datetime.utcnow().isoformat()
+            self._last_update = datetime.now(timezone.utc).isoformat()
         except Exception as e:
             print(f"Error loading schematics: {e}")
             self._schematics = {}
@@ -57,7 +57,7 @@ class RawJsonStore(MemoryStore):
         with open(self.json_path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, default=str)
 
-        self._last_update = datetime.utcnow().isoformat()
+        self._last_update = datetime.now(timezone.utc).isoformat()
 
     def _matches_filters(self, schematic: Schematic, filters: Dict[str, Any]) -> bool:
         """Check if schematic matches the given filters."""
@@ -136,7 +136,7 @@ class RawJsonStore(MemoryStore):
         top_k: int = 5,
     ) -> List[SearchResult]:
         """Perform keyword-based search (fallback for semantic search)."""
-        start_time = datetime.utcnow()
+        start_time = datetime.now(timezone.utc)
 
         candidates = list(self._schematics.values())
 
@@ -155,10 +155,10 @@ class RawJsonStore(MemoryStore):
         ]
 
         # Record telemetry
-        duration_ms = (datetime.utcnow() - start_time).total_seconds() * 1000
+        duration_ms = (datetime.now(timezone.utc) - start_time).total_seconds() * 1000
         hit = RetrievalHit(
             id=str(uuid.uuid4()),
-            timestamp=datetime.utcnow().isoformat(),
+            timestamp=datetime.now(timezone.utc).isoformat(),
             query=query,
             robot_ids=[r.schematic.id for r in results],
             chunk_ids=[],
@@ -167,8 +167,6 @@ class RawJsonStore(MemoryStore):
             backend=self.backend_name,
         )
         self._hits.append(hit)
-        if len(self._hits) > 100:
-            self._hits = self._hits[-100:]
 
         return results
 
@@ -191,7 +189,7 @@ class RawJsonStore(MemoryStore):
 
     async def get_recent_hits(self, limit: int = 20) -> List[RetrievalHit]:
         """Get recent retrieval telemetry."""
-        return self._hits[-limit:][::-1]
+        return list(self._hits)[-limit:][::-1]
 
     @property
     def backend_name(self) -> str:

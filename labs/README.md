@@ -1,8 +1,10 @@
-# MCP in Practice - Hands-On Labs
+# Context Engineering with MCP - Hands-On Labs
 
 These progressive labs will take you from building your first MCP server to deploying production-ready AI memory systems.
 
 **Note**: This course is a work-in-progress. Additional labs are planned and will be released over time.
+
+**Primary Teaching Example**: WARNERCO Robotics Schematica at `src/warnerco/backend/` demonstrates all advanced concepts (FastMCP, LangGraph, Graph Memory, etc.).
 
 ## Lab Structure
 
@@ -119,7 +121,7 @@ Track your progress:
 1. **Check the README**: Each lab has detailed step-by-step instructions
 2. **Review the solution**: Solutions are provided for reference
 3. **Use MCP Inspector**: Debug your server interactively
-4. **Check TROUBLESHOOTING_FAQ.md**: Common issues and solutions
+4. **Check docs/TROUBLESHOOTING_FAQ.md**: Common issues and solutions
 
 ### Common Issues
 
@@ -177,10 +179,11 @@ npm install
 
 While waiting for additional labs, you can:
 
-1. **Explore the example servers** - Study `mcp-servers/coretext-mcp` and `mcp-servers/stoic-mcp` in this repository
+1. **Explore WARNERCO Schematica** - Study `src/warnerco/backend/` for a production-grade MCP implementation
 2. **Read the MCP specification** - Deepen your understanding of the protocol
 3. **Experiment with tools and resources** - Extend your Lab 01 server with additional features
-4. **Try the WARNERCO Schematica example** - See a production-grade MCP implementation in `src/warnerco/backend`
+4. **Try the dashboards** - Run WARNERCO Schematica and explore `http://localhost:8000/dash/`
+5. **Study the Graph Memory tutorial** - See `docs/tutorials/graph-memory-tutorial.md`
 
 ### Resources
 

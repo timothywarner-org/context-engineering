@@ -278,6 +278,17 @@
     let totalLatency = 0;
     let queryCount = 0;
 
+    // Escape HTML to prevent XSS attacks
+    function escapeHtml(unsafe) {
+      if (unsafe == null) return '';
+      return String(unsafe)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
       await loadStats();
       setupEventListeners();
@@ -290,9 +301,9 @@
 
         document.getElementById('totalDocs').textContent = stats.total_schematics || 0;
         document.getElementById('backendInfo').innerHTML = `
-          <strong>Active Backend:</strong> ${stats.backend || 'Unknown'}<br>
+          <strong>Active Backend:</strong> ${escapeHtml(stats.backend) || 'Unknown'}<br>
           <strong>Categories:</strong> ${Object.keys(stats.categories || {}).length}<br>
-          <strong>Status Distribution:</strong> ${formatStatusCounts(stats.status_counts)}
+          <strong>Status Distribution:</strong> ${escapeHtml(formatStatusCounts(stats.status_counts))}
         `;
 
         // Update layer status based on backend
@@ -367,14 +378,14 @@
         document.getElementById('avgLatency').textContent = (totalLatency / queryCount).toFixed(0);
 
         // Update results
-        document.getElementById('resultIntent').textContent = data.intent || 'search';
+        document.getElementById('resultIntent').textContent = escapeHtml(data.intent) || 'search';
         document.getElementById('resultIntent').className = `badge badge-${getIntentBadge(data.intent)}`;
         document.getElementById('resultCount').textContent = data.total_matches || 0;
         document.getElementById('resultTime').textContent = `${(data.query_time_ms || clientTime).toFixed(0)}ms (server) / ${clientTime}ms (client)`;
         document.getElementById('resultScore').textContent = data.results?.[0]?.score
           ? `${(data.results[0].score * 100).toFixed(1)}%`
           : 'N/A';
-        document.getElementById('resultReasoning').textContent = data.reasoning || 'No reasoning available';
+        document.getElementById('resultReasoning').textContent = escapeHtml(data.reasoning) || 'No reasoning available';
 
         // Show top matches
         if (data.results && data.results.length > 0) {
@@ -385,12 +396,12 @@
                 <div class="search-result">
                   <div class="flex flex-between">
                     <div>
-                      <span class="schematic-model">${r.model}</span>
-                      <strong style="margin-left: var(--space-sm);">${r.name}</strong>
+                      <span class="schematic-model">${escapeHtml(r.model)}</span>
+                      <strong style="margin-left: var(--space-sm);">${escapeHtml(r.name)}</strong>
                     </div>
                     <span class="search-score">${(r.score * 100).toFixed(1)}%</span>
                   </div>
-                  <p class="text-muted" style="margin: var(--space-sm) 0 0; font-size: 0.875rem;">${r.summary?.substring(0, 100)}...</p>
+                  <p class="text-muted" style="margin: var(--space-sm) 0 0; font-size: 0.875rem;">${escapeHtml(r.summary?.substring(0, 100))}...</p>
                 </div>
               `).join('')}
             </div>
@@ -442,9 +453,9 @@
 
       container.innerHTML = queryHistory.map(h => `
         <div class="hit-entry">
-          <span class="hit-time">${h.timestamp}</span>
-          <span class="hit-query">${truncate(h.query, 40)}</span>
-          <span class="badge badge-${getIntentBadge(h.intent)}" style="min-width: 70px; justify-content: center;">${h.intent}</span>
+          <span class="hit-time">${escapeHtml(h.timestamp)}</span>
+          <span class="hit-query">${escapeHtml(truncate(h.query, 40))}</span>
+          <span class="badge badge-${getIntentBadge(h.intent)}" style="min-width: 70px; justify-content: center;">${escapeHtml(h.intent)}</span>
           <span class="hit-results">${h.results} results</span>
           <span class="hit-duration">${parseFloat(h.time).toFixed(0)}ms</span>
           ${h.timings ? `

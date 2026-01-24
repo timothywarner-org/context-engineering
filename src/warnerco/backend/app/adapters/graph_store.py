@@ -22,9 +22,11 @@ Usage:
 
 import json
 import sqlite3
+import threading
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Generator
 
 import networkx as nx
 
@@ -43,9 +45,13 @@ class GraphStore:
     The store maintains both a SQLite database for persistence and a
     NetworkX DiGraph for efficient graph traversal algorithms.
 
+    Thread Safety:
+        This class uses thread-local connections to ensure SQLite operations
+        are safe across multiple threads. Each thread gets its own connection.
+
     Attributes:
         db_path: Path to the SQLite database file
-        _conn: SQLite connection
+        _local: Thread-local storage for connections
         _graph: NetworkX directed graph for algorithms
     """
 
@@ -64,82 +70,99 @@ class GraphStore:
             db_path = Path(db_path)
 
         self.db_path = db_path
-        self._conn: Optional[sqlite3.Connection] = None
+        self._local = threading.local()
         self._graph: nx.DiGraph = nx.DiGraph()
 
         # Initialize database and load into NetworkX
         self._init_db()
         self._load_graph()
 
+    @contextmanager
+    def _get_connection(self) -> Generator[sqlite3.Connection, None, None]:
+        """Get a thread-local database connection.
+
+        Yields:
+            SQLite connection for the current thread
+        """
+        if not hasattr(self._local, "conn") or self._local.conn is None:
+            self._local.conn = sqlite3.connect(str(self.db_path))
+            self._local.conn.row_factory = sqlite3.Row
+        yield self._local.conn
+
+    @property
+    def _conn(self) -> Optional[sqlite3.Connection]:
+        """Get the thread-local connection (for backwards compatibility)."""
+        if not hasattr(self._local, "conn"):
+            return None
+        return self._local.conn
+
     def _init_db(self) -> None:
         """Initialize the SQLite database schema."""
         # Ensure directory exists
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
 
-        self._conn = sqlite3.connect(str(self.db_path), check_same_thread=False)
-        self._conn.row_factory = sqlite3.Row
+        with self._get_connection() as conn:
+            conn.row_factory = sqlite3.Row
 
-        cursor = self._conn.cursor()
+            cursor = conn.cursor()
 
-        # Create entities table
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS entities (
-                id TEXT PRIMARY KEY,
-                entity_type TEXT NOT NULL,
-                name TEXT NOT NULL,
-                metadata TEXT
-            )
-        """)
+            # Create entities table
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS entities (
+                    id TEXT PRIMARY KEY,
+                    entity_type TEXT NOT NULL,
+                    name TEXT NOT NULL,
+                    metadata TEXT
+                )
+            """)
 
-        # Create triplets table
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS triplets (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                subject TEXT NOT NULL,
-                predicate TEXT NOT NULL,
-                object TEXT NOT NULL,
-                metadata TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                UNIQUE(subject, predicate, object)
-            )
-        """)
+            # Create triplets table
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS triplets (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    subject TEXT NOT NULL,
+                    predicate TEXT NOT NULL,
+                    object TEXT NOT NULL,
+                    metadata TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE(subject, predicate, object)
+                )
+            """)
 
-        # Create indexes for efficient lookups
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_subject ON triplets(subject)")
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_object ON triplets(object)")
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_predicate ON triplets(predicate)")
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_entity_type ON entities(entity_type)")
+            # Create indexes for efficient lookups
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_subject ON triplets(subject)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_object ON triplets(object)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_predicate ON triplets(predicate)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_entity_type ON entities(entity_type)")
 
-        self._conn.commit()
+            conn.commit()
 
     def _load_graph(self) -> None:
         """Load graph data from SQLite into NetworkX DiGraph."""
-        if self._conn is None:
-            return
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
 
-        cursor = self._conn.cursor()
+            # Load entities as nodes
+            cursor.execute("SELECT id, entity_type, name, metadata FROM entities")
+            for row in cursor.fetchall():
+                metadata = json.loads(row["metadata"]) if row["metadata"] else {}
+                self._graph.add_node(
+                    row["id"],
+                    entity_type=row["entity_type"],
+                    name=row["name"],
+                    **metadata
+                )
 
-        # Load entities as nodes
-        cursor.execute("SELECT id, entity_type, name, metadata FROM entities")
-        for row in cursor.fetchall():
-            metadata = json.loads(row["metadata"]) if row["metadata"] else {}
-            self._graph.add_node(
-                row["id"],
-                entity_type=row["entity_type"],
-                name=row["name"],
-                **metadata
-            )
-
-        # Load triplets as edges
-        cursor.execute("SELECT subject, predicate, object, metadata FROM triplets")
-        for row in cursor.fetchall():
-            metadata = json.loads(row["metadata"]) if row["metadata"] else {}
-            self._graph.add_edge(
-                row["subject"],
-                row["object"],
-                predicate=row["predicate"],
-                **metadata
-            )
+            # Load triplets as edges
+            cursor.execute("SELECT subject, predicate, object, metadata FROM triplets")
+            for row in cursor.fetchall():
+                metadata = json.loads(row["metadata"]) if row["metadata"] else {}
+                self._graph.add_edge(
+                    row["subject"],
+                    row["object"],
+                    predicate=row["predicate"],
+                    **metadata
+                )
 
     async def add_entity(self, entity: Entity) -> bool:
         """Add an entity to the graph.
@@ -150,26 +173,23 @@ class GraphStore:
         Returns:
             True if entity was added, False if it already exists
         """
-        if self._conn is None:
-            return False
-
-        cursor = self._conn.cursor()
-
         try:
-            metadata_json = json.dumps(entity.metadata) if entity.metadata else None
-            cursor.execute(
-                "INSERT OR REPLACE INTO entities (id, entity_type, name, metadata) VALUES (?, ?, ?, ?)",
-                (entity.id, entity.entity_type, entity.name, metadata_json)
-            )
-            self._conn.commit()
+            with self._get_connection() as conn:
+                cursor = conn.cursor()
+                metadata_json = json.dumps(entity.metadata) if entity.metadata else None
+                cursor.execute(
+                    "INSERT OR REPLACE INTO entities (id, entity_type, name, metadata) VALUES (?, ?, ?, ?)",
+                    (entity.id, entity.entity_type, entity.name, metadata_json)
+                )
+                conn.commit()
 
-            # Update NetworkX graph
-            node_attrs = {"entity_type": entity.entity_type, "name": entity.name}
-            if entity.metadata:
-                node_attrs.update(entity.metadata)
-            self._graph.add_node(entity.id, **node_attrs)
+                # Update NetworkX graph
+                node_attrs = {"entity_type": entity.entity_type, "name": entity.name}
+                if entity.metadata:
+                    node_attrs.update(entity.metadata)
+                self._graph.add_node(entity.id, **node_attrs)
 
-            return True
+                return True
 
         except sqlite3.Error as e:
             print(f"Error adding entity: {e}", flush=True)
@@ -184,27 +204,33 @@ class GraphStore:
         Returns:
             True if relationship was added, False on error or duplicate
         """
-        if self._conn is None:
-            return False
-
-        cursor = self._conn.cursor()
+        # Validate predicate against standard vocabulary
+        if rel.predicate not in VALID_PREDICATES:
+            import sys
+            print(
+                f"Warning: predicate '{rel.predicate}' is not in standard vocabulary "
+                f"({', '.join(sorted(VALID_PREDICATES))}). Allowing it anyway.",
+                file=sys.stderr
+            )
 
         try:
-            metadata_json = json.dumps(rel.metadata) if rel.metadata else None
-            cursor.execute(
-                """INSERT OR IGNORE INTO triplets (subject, predicate, object, metadata)
-                   VALUES (?, ?, ?, ?)""",
-                (rel.subject, rel.predicate, rel.object, metadata_json)
-            )
-            self._conn.commit()
+            with self._get_connection() as conn:
+                cursor = conn.cursor()
+                metadata_json = json.dumps(rel.metadata) if rel.metadata else None
+                cursor.execute(
+                    """INSERT OR IGNORE INTO triplets (subject, predicate, object, metadata)
+                       VALUES (?, ?, ?, ?)""",
+                    (rel.subject, rel.predicate, rel.object, metadata_json)
+                )
+                conn.commit()
 
-            # Update NetworkX graph
-            edge_attrs = {"predicate": rel.predicate}
-            if rel.metadata:
-                edge_attrs.update(rel.metadata)
-            self._graph.add_edge(rel.subject, rel.object, **edge_attrs)
+                # Update NetworkX graph
+                edge_attrs = {"predicate": rel.predicate}
+                if rel.metadata:
+                    edge_attrs.update(rel.metadata)
+                self._graph.add_edge(rel.subject, rel.object, **edge_attrs)
 
-            return cursor.rowcount > 0
+                return cursor.rowcount > 0
 
         except sqlite3.Error as e:
             print(f"Error adding relationship: {e}", flush=True)
@@ -219,26 +245,24 @@ class GraphStore:
         Returns:
             Entity if found, None otherwise
         """
-        if self._conn is None:
-            return None
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT id, entity_type, name, metadata FROM entities WHERE id = ?",
+                (entity_id,)
+            )
+            row = cursor.fetchone()
 
-        cursor = self._conn.cursor()
-        cursor.execute(
-            "SELECT id, entity_type, name, metadata FROM entities WHERE id = ?",
-            (entity_id,)
-        )
-        row = cursor.fetchone()
+            if row is None:
+                return None
 
-        if row is None:
-            return None
-
-        metadata = json.loads(row["metadata"]) if row["metadata"] else None
-        return Entity(
-            id=row["id"],
-            entity_type=row["entity_type"],
-            name=row["name"],
-            metadata=metadata
-        )
+            metadata = json.loads(row["metadata"]) if row["metadata"] else None
+            return Entity(
+                id=row["id"],
+                entity_type=row["entity_type"],
+                name=row["name"],
+                metadata=metadata
+            )
 
     async def get_related(
         self,
@@ -256,33 +280,31 @@ class GraphStore:
         Returns:
             List of matching relationships
         """
-        if self._conn is None:
-            return []
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
 
-        cursor = self._conn.cursor()
+            if predicate:
+                cursor.execute(
+                    "SELECT subject, predicate, object, metadata FROM triplets WHERE subject = ? AND predicate = ?",
+                    (subject, predicate)
+                )
+            else:
+                cursor.execute(
+                    "SELECT subject, predicate, object, metadata FROM triplets WHERE subject = ?",
+                    (subject,)
+                )
 
-        if predicate:
-            cursor.execute(
-                "SELECT subject, predicate, object, metadata FROM triplets WHERE subject = ? AND predicate = ?",
-                (subject, predicate)
-            )
-        else:
-            cursor.execute(
-                "SELECT subject, predicate, object, metadata FROM triplets WHERE subject = ?",
-                (subject,)
-            )
+            relationships = []
+            for row in cursor.fetchall():
+                metadata = json.loads(row["metadata"]) if row["metadata"] else None
+                relationships.append(Relationship(
+                    subject=row["subject"],
+                    predicate=row["predicate"],
+                    object=row["object"],
+                    metadata=metadata
+                ))
 
-        relationships = []
-        for row in cursor.fetchall():
-            metadata = json.loads(row["metadata"]) if row["metadata"] else None
-            relationships.append(Relationship(
-                subject=row["subject"],
-                predicate=row["predicate"],
-                object=row["object"],
-                metadata=metadata
-            ))
-
-        return relationships
+            return relationships
 
     async def get_subjects(
         self,
@@ -300,33 +322,31 @@ class GraphStore:
         Returns:
             List of matching relationships
         """
-        if self._conn is None:
-            return []
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
 
-        cursor = self._conn.cursor()
+            if predicate:
+                cursor.execute(
+                    "SELECT subject, predicate, object, metadata FROM triplets WHERE object = ? AND predicate = ?",
+                    (object_id, predicate)
+                )
+            else:
+                cursor.execute(
+                    "SELECT subject, predicate, object, metadata FROM triplets WHERE object = ?",
+                    (object_id,)
+                )
 
-        if predicate:
-            cursor.execute(
-                "SELECT subject, predicate, object, metadata FROM triplets WHERE object = ? AND predicate = ?",
-                (object_id, predicate)
-            )
-        else:
-            cursor.execute(
-                "SELECT subject, predicate, object, metadata FROM triplets WHERE object = ?",
-                (object_id,)
-            )
+            relationships = []
+            for row in cursor.fetchall():
+                metadata = json.loads(row["metadata"]) if row["metadata"] else None
+                relationships.append(Relationship(
+                    subject=row["subject"],
+                    predicate=row["predicate"],
+                    object=row["object"],
+                    metadata=metadata
+                ))
 
-        relationships = []
-        for row in cursor.fetchall():
-            metadata = json.loads(row["metadata"]) if row["metadata"] else None
-            relationships.append(Relationship(
-                subject=row["subject"],
-                predicate=row["predicate"],
-                object=row["object"],
-                metadata=metadata
-            ))
-
-        return relationships
+            return relationships
 
     async def get_neighbors(
         self,
@@ -593,30 +613,23 @@ class GraphStore:
         Returns:
             GraphStats with entity counts, relationship counts, etc.
         """
-        if self._conn is None:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+
+            # Count entities by type
+            cursor.execute("SELECT entity_type, COUNT(*) as count FROM entities GROUP BY entity_type")
+            entity_types = {row["entity_type"]: row["count"] for row in cursor.fetchall()}
+
+            # Count relationships by predicate
+            cursor.execute("SELECT predicate, COUNT(*) as count FROM triplets GROUP BY predicate")
+            predicate_counts = {row["predicate"]: row["count"] for row in cursor.fetchall()}
+
             return GraphStats(
-                entity_count=0,
-                relationship_count=0,
-                entity_types={},
-                predicate_counts={}
+                entity_count=len(self._graph.nodes),
+                relationship_count=len(self._graph.edges),
+                entity_types=entity_types,
+                predicate_counts=predicate_counts
             )
-
-        cursor = self._conn.cursor()
-
-        # Count entities by type
-        cursor.execute("SELECT entity_type, COUNT(*) as count FROM entities GROUP BY entity_type")
-        entity_types = {row["entity_type"]: row["count"] for row in cursor.fetchall()}
-
-        # Count relationships by predicate
-        cursor.execute("SELECT predicate, COUNT(*) as count FROM triplets GROUP BY predicate")
-        predicate_counts = {row["predicate"]: row["count"] for row in cursor.fetchall()}
-
-        return GraphStats(
-            entity_count=len(self._graph.nodes),
-            relationship_count=len(self._graph.edges),
-            entity_types=entity_types,
-            predicate_counts=predicate_counts
-        )
 
     async def query_by_entity_type(self, entity_type: str) -> list[Entity]:
         """Get all entities of a specific type.
@@ -627,26 +640,37 @@ class GraphStore:
         Returns:
             List of entities matching the type
         """
-        if self._conn is None:
-            return []
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT id, entity_type, name, metadata FROM entities WHERE entity_type = ?",
+                (entity_type,)
+            )
 
-        cursor = self._conn.cursor()
-        cursor.execute(
-            "SELECT id, entity_type, name, metadata FROM entities WHERE entity_type = ?",
-            (entity_type,)
-        )
+            entities = []
+            for row in cursor.fetchall():
+                metadata = json.loads(row["metadata"]) if row["metadata"] else None
+                entities.append(Entity(
+                    id=row["id"],
+                    entity_type=row["entity_type"],
+                    name=row["name"],
+                    metadata=metadata
+                ))
 
-        entities = []
-        for row in cursor.fetchall():
-            metadata = json.loads(row["metadata"]) if row["metadata"] else None
-            entities.append(Entity(
-                id=row["id"],
-                entity_type=row["entity_type"],
-                name=row["name"],
-                metadata=metadata
-            ))
+            return entities
 
-        return entities
+    @staticmethod
+    def _escape_like_pattern(pattern: str) -> str:
+        """Escape special characters in LIKE patterns to prevent SQL injection.
+
+        Args:
+            pattern: The user-provided search pattern
+
+        Returns:
+            Escaped pattern safe for use in LIKE queries
+        """
+        # Escape backslash first, then % and _
+        return pattern.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
 
     async def search_entities(self, query: str) -> list[Entity]:
         """Search entities by name or ID (simple keyword match).
@@ -657,34 +681,34 @@ class GraphStore:
         Returns:
             List of entities matching the query
         """
-        if self._conn is None:
-            return []
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            # Escape special LIKE characters to prevent SQL injection
+            escaped_query = self._escape_like_pattern(query)
+            query_pattern = f"%{escaped_query}%"
+            cursor.execute(
+                """SELECT id, entity_type, name, metadata FROM entities
+                   WHERE id LIKE ? ESCAPE '\\' OR name LIKE ? ESCAPE '\\'""",
+                (query_pattern, query_pattern)
+            )
 
-        cursor = self._conn.cursor()
-        query_pattern = f"%{query}%"
-        cursor.execute(
-            """SELECT id, entity_type, name, metadata FROM entities
-               WHERE id LIKE ? OR name LIKE ?""",
-            (query_pattern, query_pattern)
-        )
+            entities = []
+            for row in cursor.fetchall():
+                metadata = json.loads(row["metadata"]) if row["metadata"] else None
+                entities.append(Entity(
+                    id=row["id"],
+                    entity_type=row["entity_type"],
+                    name=row["name"],
+                    metadata=metadata
+                ))
 
-        entities = []
-        for row in cursor.fetchall():
-            metadata = json.loads(row["metadata"]) if row["metadata"] else None
-            entities.append(Entity(
-                id=row["id"],
-                entity_type=row["entity_type"],
-                name=row["name"],
-                metadata=metadata
-            ))
-
-        return entities
+            return entities
 
     def close(self) -> None:
-        """Close the database connection."""
-        if self._conn:
-            self._conn.close()
-            self._conn = None
+        """Close the database connection for the current thread."""
+        if hasattr(self._local, "conn") and self._local.conn:
+            self._local.conn.close()
+            self._local.conn = None
 
 
 # =============================================================================
