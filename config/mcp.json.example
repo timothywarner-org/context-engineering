@@ -1,0 +1,131 @@
+{
+  "_usage": "This file contains example configurations. Choose ONE server entry based on your deployment strategy. For production with APIM proxy, use 'warnerco-schematica-azure-apim'. For direct Container App access (dev/testing), use 'warnerco-schematica-azure'. For local development, use 'warnerco-schematica-local'.",
+  "servers": {
+    "warnerco-schematica-azure": {
+      "url": "https://warnerco-schematica-classroom.wonderfulground-26566597.eastus2.azurecontainerapps.io/mcp",
+      "transport": "http",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "description": "WARNERCO Schematica on Azure Container Apps (direct access - FOR TESTING ONLY, use APIM in production)"
+    },
+    "warnerco-schematica-azure-apim": {
+      "url": "https://warnerco-apim.azure-api.net/mcp",
+      "transport": "http",
+      "headers": {
+        "Content-Type": "application/json",
+        "Ocp-Apim-Subscription-Key": "${APIM_SUBSCRIPTION_KEY}"
+      },
+      "description": "WARNERCO Schematica via Azure API Management (RECOMMENDED: with rate limiting, analytics, and caching)"
+    },
+    "warnerco-schematica-local": {
+      "command": "uv",
+      "args": ["run", "warnerco-mcp"],
+      "cwd": "${workspaceFolder}/src/warnerco/backend",
+      "env": {
+        "MEMORY_BACKEND": "chroma"
+      },
+      "description": "Local development server using stdio transport"
+    }
+  },
+  "_deployment_guide": {
+    "step_1_get_container_app_url": {
+      "description": "Get your deployed Container App FQDN",
+      "commands": [
+        "az containerapp show --name warnerco-schematica-classroom --resource-group warnerco --query properties.configuration.ingress.fqdn -o tsv",
+        "Current value: warnerco-schematica-classroom.wonderfulground-26566597.eastus2.azurecontainerapps.io"
+      ]
+    },
+    "step_2_get_apim_gateway": {
+      "description": "Get your API Management gateway URL",
+      "commands": [
+        "az apim show --name warnerco-apim --resource-group warnerco --query gatewayUrl -o tsv",
+        "Current value: https://warnerco-apim.azure-api.net"
+      ]
+    },
+    "step_3_create_apim_subscription": {
+      "description": "Create an API Management subscription key for authentication",
+      "commands": [
+        "az apim subscription create --resource-group warnerco --service-name warnerco-apim --name vscode-mcp-client --scope /apis/schematica-api",
+        "az apim subscription show --resource-group warnerco --service-name warnerco-apim --subscription-id vscode-mcp-client --query primaryKey -o tsv"
+      ]
+    },
+    "step_4_test_connection": {
+      "description": "Verify your MCP endpoint is accessible",
+      "examples": [
+        "# Test Container App directly",
+        "curl https://YOUR-CONTAINER-APP-FQDN/mcp",
+        "",
+        "# Test via APIM (with subscription key)",
+        "curl -H 'Ocp-Apim-Subscription-Key: YOUR-KEY' https://YOUR-APIM-GATEWAY/mcp"
+      ]
+    }
+  },
+  "_transport_info": {
+    "http": {
+      "description": "Standard HTTP request/response transport used by FastMCP's http_app()",
+      "supported_by": [
+        "VS Code MCP extension (when using url property)",
+        "Custom MCP clients",
+        "Claude Code (with URL-based server config)"
+      ],
+      "endpoints": {
+        "/mcp": "FastMCP HTTP endpoint mounted in main.py line 77",
+        "/api": "REST API for direct HTTP calls (bypasses MCP protocol)",
+        "/docs": "OpenAPI documentation"
+      }
+    },
+    "stdio": {
+      "description": "Standard input/output transport for local development",
+      "supported_by": [
+        "Claude Desktop",
+        "VS Code MCP extension (when using command property)",
+        "Any MCP client supporting stdio"
+      ],
+      "entry_point": "uv run warnerco-mcp (defined in pyproject.toml)"
+    }
+  },
+  "_azure_infrastructure": {
+    "container_app": {
+      "port": 8000,
+      "transport": "http",
+      "ingress": "external",
+      "cors": "enabled (* for all origins)",
+      "mcp_mount_path": "/mcp",
+      "scaling": {
+        "min_replicas": "See replicaMin parameter in Bicep",
+        "max_replicas": "See replicaMax parameter in Bicep",
+        "trigger": "http-scaling (50 concurrent requests)"
+      }
+    },
+    "apim": {
+      "tier": "Consumption",
+      "service_url": "Points to Container App FQDN",
+      "path": "'' (root path)",
+      "protocols": ["https"],
+      "authentication": "Subscription keys (created via Azure Portal or CLI)"
+    },
+    "memory_backend": {
+      "chroma": "Default for dev/classroom",
+      "azure_search": "When enableAiSearch=true parameter is set",
+      "configured_via": "MEMORY_BACKEND environment variable"
+    }
+  },
+  "_environment_variables": {
+    "APIM_SUBSCRIPTION_KEY": {
+      "description": "Azure API Management subscription key for authenticated access",
+      "how_to_get": "Azure Portal → API Management → Subscriptions → Show keys, or use CLI command above"
+    },
+    "MEMORY_BACKEND": {
+      "description": "Which memory backend to use (chroma, json, or azure_search)",
+      "values": ["chroma", "json", "azure_search"],
+      "set_in": "Container App environment variables or local .vscode/mcp.json"
+    }
+  },
+  "_notes": {
+    "vs_code_usage": "Copy this file to .vscode/mcp.json and replace placeholders with actual values",
+    "claude_desktop": "Claude Desktop uses a different config file location and format (see config/claude_desktop_config.json)",
+    "multiple_environments": "You can configure multiple server entries for dev, staging, and production environments",
+    "local_vs_azure": "Use 'command' property for local stdio servers, 'url' property for remote HTTP servers"
+  }
+}

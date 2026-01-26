@@ -285,7 +285,7 @@ def mock_langgraph_state():
     Returns:
         Dict representing a GraphState for the flow.
     """
-    from datetime import datetime
+    from datetime import datetime, timezone
 
     return {
         "query": "What depends on POW-05?",
@@ -297,7 +297,7 @@ def mock_langgraph_state():
         "graph_context": "",  # New field for graph memory
         "response": {},
         "error": None,
-        "start_time": datetime.utcnow().isoformat(),
+        "start_time": datetime.now(timezone.utc).isoformat(),
         "timings": {},
     }
 

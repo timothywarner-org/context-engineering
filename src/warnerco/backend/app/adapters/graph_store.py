@@ -716,17 +716,22 @@ class GraphStore:
 # =============================================================================
 
 _graph_store: Optional[GraphStore] = None
+_graph_store_lock = threading.Lock()
 
 
 def get_graph_store() -> GraphStore:
     """Get or create the singleton GraphStore instance.
+
+    Thread-safe singleton pattern using double-checked locking.
 
     Returns:
         GraphStore singleton
     """
     global _graph_store
     if _graph_store is None:
-        _graph_store = GraphStore()
+        with _graph_store_lock:
+            if _graph_store is None:
+                _graph_store = GraphStore()
     return _graph_store
 
 

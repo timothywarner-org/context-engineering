@@ -1,6 +1,7 @@
 """REST API routes for WARNERCO Robotics Schematica."""
 
-from datetime import datetime
+import logging
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, HTTPException, Query
@@ -20,6 +21,8 @@ from app.models import (
 
 
 router = APIRouter()
+
+logger = logging.getLogger(__name__)
 
 
 # Response models
@@ -67,7 +70,7 @@ async def health_check():
     return HealthResponse(
         status="healthy",
         backend=memory.backend_name,
-        timestamp=datetime.utcnow().isoformat(),
+        timestamp=datetime.now(timezone.utc).isoformat(),
     )
 
 
@@ -162,7 +165,7 @@ async def index_all_robots():
 @router.post("/search", response_model=SearchResponse, tags=["Search"])
 async def semantic_search(query: SearchQuery):
     """Perform semantic search on robot schematics."""
-    start_time = datetime.utcnow()
+    start_time = datetime.now(timezone.utc)
 
     # Use LangGraph flow for enhanced search
     result = await run_query(
@@ -186,7 +189,7 @@ async def semantic_search(query: SearchQuery):
                 )
             )
 
-    duration_ms = (datetime.utcnow() - start_time).total_seconds() * 1000
+    duration_ms = (datetime.now(timezone.utc) - start_time).total_seconds() * 1000
 
     return SearchResponse(
         results=search_results,
@@ -282,7 +285,8 @@ async def graph_stats():
             predicate_counts=stats.predicate_counts,
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Graph error: {str(e)}")
+        logger.exception("Graph stats operation failed")
+        raise HTTPException(status_code=500, detail="Internal server error processing graph request")
 
 
 @router.get("/graph/neighbors/{entity_id}", response_model=GraphNeighborsResponse, tags=["Graph"])
@@ -341,7 +345,8 @@ async def graph_neighbors(
         )
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Graph error: {str(e)}")
+        logger.exception("Graph neighbors operation failed for entity: %s", entity_id)
+        raise HTTPException(status_code=500, detail="Internal server error processing graph request")
 
 
 @router.get("/graph/path", response_model=GraphPathResponse, tags=["Graph"])
@@ -380,4 +385,5 @@ async def graph_path(
             )
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Graph error: {str(e)}")
+        logger.exception("Graph path operation failed from %s to %s", source, target)
+        raise HTTPException(status_code=500, detail="Internal server error processing graph request")

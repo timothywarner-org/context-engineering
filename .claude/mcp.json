@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "warnerco-schematica": {
+      "command": "uv",
+      "args": ["run", "warnerco-mcp"],
+      "cwd": "./src/warnerco/backend",
+      "env": {
+        "MEMORY_BACKEND": "chroma"
+      }
+    }
+  }
+}

@@ -36,7 +36,7 @@ Version: 2.0.0
 """
 
 from typing import Any, Dict, List, Literal, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 from pydantic import BaseModel, Field
 from fastmcp import FastMCP, Context
@@ -476,6 +476,9 @@ async def warn_semantic_search(
         >>> for item in result.results:
         ...     print(f"{item.id}: {item.score:.2f} - {item.component}")
     """
+    # Enforce top_k limits (documented as 1-50)
+    top_k = max(1, min(top_k, 50))
+
     filters = {}
     if category:
         filters["category"] = category
@@ -602,7 +605,7 @@ async def warn_index_schematic(schematic_id: str) -> IndexResult:
             schematic_id=schematic_id,
             success=False,
             message=f"Schematic {schematic_id} not found",
-            indexed_at=datetime.utcnow().isoformat(),
+            indexed_at=datetime.now(timezone.utc).isoformat(),
         )
 
     try:
@@ -614,21 +617,21 @@ async def warn_index_schematic(schematic_id: str) -> IndexResult:
                 schematic_id=schematic_id,
                 success=True,
                 message=f"Successfully indexed schematic {schematic_id}",
-                indexed_at=datetime.utcnow().isoformat(),
+                indexed_at=datetime.now(timezone.utc).isoformat(),
             )
         else:
             return IndexResult(
                 schematic_id=schematic_id,
                 success=False,
                 message="Indexing returned false - check backend configuration",
-                indexed_at=datetime.utcnow().isoformat(),
+                indexed_at=datetime.now(timezone.utc).isoformat(),
             )
     except Exception as e:
         return IndexResult(
             schematic_id=schematic_id,
             success=False,
             message=f"Indexing error: {str(e)}",
-            indexed_at=datetime.utcnow().isoformat(),
+            indexed_at=datetime.now(timezone.utc).isoformat(),
         )
 
 
@@ -908,7 +911,7 @@ async def warn_create_schematic(
             url = f"https://docs.warnerco.com/schematics/{new_id.lower()}"
 
         # Get current date for last_verified
-        current_date = datetime.utcnow().strftime("%Y-%m-%d")
+        current_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
         # Map string status to enum
         status_enum = SchematicStatus(status.lower())
@@ -1105,7 +1108,7 @@ async def warn_update_schematic(
             updated_fields.append("url")
 
         # Always update last_verified when making changes
-        new_last_verified = datetime.utcnow().strftime("%Y-%m-%d")
+        new_last_verified = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         if updated_fields:  # Only if there were actual changes
             updated_fields.append("last_verified")
 
@@ -1460,7 +1463,7 @@ async def warn_feedback_loop(ctx: Context, schematic_id: str) -> FeedbackResult:
             schematic_id=schematic_id,
             rating=0,
             feedback_text="",
-            submitted_at=datetime.utcnow().isoformat(),
+            submitted_at=datetime.now(timezone.utc).isoformat(),
             acknowledged=False,
         )
 
@@ -1485,13 +1488,13 @@ async def warn_feedback_loop(ctx: Context, schematic_id: str) -> FeedbackResult:
             schematic_id=schematic_id,
             rating=0,
             feedback_text="Feedback cancelled",
-            submitted_at=datetime.utcnow().isoformat(),
+            submitted_at=datetime.now(timezone.utc).isoformat(),
             acknowledged=False,
         )
 
     # Process the feedback
     feedback_data = feedback_result.data
-    submitted_at = datetime.utcnow().isoformat()
+    submitted_at = datetime.now(timezone.utc).isoformat()
 
     # In a production system, this would persist to a database
     await ctx.info(

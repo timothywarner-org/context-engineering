@@ -11,7 +11,7 @@ that vector search alone cannot capture.
 
 import json
 import re
-import uuid
+import threading
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Annotated, Dict, List, Optional, TypedDict
@@ -241,7 +241,6 @@ async def retrieve(state: GraphState) -> GraphState:
         # For lookup, try to extract specific ID
         if state["intent"] == QueryIntent.LOOKUP:
             # Try to find ID pattern in query
-            import re
             id_match = re.search(r"(WRN-\d+)", state["query"].upper())
             if id_match:
                 schematic = await memory.get_schematic(id_match.group(1))
@@ -537,8 +536,9 @@ class SchematicaGraph:
             return state["response"]
 
 
-# Singleton instance
+# Singleton instance with thread-safe initialization
 _graph: Optional[SchematicaGraph] = None
+_graph_lock = threading.Lock()
 
 
 async def run_query(
@@ -547,6 +547,8 @@ async def run_query(
     top_k: int = 5,
 ) -> Dict[str, Any]:
     """Run a query through the LangGraph flow.
+
+    Thread-safe singleton pattern using double-checked locking.
 
     Args:
         query: Natural language query
@@ -558,6 +560,8 @@ async def run_query(
     """
     global _graph
     if _graph is None:
-        _graph = SchematicaGraph()
+        with _graph_lock:
+            if _graph is None:
+                _graph = SchematicaGraph()
 
     return await _graph.run(query, filters, top_k)

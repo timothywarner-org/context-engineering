@@ -11,6 +11,11 @@ from app.config import settings
 from app.models import MemoryStats, RetrievalHit, Schematic, SearchResult
 
 
+def _escape_odata_string(value: str) -> str:
+    """Escape single quotes in OData filter strings to prevent injection."""
+    return value.replace("'", "''")
+
+
 class AzureAiSearchMemoryStore(MemoryStore):
     """Memory store backed by Azure AI Search.
 
@@ -194,7 +199,7 @@ class AzureAiSearchMemoryStore(MemoryStore):
                 conditions = []
                 for key, value in filters.items():
                     if key in ("category", "model", "status"):
-                        conditions.append(f"{key} eq '{value}'")
+                        conditions.append(f"{key} eq '{_escape_odata_string(str(value))}'")
                 if conditions:
                     filter_expr = " and ".join(conditions)
 

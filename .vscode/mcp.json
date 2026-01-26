@@ -7,6 +7,14 @@
       "env": {
         "MEMORY_BACKEND": "chroma"
       }
+    },
+    "warnerco-schematica-azure-apim": {
+      "url": "https://warnerco-apim.azure-api.net/mcp",
+      "transport": "http",
+      "headers": {
+        "Content-Type": "application/json",
+        "Ocp-Apim-Subscription-Key": "${env:APIM_SUBSCRIPTION_KEY}"
+      }
     }
   }
 }

@@ -6,14 +6,28 @@ Welcome to the training hub for mastering **Context Engineering with Model Conte
 
 ---
 
+## What's New (January 2026)
+
+- **Azure APIM Integration** - Production-ready API Management proxy with rate limiting and analytics
+- **VS Code MCP Support** - Native MCP client configuration with local and Azure endpoints
+- **Environment Management** - PowerShell refresh script for seamless env var updates
+- **Thread-safe singleton patterns** - Factory, graph store, and LangGraph flow now use proper locking for concurrent access
+- **Security hardening** - OData filter injection protection in Azure AI Search adapter
+- **Python 3.12+ compatibility** - Replaced deprecated `datetime.utcnow()` with `datetime.now(timezone.utc)` throughout
+- **Full test coverage** - 82 tests passing across all adapters and components
+- **Input validation** - `top_k` parameter enforced to 1-50 range in semantic search
+- **VS Code Tasks** - Quick access to environment refresh, connection testing, and server startup
+
+---
+
 ## Course Structure (4 x 50 Minutes)
 
-| Segment | Topic | Focus |
-|---------|-------|-------|
-| **1** | All About Context | Token economics, context loss types, why RAG isn't enough |
-| **2** | All About MCP | FastMCP, FastAPI, tools, resources, prompts, elicitations |
-| **3** | Semantic Memory Stores | JSON, ChromaDB, Azure AI Search, Graph Memory |
-| **4** | MCP in Production | Claude Desktop, Claude Code, VS Code, GitHub Copilot, LangGraph |
+| Segment | Topic                  | Focus                                                           |
+| ------- | ---------------------- | --------------------------------------------------------------- |
+| **1**   | All About Context      | Token economics, context loss types, why RAG isn't enough       |
+| **2**   | All About MCP          | FastMCP, FastAPI, tools, resources, prompts, elicitations       |
+| **3**   | Semantic Memory Stores | JSON, ChromaDB, Azure AI Search, Graph Memory                   |
+| **4**   | MCP in Production      | Claude Desktop, Claude Code, VS Code, GitHub Copilot, LangGraph |
 
 **Total Duration:** 4 hours (with 10-minute breaks)
 
@@ -23,7 +37,7 @@ Welcome to the training hub for mastering **Context Engineering with Model Conte
 
 ### Prerequisites
 
-- Python 3.11+ (for WARNERCO Schematica)
+- Python 3.11+ (3.12+ recommended for WARNERCO Schematica)
 - Node.js 20+ (for Lab 01 and MCP Inspector)
 - [uv](https://docs.astral.sh/uv/) package manager (recommended for Python)
 - Claude Desktop or Claude Code
@@ -110,8 +124,15 @@ context-engineering/
 │   ├── RUNBOOK.md                  # Operational runbook
 │   └── *.pptx                      # Slide decks
 ├── config/                         # Sample MCP client configurations
+│   ├── mcp.json.example            # VS Code MCP config with Azure examples
+│   ├── claude_desktop_config.json  # Claude Desktop config sample
+│   └── README.md                   # Configuration guide
 ├── examples/                       # Configuration examples
 ├── reference/                      # External reference implementations
+├── .vscode/                        # VS Code workspace configuration
+│   ├── mcp.json                    # Active MCP server configuration
+│   ├── tasks.json                  # Build and utility tasks
+│   └── refresh-env.ps1             # Environment variable refresh script
 ├── .claude/                        # Claude Code extensions
 │   ├── agents/                     # Custom agents
 │   └── skills/                     # Custom skills
@@ -165,12 +186,12 @@ async def store_memory(params: MemoryInput) -> str:
 
 Implement multiple storage backends with the WARNERCO Schematica pattern:
 
-| Backend | Best For | Key Feature |
-|---------|----------|-------------|
-| JSON | Prototyping | Zero setup, keyword search |
-| ChromaDB | Local development | Auto embeddings, semantic search |
-| Azure AI Search | Production | Enterprise scale, multi-tenant |
-| Graph (SQLite + NetworkX) | Relationship queries | Connected entities, paths |
+| Backend                   | Best For             | Key Feature                      |
+| ------------------------- | -------------------- | -------------------------------- |
+| JSON                      | Prototyping          | Zero setup, keyword search       |
+| ChromaDB                  | Local development    | Auto embeddings, semantic search |
+| Azure AI Search           | Production           | Enterprise scale, multi-tenant   |
+| Graph (SQLite + NetworkX) | Relationship queries | Connected entities, paths        |
 
 ```python
 # WARNERCO Schematica memory backend pattern
@@ -204,15 +225,28 @@ Configure Claude Desktop, Claude Code, and VS Code:
 
 ```json
 {
-  "mcpServers": {
-    "warnerco": {
+  "servers": {
+    "warnerco-schematica": {
       "command": "uv",
       "args": ["run", "warnerco-mcp"],
-      "cwd": "${workspaceFolder}/src/warnerco/backend"
+      "cwd": "${workspaceFolder}/src/warnerco/backend",
+      "env": {
+        "MEMORY_BACKEND": "chroma"
+      }
+    },
+    "warnerco-schematica-azure-apim": {
+      "url": "https://warnerco-apim.azure-api.net/mcp",
+      "transport": "http",
+      "headers": {
+        "Content-Type": "application/json",
+        "Ocp-Apim-Subscription-Key": "${env:APIM_SUBSCRIPTION_KEY}"
+      }
     }
   }
 }
 ```
+
+**Note:** See `config/mcp.json.example` for detailed Azure deployment configuration.
 
 ---
 
@@ -238,56 +272,151 @@ The flagship teaching application demonstrates production MCP patterns:
 
 **MCP Tools:**
 
-| Tool | Description |
-|------|-------------|
-| `warn_list_robots` | List all robot schematics |
-| `warn_get_robot` | Get schematic by ID |
-| `warn_semantic_search` | Semantic search across schematics |
-| `warn_memory_stats` | Backend statistics |
-| `warn_add_relationship` | Create graph triplet (subject, predicate, object) |
-| `warn_graph_neighbors` | Get connected entities |
-| `warn_graph_path` | Find shortest path between entities |
-| `warn_graph_stats` | Graph node/edge counts |
+| Tool                      | Description                                       |
+| ------------------------- | ------------------------------------------------- |
+| `warn_list_robots`        | List all robot schematics with optional filters   |
+| `warn_get_robot`          | Get schematic by ID                               |
+| `warn_semantic_search`    | Semantic search across schematics (top_k: 1-50)   |
+| `warn_memory_stats`       | Backend statistics                                |
+| `warn_index_schematic`    | Index a single schematic for semantic search      |
+| `warn_compare_schematics` | Compare two schematics side-by-side               |
+| `warn_create_schematic`   | Create a new schematic                            |
+| `warn_update_schematic`   | Update an existing schematic                      |
+| `warn_delete_schematic`   | Delete a schematic (requires confirmation)        |
+| `warn_guided_search`      | Interactive multi-step search with elicitation    |
+| `warn_feedback_loop`      | Collect user feedback on a schematic              |
+| `warn_add_relationship`   | Create graph triplet (subject, predicate, object) |
+| `warn_graph_neighbors`    | Get connected entities                            |
+| `warn_graph_path`         | Find shortest path between entities               |
+| `warn_graph_stats`        | Graph node/edge counts                            |
 
 **API Endpoints:**
 
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/api/robots` | List schematics |
-| GET | `/api/robots/{id}` | Get by ID |
-| POST | `/api/search` | Semantic search |
-| GET | `/api/memory/stats` | Backend stats |
-| GET | `/api/graph/stats` | Graph statistics |
-| GET | `/api/graph/neighbors/{id}` | Entity neighbors |
-| GET | `/docs` | OpenAPI documentation |
+| Method | Path                        | Description           |
+| ------ | --------------------------- | --------------------- |
+| GET    | `/api/robots`               | List schematics       |
+| GET    | `/api/robots/{id}`          | Get by ID             |
+| POST   | `/api/search`               | Semantic search       |
+| GET    | `/api/memory/stats`         | Backend stats         |
+| GET    | `/api/graph/stats`          | Graph statistics      |
+| GET    | `/api/graph/neighbors/{id}` | Entity neighbors      |
+| GET    | `/docs`                     | OpenAPI documentation |
 
 ---
 
 ## Memory Store Comparison
 
-| Feature | JSON | ChromaDB | Azure AI Search | Graph |
-|---------|------|----------|-----------------|-------|
-| Setup | None | `pip install` | Azure subscription | SQLite |
-| Semantic Search | No | Yes | Yes | No |
-| Relationship Queries | No | No | No | Yes |
-| Full-Text Search | Keyword only | No | Yes | No |
-| Scale | <1K | <100K | Millions | <100K |
-| Cost | Free | Free | Pay-per-use | Free |
-| Best For | Prototyping | Local dev | Production | Connections |
+| Feature              | JSON         | ChromaDB      | Azure AI Search    | Graph       |
+| -------------------- | ------------ | ------------- | ------------------ | ----------- |
+| Setup                | None         | `pip install` | Azure subscription | SQLite      |
+| Semantic Search      | No           | Yes           | Yes                | No          |
+| Relationship Queries | No           | No            | No                 | Yes         |
+| Full-Text Search     | Keyword only | No            | Yes                | No          |
+| Scale                | <1K          | <100K         | Millions           | <100K       |
+| Cost                 | Free         | Free          | Pay-per-use        | Free        |
+| Best For             | Prototyping  | Local dev     | Production         | Connections |
 
 ---
 
 ## Environment Variables
 
+### Application Settings
+
 Set in `src/warnerco/backend/.env`:
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `MEMORY_BACKEND` | `json` | Backend type: `json`, `chroma`, `azure_search` |
-| `AZURE_SEARCH_ENDPOINT` | - | Azure AI Search endpoint |
-| `AZURE_SEARCH_KEY` | - | Azure AI Search API key |
-| `AZURE_OPENAI_ENDPOINT` | - | Azure OpenAI endpoint |
-| `AZURE_OPENAI_API_KEY` | - | Azure OpenAI API key |
+| Variable                            | Default                  | Description                                    |
+| ----------------------------------- | ------------------------ | ---------------------------------------------- |
+| `MEMORY_BACKEND`                    | `chroma`                 | Backend type: `json`, `chroma`, `azure_search` |
+| `AZURE_SEARCH_ENDPOINT`             | -                        | Azure AI Search endpoint                       |
+| `AZURE_SEARCH_KEY`                  | -                        | Azure AI Search API key                        |
+| `AZURE_OPENAI_ENDPOINT`             | -                        | Azure OpenAI endpoint                          |
+| `AZURE_OPENAI_API_KEY`              | -                        | Azure OpenAI API key                           |
+| `AZURE_OPENAI_DEPLOYMENT`           | `gpt-4o-mini`            | Chat model deployment name                     |
+| `AZURE_OPENAI_EMBEDDING_DEPLOYMENT` | `text-embedding-ada-002` | Embedding model name                           |
+
+### System Environment Variables
+
+Set at system level (Windows: System Properties → Environment Variables):
+
+| Variable                | Description                                                 |
+| ----------------------- | ----------------------------------------------------------- |
+| `APIM_SUBSCRIPTION_KEY` | Azure API Management subscription key for remote MCP access |
+
+**Tip:** Use `.vscode/refresh-env.ps1` to reload environment variables without restarting VS Code:
+
+```powershell
+& .vscode/refresh-env.ps1
+```
+
+---
+
+## VS Code Configuration
+
+### Local Development
+
+The repository includes a pre-configured `.vscode/mcp.json` for local development:
+
+```json
+{
+  "servers": {
+    "warnerco-schematica": {
+      "command": "uv",
+      "args": ["run", "warnerco-mcp"],
+      "cwd": "${workspaceFolder}/src/warnerco/backend",
+      "env": {
+        "MEMORY_BACKEND": "chroma"
+      }
+    }
+  }
+}
+```
+
+### Azure Deployment Access
+
+To connect to your deployed Azure instance, add the APIM server entry:
+
+```json
+{
+  "servers": {
+    "warnerco-schematica-azure-apim": {
+      "url": "https://warnerco-apim.azure-api.net/mcp",
+      "transport": "http",
+      "headers": {
+        "Ocp-Apim-Subscription-Key": "${env:APIM_SUBSCRIPTION_KEY}"
+      }
+    }
+  }
+}
+```
+
+### VS Code Tasks
+
+Press `Ctrl+Shift+P` → "Tasks: Run Task" to access:
+
+- **Refresh Environment Variables** - Reload system env vars without restarting
+- **Test APIM MCP Connection** - Verify Azure deployment connectivity
+- **Start WARNERCO MCP Server (Local)** - Launch local development server
+
+### Getting APIM Subscription Key
+
+```bash
+# Create subscription
+az apim subscription create \
+  --resource-group warnerco \
+  --service-name warnerco-apim \
+  --name vscode-mcp-client \
+  --scope /apis/mcp-tools
+
+# Get primary key
+az rest --method post \
+  --url "https://management.azure.com/subscriptions/$(az account show --query id -o tsv)/resourceGroups/warnerco/providers/Microsoft.ApiManagement/service/warnerco-apim/subscriptions/vscode-mcp-client/listSecrets?api-version=2022-08-01" \
+  --query primaryKey -o tsv
+
+# Set as system environment variable (Windows)
+[System.Environment]::SetEnvironmentVariable('APIM_SUBSCRIPTION_KEY', 'YOUR-KEY', 'Machine')
+```
+
+See `config/mcp.json.example` for complete deployment configuration examples.
 
 ---
 
