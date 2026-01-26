@@ -1,0 +1,12 @@
+{
+  "servers": {
+    "warnerco-schematica": {
+      "command": "uv",
+      "args": ["run", "warnerco-mcp"],
+      "cwd": "${workspaceFolder}/src/warnerco/backend",
+      "env": {
+        "MEMORY_BACKEND": "chroma"
+      }
+    }
+  }
+}
