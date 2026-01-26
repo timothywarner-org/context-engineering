@@ -387,3 +387,121 @@ async def graph_path(
     except Exception as e:
         logger.exception("Graph path operation failed from %s to %s", source, target)
         raise HTTPException(status_code=500, detail="Internal server error processing graph request")
+
+
+# =============================================================================
+# Scratchpad Memory Endpoints
+# =============================================================================
+
+
+class ScratchpadStatsResponse(BaseModel):
+    """Scratchpad memory statistics response."""
+
+    entry_count: int
+    total_original_tokens: int
+    total_minimized_tokens: int
+    tokens_saved: int
+    savings_percentage: float
+    token_budget: int
+    token_budget_used: int
+    token_budget_remaining: int
+    predicate_counts: Dict[str, int]
+    oldest_entry: Optional[str] = None
+    newest_entry: Optional[str] = None
+
+
+class ScratchpadEntryResponse(BaseModel):
+    """Scratchpad entry response."""
+
+    id: str
+    subject: str
+    predicate: str
+    object_: str
+    content: str
+    original_tokens: int
+    minimized_tokens: int
+    created_at: str
+    expires_at: str
+
+
+class ScratchpadEntriesResponse(BaseModel):
+    """Scratchpad entries list response."""
+
+    entries: List[ScratchpadEntryResponse]
+    total: int
+
+
+@router.get("/scratchpad/stats", response_model=ScratchpadStatsResponse, tags=["Scratchpad"])
+async def scratchpad_stats():
+    """Get scratchpad memory statistics.
+
+    Returns token usage, entry counts, and savings metrics.
+    Useful for monitoring scratchpad utilization and compression effectiveness.
+    """
+    from app.adapters.scratchpad_store import get_scratchpad_store
+
+    try:
+        scratchpad = get_scratchpad_store()
+        stats = scratchpad.stats()
+
+        return ScratchpadStatsResponse(
+            entry_count=stats.entry_count,
+            total_original_tokens=stats.total_original_tokens,
+            total_minimized_tokens=stats.total_minimized_tokens,
+            tokens_saved=stats.tokens_saved,
+            savings_percentage=stats.savings_percentage,
+            token_budget=stats.token_budget,
+            token_budget_used=stats.token_budget_used,
+            token_budget_remaining=stats.token_budget_remaining,
+            predicate_counts=stats.predicate_counts,
+            oldest_entry=stats.oldest_entry,
+            newest_entry=stats.newest_entry,
+        )
+    except Exception as e:
+        logger.exception("Scratchpad stats operation failed")
+        raise HTTPException(status_code=500, detail="Internal server error processing scratchpad request")
+
+
+@router.get("/scratchpad/entries", response_model=ScratchpadEntriesResponse, tags=["Scratchpad"])
+async def scratchpad_entries(
+    subject: Optional[str] = Query(None, description="Filter by subject"),
+    predicate: Optional[str] = Query(None, description="Filter by predicate type"),
+):
+    """Get scratchpad entries with optional filtering.
+
+    Args:
+        subject: Filter by subject entity (optional)
+        predicate: Filter by predicate type (optional)
+    """
+    from app.adapters.scratchpad_store import get_scratchpad_store
+
+    try:
+        scratchpad = get_scratchpad_store()
+        result = await scratchpad.read(
+            subject=subject,
+            predicate=predicate,
+            enrich=False,
+        )
+
+        entries = []
+        for entry in result.entries:
+            entries.append(ScratchpadEntryResponse(
+                id=entry.id,
+                subject=entry.subject,
+                predicate=entry.predicate,
+                object_=entry.object_,
+                content=entry.content,
+                original_tokens=entry.original_tokens,
+                minimized_tokens=entry.minimized_tokens,
+                created_at=entry.created_at,
+                expires_at=entry.expires_at,
+            ))
+
+        return ScratchpadEntriesResponse(
+            entries=entries,
+            total=result.total,
+        )
+
+    except Exception as e:
+        logger.exception("Scratchpad entries operation failed")
+        raise HTTPException(status_code=500, detail="Internal server error processing scratchpad request")

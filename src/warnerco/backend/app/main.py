@@ -13,6 +13,9 @@ from app.api import router as api_router
 from app.config import settings
 from app.mcp_tools import mcp
 
+# Create FastMCP HTTP app (streamable HTTP) for lifespan integration
+mcp_app = mcp.http_app(transport="http", path="/")
+
 
 def get_cors_origins() -> list[str]:
     """Get CORS origins from environment or use defaults.
@@ -35,18 +38,20 @@ def get_cors_origins() -> list[str]:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan handler."""
-    # Startup
-    print(f"Starting WARNERCO Robotics Schematica...")
-    print(f"Memory Backend: {settings.memory_backend.value}")
-    print(f"Debug Mode: {settings.debug}")
+    async with mcp_app.lifespan(mcp_app):
+        # Startup
+        print("Starting WARNERCO Robotics Schematica...")
+        print(f"Memory Backend: {settings.memory_backend.value}")
+        print(f"Debug Mode: {settings.debug}")
 
-    # Initialize memory backend
-    from app.adapters import get_memory_store
-    memory = get_memory_store()
-    stats = await memory.get_memory_stats()
-    print(f"Loaded {stats.total_schematics} schematics")
+        # Initialize memory backend
+        from app.adapters import get_memory_store
 
-    yield
+        memory = get_memory_store()
+        stats = await memory.get_memory_stats()
+        print(f"Loaded {stats.total_schematics} schematics")
+
+        yield
 
     # Shutdown
     print("Shutting down WARNERCO Robotics Schematica...")
@@ -73,8 +78,8 @@ app.add_middleware(
 # Include API routes
 app.include_router(api_router, prefix="/api")
 
-# Mount FastMCP at /mcp
-app.mount("/mcp", mcp.http_app())
+# Mount FastMCP at /mcp (streamable HTTP transport for remote clients)
+app.mount("/mcp", mcp_app)
 
 # Static files paths
 STATIC_DIR = Path(__file__).parent.parent / "static"

@@ -294,7 +294,9 @@ def mock_langgraph_state():
         "intent": None,
         "candidates": [],
         "compressed_context": "",
-        "graph_context": "",  # New field for graph memory
+        "graph_context": [],  # Context from Knowledge Graph
+        "scratchpad_context": [],  # Context from Scratchpad Memory
+        "scratchpad_token_count": 0,  # Tokens used by scratchpad
         "response": {},
         "error": None,
         "start_time": datetime.now(timezone.utc).isoformat(),
@@ -334,6 +336,9 @@ def pytest_configure(config):
     )
     config.addinivalue_line(
         "markers", "mcp: marks tests that require MCP tools"
+    )
+    config.addinivalue_line(
+        "markers", "scratchpad: marks tests for scratchpad memory"
     )
 
 

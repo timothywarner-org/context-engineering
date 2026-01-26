@@ -306,15 +306,16 @@ Behind the scenes, WARNERCO:
 
 ### How the LangGraph Flow Works
 
-The updated 6-node pipeline:
+The 7-node pipeline:
 
 ```
-1. parse_intent    - Classify query (LOOKUP, DIAGNOSTIC, ANALYTICS, SEARCH)
-2. query_graph     - NEW: Find graph context if intent benefits from it
-3. retrieve        - Get candidates from vector store (boosted by graph context)
-4. compress_context - Minimize tokens while preserving key info
-5. reason          - LLM synthesizes response
-6. respond         - Format final output
+1. parse_intent      - Classify query (LOOKUP, DIAGNOSTIC, ANALYTICS, SEARCH)
+2. query_graph       - Find graph context if intent benefits from it
+3. inject_scratchpad - Add session working memory (observations, inferences)
+4. retrieve          - Get candidates from vector store (boosted by graph context)
+5. compress_context  - Minimize tokens while preserving key info
+6. reason            - LLM synthesizes response
+7. respond           - Format final output
 ```
 
 ### When Does query_graph Activate?

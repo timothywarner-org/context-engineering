@@ -18,7 +18,7 @@
       "value": 3
     },
     "containerImage": {
-      "value": "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
+      "value": "REPLACE_WITH_YOUR_ACR.azurecr.io/warnerco-schematica:latest"
     }
   }
 }

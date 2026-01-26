@@ -10,22 +10,24 @@ flowchart LR
         K["<b>top_k</b><br/>int"]
     end
 
-    subgraph Pipeline["<b>LANGGRAPH 6-NODE HYBRID PIPELINE</b>"]
+    subgraph Pipeline["<b>LANGGRAPH 7-NODE HYBRID PIPELINE</b>"]
         direction LR
 
         N1["<b>1. PARSE INTENT</b><br/><br/>Classify query type<br/>Extract entities<br/>Set strategy"]
 
         N2["<b>2. QUERY GRAPH</b><br/><br/>Find relationships<br/>Get neighbors<br/>Enrich context"]
 
-        N3["<b>3. RETRIEVE</b><br/><br/>Query vector store<br/>Apply filters<br/>Boost graph hits"]
+        N3["<b>3. INJECT SCRATCHPAD</b><br/><br/>Add working memory<br/>Session observations<br/>Recent inferences"]
 
-        N4["<b>4. COMPRESS</b><br/><br/>Extract key fields<br/>Minimize tokens<br/>Preserve context"]
+        N4["<b>4. RETRIEVE</b><br/><br/>Query vector store<br/>Apply filters<br/>Boost graph hits"]
 
-        N5["<b>5. REASON</b><br/><br/>Call Azure OpenAI<br/>Generate insights<br/>Synthesize response"]
+        N5["<b>5. COMPRESS</b><br/><br/>Extract key fields<br/>Minimize tokens<br/>Preserve context"]
 
-        N6["<b>6. RESPOND</b><br/><br/>Format output<br/>Add metadata<br/>Return result"]
+        N6["<b>6. REASON</b><br/><br/>Call Azure OpenAI<br/>Generate insights<br/>Synthesize response"]
 
-        N1 ==> N2 ==> N3 ==> N4 ==> N5 ==> N6
+        N7["<b>7. RESPOND</b><br/><br/>Format output<br/>Add metadata<br/>Return result"]
+
+        N1 ==> N2 ==> N3 ==> N4 ==> N5 ==> N6 ==> N7
     end
 
     subgraph Intents["<b>INTENT TYPES</b>"]
@@ -40,11 +42,12 @@ flowchart LR
         direction TB
         GS["<b>Graph Store</b><br/>SQLite + NetworkX<br/>Relationships"]
         VS["<b>Vector Store</b><br/>Chroma / Azure<br/>Embeddings"]
+        SP["<b>Scratchpad</b><br/>In-memory<br/>Session observations"]
     end
 
     subgraph State["<b>GRAPH STATE</b>"]
         direction TB
-        S["<b>TypedDict</b><br/><br/>query: str<br/>intent: QueryIntent<br/>filters: dict<br/>graph_context: list<br/>candidates: list<br/>compressed: str<br/>reasoning: str<br/>response: dict<br/>timings: dict"]
+        S["<b>TypedDict</b><br/><br/>query: str<br/>intent: QueryIntent<br/>filters: dict<br/>graph_context: list<br/>scratchpad_context: list<br/>candidates: list<br/>compressed: str<br/>reasoning: str<br/>response: dict<br/>timings: dict"]
     end
 
     subgraph Output["<b>OUTPUT</b>"]
@@ -55,11 +58,12 @@ flowchart LR
     Q --> N1
     F --> N1
     K --> N1
-    N6 --> R
+    N7 --> R
 
     %% Memory connections
     N2 -.->|"query"| GS
-    N3 -.->|"search"| VS
+    N3 -.->|"inject"| SP
+    N4 -.->|"search"| VS
 
     %% Side connections
     N1 -.->|"classifies"| Intents
@@ -69,18 +73,20 @@ flowchart LR
     classDef inputNode fill:#1e40af,stroke:#1e3a8a,color:#fff,stroke-width:2px
     classDef pipeNode fill:#166534,stroke:#14532d,color:#fff,stroke-width:3px
     classDef graphNode fill:#7c3aed,stroke:#5b21b6,color:#fff,stroke-width:2px
+    classDef scratchNode fill:#0891b2,stroke:#0e7490,color:#fff,stroke-width:2px
     classDef intentNode fill:#9a3412,stroke:#7c2d12,color:#fff,stroke-width:2px
     classDef stateNode fill:#6b21a8,stroke:#581c87,color:#fff,stroke-width:2px
     classDef outputNode fill:#be123c,stroke:#9f1239,color:#fff,stroke-width:2px
     classDef memNode fill:#b45309,stroke:#92400e,color:#fff,stroke-width:2px
 
     class Q,F,K inputNode
-    class N1,N3,N4,N5,N6 pipeNode
+    class N1,N4,N5,N6,N7 pipeNode
     class N2 graphNode
+    class N3 scratchNode
     class I1,I2,I3,I4 intentNode
     class S stateNode
     class R outputNode
-    class GS,VS memNode
+    class GS,VS,SP memNode
 ```
 
 ## Pipeline Details
@@ -96,7 +102,7 @@ Analyzes the incoming query to determine the best retrieval strategy.
 | **ANALYTICS** | "How many sensors?" | Aggregate, count operations | Yes |
 | **SEARCH** | General semantic query | Vector similarity, ranking | Optional |
 
-### Node 2: Query Graph (NEW)
+### Node 2: Query Graph
 
 Enriches context with relationship data from the knowledge graph. This node:
 - Extracts entity references from the query
@@ -123,7 +129,24 @@ state["graph_context"] = [
 - LOOKUP intent (direct fetch, no graph needed)
 - Pure semantic SEARCH (no explicit relationships)
 
-### Node 3: Retrieve
+### Node 3: Inject Scratchpad
+
+Retrieves session-scoped observations and inferences from the scratchpad memory.
+
+```python
+# Get recent scratchpad context
+context_lines, token_count = scratchpad.get_context_for_injection(token_budget=1500)
+
+# Add to state
+state["scratchpad_context"] = context_lines
+```
+
+**What it adds**:
+- Recent observations about schematics
+- Inferences made during the session
+- Contextual notes from user interactions
+
+### Node 4: Retrieve
 
 Fetches candidates from the vector store, optionally boosting results that appear in graph context.
 
@@ -143,16 +166,17 @@ if state.get("graph_context"):
             r.score *= 1.2  # 20% boost
 ```
 
-### Node 4: Compress Context
+### Node 5: Compress Context
 
-Reduces token usage while preserving essential information from both vector and graph sources.
+Reduces token usage while preserving essential information from vector, graph, and scratchpad sources.
 
 - Extracts: `id`, `name`, `summary`, `category`
 - Includes: relationship context from graph (if present)
+- Includes: scratchpad observations (if present)
 - Omits: full specifications, URLs, verbose metadata
 - Target: <2000 tokens for LLM context
 
-### Node 5: Reason
+### Node 6: Reason
 
 Calls Azure OpenAI with compressed hybrid context.
 
@@ -161,14 +185,14 @@ response = await client.chat.completions.create(
     model="gpt-4o-mini",
     messages=[
         {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": f"Query: {query}\n\nVector Context:\n{compressed}\n\nGraph Context:\n{graph_summary}"}
+        {"role": "user", "content": f"Query: {query}\n\nContext:\n{compressed}\n\nGraph Context:\n{graph_summary}\n\nSession Notes:\n{scratchpad_context}"}
     ]
 )
 ```
 
-### Node 6: Respond
+### Node 7: Respond
 
-Formats the final response with metadata including graph enrichment.
+Formats the final response with metadata including graph and scratchpad enrichment.
 
 ```python
 return QueryResponse(
@@ -179,6 +203,7 @@ return QueryResponse(
         "entities_found": len(state.get("graph_context", [])),
         "relationships_used": count_relationships(state)
     },
+    scratchpad_entries=len(state.get("scratchpad_context", [])),
     reasoning=state["reasoning"],
     query_time_ms=elapsed
 )
@@ -194,10 +219,11 @@ The `GraphState` TypedDict maintains context across all nodes:
 | `intent` | QueryIntent | Node 1 | Classified intent type |
 | `filters` | dict | Input | Category, model filters |
 | `graph_context` | list | Node 2 | Entities/relationships from graph |
-| `candidates` | list[SearchResult] | Node 3 | Vector search results |
-| `compressed_context` | str | Node 4 | Token-optimized context |
-| `reasoning` | str | Node 5 | LLM-generated response |
-| `response` | dict | Node 6 | Final formatted output |
+| `scratchpad_context` | list | Node 3 | Session observations/inferences |
+| `candidates` | list[SearchResult] | Node 4 | Vector search results |
+| `compressed_context` | str | Node 5 | Token-optimized context |
+| `reasoning` | str | Node 6 | LLM-generated response |
+| `response` | dict | Node 7 | Final formatted output |
 | `timings` | dict | All nodes | Per-node latency metrics |
 
 ## Hybrid RAG Benefits

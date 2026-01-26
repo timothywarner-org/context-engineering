@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scratchpad Monitor | WARNERCO Robotics</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="stylesheet" href="/dash/styles/global.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-container">
+      <a href="/dash/" class="nav-brand">
+        <img src="/assets/warnerco-logo.svg" alt="WARNERCO" class="nav-logo">
+      </a>
+      <div class="nav-links">
+        <a href="/dash/schematics/" class="nav-link">Schematics</a>
+        <a href="/dash/memory/" class="nav-link">Memory</a>
+        <a href="/dash/scratchpad/" class="nav-link active">Scratchpad</a>
+        <a href="/docs" class="nav-link" target="_blank">API Docs</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container" style="padding: var(--space-xl) var(--space-lg);">
+    <!-- Hero Section -->
+    <div class="card mb-lg" style="background: linear-gradient(135deg, var(--bg-card) 0%, rgba(139,92,246,0.1) 100%);">
+      <h1 style="margin-bottom: var(--space-sm);">Scratchpad Memory Monitor</h1>
+      <p class="text-secondary" style="max-width: 800px; margin-bottom: 0;">
+        Session-scoped working memory for observations and inferences. The scratchpad complements vector
+        and graph memory with ephemeral storage that supports LLM-powered minimization on write
+        and enrichment on read.
+      </p>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="grid grid-4 mb-lg" id="statsRow">
+      <div class="stat-card">
+        <div class="stat-value" id="totalOriginal">-</div>
+        <div class="stat-label">Original Tokens</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="tokensSaved">-</div>
+        <div class="stat-label">Tokens Saved</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="savingsPercent">-</div>
+        <div class="stat-label">Savings %</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="entryCount">-</div>
+        <div class="stat-label">Entries</div>
+      </div>
+    </div>
+
+    <div class="grid grid-2 mb-lg">
+      <!-- Token Budget Visualization -->
+      <div class="card">
+        <h2 style="margin-bottom: var(--space-lg);">Token Budget</h2>
+        <div class="budget-viz">
+          <div class="budget-bar-container">
+            <div class="budget-bar" id="budgetBar" style="width: 0%"></div>
+          </div>
+          <div class="budget-labels">
+            <span id="budgetUsed">0</span> / <span id="budgetTotal">2000</span> tokens
+          </div>
+        </div>
+
+        <div class="mt-lg">
+          <h4>Predicate Distribution</h4>
+          <div id="predicateDistribution" class="predicate-viz mt-md">
+            <div class="text-muted" style="font-size: 0.875rem;">No entries yet</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Write Test Panel -->
+      <div class="card">
+        <h2 style="margin-bottom: var(--space-lg);">Test Write</h2>
+        <p class="text-secondary mb-md">Add an entry to the scratchpad to test minimization.</p>
+
+        <div class="mb-md">
+          <label class="input-label">Subject</label>
+          <input type="text" id="writeSubject" class="input" placeholder="e.g., WRN-00006">
+        </div>
+
+        <div class="mb-md">
+          <label class="input-label">Predicate</label>
+          <select id="writePredicate" class="input">
+            <option value="observed">observed</option>
+            <option value="inferred">inferred</option>
+            <option value="relevant_to">relevant_to</option>
+            <option value="summarized_as">summarized_as</option>
+            <option value="contradicts">contradicts</option>
+            <option value="supersedes">supersedes</option>
+            <option value="depends_on">depends_on</option>
+          </select>
+        </div>
+
+        <div class="mb-md">
+          <label class="input-label">Object</label>
+          <input type="text" id="writeObject" class="input" placeholder="e.g., thermal_system">
+        </div>
+
+        <div class="mb-md">
+          <label class="input-label">Content</label>
+          <textarea id="writeContent" class="input" rows="3" placeholder="e.g., WRN-00006 has thermal issues when running hydraulics"></textarea>
+        </div>
+
+        <div class="mb-md">
+          <label class="checkbox-label">
+            <input type="checkbox" id="writeMinimize" checked>
+            Enable minimization (LLM compression)
+          </label>
+        </div>
+
+        <button id="writeBtn" class="btn btn-primary">Write Entry</button>
+
+        <div id="writeResult" class="mt-md hidden">
+          <div class="alert" id="writeResultAlert"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Entries Table -->
+    <div class="card mb-lg">
+      <div class="card-header">
+        <h2>Scratchpad Entries</h2>
+        <div class="flex gap-md">
+          <button id="refreshBtn" class="btn btn-outline btn-sm">Refresh</button>
+          <button id="clearAllBtn" class="btn btn-danger btn-sm">Clear All</button>
+        </div>
+      </div>
+
+      <div class="table-container mt-md">
+        <table class="table" id="entriesTable">
+          <thead>
+            <tr>
+              <th style="width: 80px;">Time</th>
+              <th style="width: 120px;">Subject</th>
+              <th style="width: 100px;">Predicate</th>
+              <th>Content</th>
+              <th style="width: 80px;">Original</th>
+              <th style="width: 80px;">Saved</th>
+              <th style="width: 80px;">Expires</th>
+            </tr>
+          </thead>
+          <tbody id="entriesBody">
+            <tr>
+              <td colspan="7" class="text-muted" style="text-align: center; padding: var(--space-xl);">
+                No entries yet. Use the test panel to add entries.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Educational Content -->
+    <div class="grid grid-3 mb-lg">
+      <div class="card">
+        <h3 style="color: var(--primary-light); margin-bottom: var(--space-md);">Minimization</h3>
+        <p class="text-secondary" style="font-size: 0.875rem; line-height: 1.6;">
+          On write, content is compressed by an LLM to preserve meaning with fewer tokens.
+          This reduces context window usage in downstream reasoning.
+        </p>
+        <div class="mt-md" style="background: var(--bg-secondary); padding: var(--space-md); border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 0.75rem;">
+          <div style="color: var(--text-muted);">Before (12 tokens):</div>
+          <div style="color: var(--danger);">"WRN-00006 has thermal issues when running hydraulics"</div>
+          <div style="color: var(--text-muted); margin-top: var(--space-sm);">After (8 tokens):</div>
+          <div style="color: var(--success);">"WRN-00006: thermal issues with hydraulics"</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="color: var(--primary-light); margin-bottom: var(--space-md);">Enrichment</h3>
+        <p class="text-secondary" style="font-size: 0.875rem; line-height: 1.6;">
+          On read with <code>enrich=true</code>, minimized content is expanded by an LLM
+          to provide richer context. Results are cached per entry.
+        </p>
+        <div class="mt-md" style="background: var(--bg-secondary); padding: var(--space-md); border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 0.75rem;">
+          <div style="color: var(--text-muted);">Stored:</div>
+          <div style="color: var(--warning);">"WRN-00006: thermal issues with hydraulics"</div>
+          <div style="color: var(--text-muted); margin-top: var(--space-sm);">Enriched:</div>
+          <div style="color: var(--info);">"WRN-00006 experiences thermal regulation problems when the hydraulic system is active..."</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="color: var(--primary-light); margin-bottom: var(--space-md);">LangGraph Integration</h3>
+        <p class="text-secondary" style="font-size: 0.875rem; line-height: 1.6;">
+          Scratchpad entries are automatically injected into the RAG pipeline via
+          the <code>inject_scratchpad</code> node, appearing before graph context.
+        </p>
+        <div class="mt-md" style="font-size: 0.75rem;">
+          <div class="flex gap-sm" style="flex-wrap: wrap;">
+            <span class="badge badge-info">1. Parse</span>
+            <span style="color: var(--text-muted);">→</span>
+            <span class="badge badge-info">2. Graph</span>
+            <span style="color: var(--text-muted);">→</span>
+            <span class="badge badge-success">3. Scratchpad</span>
+            <span style="color: var(--text-muted);">→</span>
+            <span class="badge badge-info">4. Retrieve</span>
+            <span style="color: var(--text-muted);">→</span>
+            <span class="badge badge-info">...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer style="text-align: center; padding: var(--space-lg); color: var(--text-muted); font-size: 0.875rem;">
+    WARNERCO Robotics Schematica &copy; 2025 | Educational Demonstration
+  </footer>
+
+  <style>
+    /* Scratchpad-specific styles */
+    .budget-viz {
+      margin-bottom: var(--space-md);
+    }
+
+    .budget-bar-container {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      height: 24px;
+      overflow: hidden;
+      margin-bottom: var(--space-sm);
+    }
+
+    .budget-bar {
+      background: linear-gradient(90deg, var(--success) 0%, var(--warning) 70%, var(--danger) 100%);
+      height: 100%;
+      transition: width 0.3s ease;
+      border-radius: var(--radius-md);
+    }
+
+    .budget-labels {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    .predicate-viz {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .predicate-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+
+    .predicate-label {
+      width: 100px;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .predicate-bar-bg {
+      flex: 1;
+      background: var(--bg-secondary);
+      height: 16px;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+
+    .predicate-bar-fill {
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.3s ease;
+    }
+
+    .predicate-count {
+      width: 40px;
+      text-align: right;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .input-label {
+      display: block;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: var(--space-xs);
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .checkbox-label input {
+      width: 16px;
+      height: 16px;
+    }
+
+    .alert {
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+    }
+
+    .alert-success {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid var(--success);
+      color: var(--success);
+    }
+
+    .alert-error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid var(--danger);
+      color: var(--danger);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .time-cell {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .content-cell {
+      max-width: 300px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .tokens-saved {
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .expires-soon {
+      color: var(--warning);
+    }
+  </style>
+
+  <script>
+    const API_BASE = '/api';
+
+    // Escape HTML to prevent XSS
+    function escapeHtml(unsafe) {
+      if (unsafe == null) return '';
+      return String(unsafe)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadStats();
+      await loadEntries();
+      setupEventListeners();
+    });
+
+    async function loadStats() {
+      try {
+        const res = await fetch(`${API_BASE}/scratchpad/stats`);
+        const stats = await res.json();
+
+        document.getElementById('totalOriginal').textContent = stats.total_original_tokens || 0;
+        document.getElementById('tokensSaved').textContent = stats.tokens_saved || 0;
+        document.getElementById('savingsPercent').textContent = `${stats.savings_percentage || 0}%`;
+        document.getElementById('entryCount').textContent = stats.entry_count || 0;
+
+        // Update budget bar
+        const budgetPercent = (stats.token_budget_used / stats.token_budget * 100) || 0;
+        document.getElementById('budgetBar').style.width = `${budgetPercent}%`;
+        document.getElementById('budgetUsed').textContent = stats.token_budget_used || 0;
+        document.getElementById('budgetTotal').textContent = stats.token_budget || 2000;
+
+        // Update predicate distribution
+        renderPredicateDistribution(stats.predicate_counts || {}, stats.entry_count || 0);
+
+      } catch (err) {
+        console.error('Failed to load stats:', err);
+      }
+    }
+
+    function renderPredicateDistribution(counts, total) {
+      const container = document.getElementById('predicateDistribution');
+
+      if (!total || Object.keys(counts).length === 0) {
+        container.innerHTML = '<div class="text-muted" style="font-size: 0.875rem;">No entries yet</div>';
+        return;
+      }
+
+      const maxCount = Math.max(...Object.values(counts));
+
+      container.innerHTML = Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .map(([predicate, count]) => `
+          <div class="predicate-row">
+            <span class="predicate-label">${escapeHtml(predicate)}</span>
+            <div class="predicate-bar-bg">
+              <div class="predicate-bar-fill" style="width: ${(count / maxCount * 100)}%"></div>
+            </div>
+            <span class="predicate-count">${count}</span>
+          </div>
+        `).join('');
+    }
+
+    async function loadEntries() {
+      try {
+        const res = await fetch(`${API_BASE}/scratchpad/entries`);
+        const data = await res.json();
+
+        renderEntries(data.entries || []);
+
+      } catch (err) {
+        console.error('Failed to load entries:', err);
+      }
+    }
+
+    function renderEntries(entries) {
+      const tbody = document.getElementById('entriesBody');
+
+      if (!entries.length) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="text-muted" style="text-align: center; padding: var(--space-xl);">
+              No entries yet. Use the test panel to add entries.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = entries.map(entry => {
+        const createdTime = new Date(entry.created_at).toLocaleTimeString();
+        const expiresTime = new Date(entry.expires_at);
+        const now = new Date();
+        const minutesRemaining = Math.max(0, Math.round((expiresTime - now) / 60000));
+        const tokensSaved = entry.original_tokens - entry.minimized_tokens;
+        const expiresClass = minutesRemaining < 10 ? 'expires-soon' : '';
+
+        return `
+          <tr>
+            <td class="time-cell">${escapeHtml(createdTime)}</td>
+            <td><code>${escapeHtml(entry.subject)}</code></td>
+            <td><span class="badge badge-info">${escapeHtml(entry.predicate)}</span></td>
+            <td class="content-cell" title="${escapeHtml(entry.content)}">${escapeHtml(entry.content)}</td>
+            <td>${entry.original_tokens}</td>
+            <td class="tokens-saved">${tokensSaved > 0 ? '+' + tokensSaved : '0'}</td>
+            <td class="${expiresClass}">${minutesRemaining}m</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function writeEntry() {
+      const subject = document.getElementById('writeSubject').value.trim();
+      const predicate = document.getElementById('writePredicate').value;
+      const object_ = document.getElementById('writeObject').value.trim();
+      const content = document.getElementById('writeContent').value.trim();
+      const minimize = document.getElementById('writeMinimize').checked;
+
+      if (!subject || !object_ || !content) {
+        showWriteResult(false, 'Please fill in all fields');
+        return;
+      }
+
+      try {
+        // Use MCP tool endpoint via POST
+        const res = await fetch(`${API_BASE}/scratchpad/stats`);
+
+        // For now, we'll use a simple approach since we don't have a direct write endpoint
+        // In production, you'd call the MCP tool or add a POST endpoint
+        showWriteResult(false, 'Direct write not available via API. Use MCP tools (warn_scratchpad_write) or MCP Inspector.');
+
+      } catch (err) {
+        showWriteResult(false, `Error: ${err.message}`);
+      }
+    }
+
+    function showWriteResult(success, message) {
+      const resultDiv = document.getElementById('writeResult');
+      const alertDiv = document.getElementById('writeResultAlert');
+
+      resultDiv.classList.remove('hidden');
+      alertDiv.className = `alert ${success ? 'alert-success' : 'alert-error'}`;
+      alertDiv.textContent = message;
+
+      setTimeout(() => {
+        resultDiv.classList.add('hidden');
+      }, 5000);
+    }
+
+    async function clearAll() {
+      if (!confirm('Clear all scratchpad entries?')) return;
+
+      try {
+        // Note: This would need a DELETE endpoint
+        showWriteResult(false, 'Clear via API not available. Use MCP tools (warn_scratchpad_clear) or MCP Inspector.');
+      } catch (err) {
+        console.error('Failed to clear:', err);
+      }
+    }
+
+    function setupEventListeners() {
+      document.getElementById('writeBtn').addEventListener('click', writeEntry);
+      document.getElementById('refreshBtn').addEventListener('click', async () => {
+        await loadStats();
+        await loadEntries();
+      });
+      document.getElementById('clearAllBtn').addEventListener('click', clearAll);
+
+      // Auto-refresh every 10 seconds
+      setInterval(async () => {
+        await loadStats();
+        await loadEntries();
+      }, 10000);
+    }
+  </script>
+</body>
+</html>

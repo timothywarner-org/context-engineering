@@ -3293,6 +3293,326 @@ async def warn_graph_stats() -> GraphStatsResult:
 
 
 # =============================================================================
+# SCRATCHPAD MEMORY TOOLS
+# =============================================================================
+# Tools for session-scoped working memory. The scratchpad complements the
+# vector (Chroma) and graph (SQLite + NetworkX) memory layers with ephemeral,
+# session-scoped storage for observations and inferences.
+
+
+class ScratchpadWriteToolResult(BaseModel):
+    """Result of a scratchpad write operation."""
+
+    success: bool = Field(description="Whether the write succeeded")
+    entry_id: Optional[str] = Field(default=None, description="ID of the created entry")
+    tokens_saved: int = Field(default=0, description="Tokens saved by minimization")
+    original_tokens: int = Field(default=0, description="Original token count")
+    minimized_tokens: int = Field(default=0, description="Token count after minimization")
+    message: str = Field(description="Status message")
+
+
+class ScratchpadReadToolResult(BaseModel):
+    """Result of a scratchpad read operation."""
+
+    entries: List[Dict[str, Any]] = Field(default_factory=list, description="Matching entries")
+    total: int = Field(description="Total entries matching filters")
+    enriched_count: int = Field(default=0, description="Number of entries that were enriched")
+
+
+class ScratchpadClearToolResult(BaseModel):
+    """Result of a scratchpad clear operation."""
+
+    cleared_count: int = Field(description="Number of entries cleared")
+    message: str = Field(description="Status message")
+
+
+class ScratchpadStatsToolResult(BaseModel):
+    """Statistics about the scratchpad memory."""
+
+    entry_count: int = Field(description="Total number of entries")
+    total_original_tokens: int = Field(description="Sum of original token counts")
+    total_minimized_tokens: int = Field(description="Sum of minimized token counts")
+    tokens_saved: int = Field(description="Tokens saved through minimization")
+    savings_percentage: float = Field(description="Percentage of tokens saved")
+    token_budget: int = Field(description="Maximum allowed tokens")
+    token_budget_used: int = Field(description="Current tokens used")
+    token_budget_remaining: int = Field(description="Remaining token budget")
+    predicate_counts: Dict[str, int] = Field(default_factory=dict, description="Count by predicate type")
+
+
+@mcp.tool()
+async def warn_scratchpad_write(
+    subject: str,
+    predicate: str,
+    object_: str,
+    content: str,
+    minimize: bool = True,
+) -> ScratchpadWriteToolResult:
+    """Store an observation or inference in the session-scoped scratchpad memory.
+
+    The scratchpad provides ephemeral working memory for the current session.
+    Unlike the persistent vector and graph stores, scratchpad entries expire
+    after 30 minutes and are cleared when the session ends.
+
+    When minimize=True (default), the content is compressed using an LLM to
+    reduce token usage while preserving essential meaning.
+
+    Args:
+        subject: The entity being described (e.g., "WRN-00006", "query:thermal")
+        predicate: Type of cognitive operation. Must be one of:
+            - observed: Direct observation from user/system
+            - inferred: Conclusion drawn from observations
+            - relevant_to: Connection to another entity
+            - summarized_as: Condensed representation
+            - contradicts: Conflicting information
+            - supersedes: Replaces prior information
+            - depends_on: Dependency relationship
+        object_: Related entity or concept (e.g., "thermal_system", "issue")
+        content: The text content to store
+        minimize: Whether to use LLM to compress content (default: True)
+
+    Returns:
+        ScratchpadWriteToolResult containing:
+            - success: Whether the write succeeded
+            - entry_id: ID of the created entry
+            - tokens_saved: Tokens saved by minimization
+            - original_tokens: Token count before minimization
+            - minimized_tokens: Token count after minimization
+            - message: Status message
+
+    Example:
+        >>> # Store an observation about a schematic
+        >>> result = await warn_scratchpad_write(
+        ...     subject="WRN-00006",
+        ...     predicate="observed",
+        ...     object_="thermal_system",
+        ...     content="WRN-00006 has thermal issues when running hydraulics"
+        ... )
+        >>> print(f"Saved {result.tokens_saved} tokens")
+    """
+    from app.adapters.scratchpad_store import get_scratchpad_store
+
+    try:
+        scratchpad = get_scratchpad_store()
+        result = await scratchpad.write(
+            subject=subject,
+            predicate=predicate,
+            object_=object_,
+            content=content,
+            minimize=minimize,
+        )
+
+        if result.success and result.entry:
+            return ScratchpadWriteToolResult(
+                success=True,
+                entry_id=result.entry.id,
+                tokens_saved=result.tokens_saved,
+                original_tokens=result.entry.original_tokens,
+                minimized_tokens=result.entry.minimized_tokens,
+                message=result.message,
+            )
+        else:
+            return ScratchpadWriteToolResult(
+                success=False,
+                entry_id=None,
+                tokens_saved=0,
+                original_tokens=0,
+                minimized_tokens=0,
+                message=result.message,
+            )
+
+    except Exception as e:
+        import sys
+        print(f"Error in warn_scratchpad_write: {e}", file=sys.stderr)
+        return ScratchpadWriteToolResult(
+            success=False,
+            entry_id=None,
+            tokens_saved=0,
+            original_tokens=0,
+            minimized_tokens=0,
+            message=f"Error: {str(e)}",
+        )
+
+
+@mcp.tool()
+async def warn_scratchpad_read(
+    subject: Optional[str] = None,
+    predicate: Optional[str] = None,
+    enrich: bool = False,
+) -> ScratchpadReadToolResult:
+    """Retrieve entries from the session-scoped scratchpad memory.
+
+    Entries can be filtered by subject and/or predicate. When enrich=True,
+    the content is expanded using an LLM to provide more detailed context.
+
+    Args:
+        subject: Filter by subject entity (optional)
+        predicate: Filter by predicate type (optional). Valid predicates:
+            observed, inferred, relevant_to, summarized_as, contradicts,
+            supersedes, depends_on
+        enrich: Whether to use LLM to expand content (default: False)
+
+    Returns:
+        ScratchpadReadToolResult containing:
+            - entries: List of matching entries with content
+            - total: Total number of matching entries
+            - enriched_count: Number of entries that were enriched
+
+    Example:
+        >>> # Read all observations about WRN-00006
+        >>> result = await warn_scratchpad_read(subject="WRN-00006", predicate="observed")
+        >>> for entry in result.entries:
+        ...     print(f"{entry['predicate']}: {entry['content']}")
+    """
+    from app.adapters.scratchpad_store import get_scratchpad_store
+
+    try:
+        scratchpad = get_scratchpad_store()
+        result = await scratchpad.read(
+            subject=subject,
+            predicate=predicate,
+            enrich=enrich,
+        )
+
+        entries = []
+        for entry in result.entries:
+            entries.append({
+                "id": entry.id,
+                "subject": entry.subject,
+                "predicate": entry.predicate,
+                "object": entry.object_,
+                "content": entry.enriched_content if entry.enriched_content else entry.content,
+                "original_tokens": entry.original_tokens,
+                "minimized_tokens": entry.minimized_tokens,
+                "created_at": entry.created_at,
+                "expires_at": entry.expires_at,
+            })
+
+        return ScratchpadReadToolResult(
+            entries=entries,
+            total=result.total,
+            enriched_count=result.enriched_count,
+        )
+
+    except Exception as e:
+        import sys
+        print(f"Error in warn_scratchpad_read: {e}", file=sys.stderr)
+        return ScratchpadReadToolResult(
+            entries=[],
+            total=0,
+            enriched_count=0,
+        )
+
+
+@mcp.tool()
+async def warn_scratchpad_clear(
+    subject: Optional[str] = None,
+    older_than_minutes: Optional[int] = None,
+) -> ScratchpadClearToolResult:
+    """Clear entries from the session-scoped scratchpad memory.
+
+    Entries can be cleared by subject or by age. If neither parameter is
+    provided, ALL entries are cleared.
+
+    Args:
+        subject: Clear only entries for this subject (optional)
+        older_than_minutes: Clear entries older than N minutes (optional)
+
+    Returns:
+        ScratchpadClearToolResult containing:
+            - cleared_count: Number of entries cleared
+            - message: Status message
+
+    Example:
+        >>> # Clear all entries for a specific subject
+        >>> result = await warn_scratchpad_clear(subject="WRN-00006")
+        >>> print(f"Cleared {result.cleared_count} entries")
+
+        >>> # Clear all entries older than 10 minutes
+        >>> result = await warn_scratchpad_clear(older_than_minutes=10)
+    """
+    from app.adapters.scratchpad_store import get_scratchpad_store
+
+    try:
+        scratchpad = get_scratchpad_store()
+        result = scratchpad.clear(
+            subject=subject,
+            older_than_minutes=older_than_minutes,
+        )
+
+        return ScratchpadClearToolResult(
+            cleared_count=result.cleared_count,
+            message=result.message,
+        )
+
+    except Exception as e:
+        import sys
+        print(f"Error in warn_scratchpad_clear: {e}", file=sys.stderr)
+        return ScratchpadClearToolResult(
+            cleared_count=0,
+            message=f"Error: {str(e)}",
+        )
+
+
+@mcp.tool()
+async def warn_scratchpad_stats() -> ScratchpadStatsToolResult:
+    """Get statistics about the session-scoped scratchpad memory.
+
+    Returns token usage, entry counts, and savings metrics. Useful for
+    monitoring scratchpad utilization and compression effectiveness.
+
+    Returns:
+        ScratchpadStatsToolResult containing:
+            - entry_count: Total number of entries
+            - total_original_tokens: Sum of original token counts
+            - total_minimized_tokens: Sum of minimized token counts
+            - tokens_saved: Total tokens saved through minimization
+            - savings_percentage: Percentage of tokens saved
+            - token_budget: Maximum allowed tokens
+            - token_budget_used: Current tokens used
+            - token_budget_remaining: Remaining token budget
+            - predicate_counts: Count by predicate type
+
+    Example:
+        >>> stats = await warn_scratchpad_stats()
+        >>> print(f"Using {stats.token_budget_used}/{stats.token_budget} tokens")
+        >>> print(f"Saved {stats.savings_percentage}% through minimization")
+    """
+    from app.adapters.scratchpad_store import get_scratchpad_store
+
+    try:
+        scratchpad = get_scratchpad_store()
+        stats = scratchpad.stats()
+
+        return ScratchpadStatsToolResult(
+            entry_count=stats.entry_count,
+            total_original_tokens=stats.total_original_tokens,
+            total_minimized_tokens=stats.total_minimized_tokens,
+            tokens_saved=stats.tokens_saved,
+            savings_percentage=stats.savings_percentage,
+            token_budget=stats.token_budget,
+            token_budget_used=stats.token_budget_used,
+            token_budget_remaining=stats.token_budget_remaining,
+            predicate_counts=stats.predicate_counts,
+        )
+
+    except Exception as e:
+        import sys
+        print(f"Error in warn_scratchpad_stats: {e}", file=sys.stderr)
+        return ScratchpadStatsToolResult(
+            entry_count=0,
+            total_original_tokens=0,
+            total_minimized_tokens=0,
+            tokens_saved=0,
+            savings_percentage=0.0,
+            token_budget=2000,
+            token_budget_used=0,
+            token_budget_remaining=2000,
+            predicate_counts={},
+        )
+
+
+# =============================================================================
 # MODULE EXPORTS
 # =============================================================================
 # The mcp instance is the main export. It is used by:

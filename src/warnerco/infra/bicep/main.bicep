@@ -18,7 +18,7 @@ param enableWaf bool = false
 param enableAiSearch bool = false
 
 @description('Container image to deploy')
-param containerImage string = 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
+param containerImage string = 'REPLACE_WITH_YOUR_ACR.azurecr.io/warnerco-schematica:latest'
 
 @description('Minimum number of replicas')
 @minValue(0)

@@ -41,15 +41,16 @@ flowchart TB
         end
     end
 
-    subgraph LangGraphFlow["LANGGRAPH 6-NODE PIPELINE"]
+    subgraph LangGraphFlow["LANGGRAPH 7-NODE PIPELINE"]
         direction LR
         N1["1. PARSE<br/>INTENT"]
         N2["2. QUERY<br/>GRAPH"]
-        N3["3. RETRIEVE<br/>VECTORS"]
-        N4["4. COMPRESS<br/>CONTEXT"]
-        N5["5. REASON<br/>LLM"]
-        N6["6. RESPOND<br/>FORMAT"]
-        N1 --> N2 --> N3 --> N4 --> N5 --> N6
+        N2b["3. INJECT<br/>SCRATCHPAD"]
+        N3["4. RETRIEVE<br/>VECTORS"]
+        N4["5. COMPRESS<br/>CONTEXT"]
+        N5["6. REASON<br/>LLM"]
+        N6["7. RESPOND<br/>FORMAT"]
+        N1 --> N2 --> N2b --> N3 --> N4 --> N5 --> N6
     end
 
     subgraph MCPTools["MCP GRAPH TOOLS"]
@@ -79,11 +80,11 @@ flowchart TB
     class JSON sourceNode
     class CHROMA,AZURE vectorNode
     class SQLITE,NX graphNode
-    class N1,N2,N3,N4,N5,N6 pipeNode
+    class N1,N2,N2b,N3,N4,N5,N6 pipeNode
     class T1,T2,T3,T4 toolNode
 ```
 
-**Text description for accessibility**: The diagram shows data flowing from schematics.json into two parallel memory stores: Vector Store (ChromaDB/Azure AI Search) for semantic search and Graph Store (SQLite + NetworkX) for relationship queries. The LangGraph pipeline has 6 nodes that query both stores, with dedicated MCP tools for graph operations.
+**Text description for accessibility**: The diagram shows data flowing from schematics.json into two parallel memory stores: Vector Store (ChromaDB/Azure AI Search) for semantic search and Graph Store (SQLite + NetworkX) for relationship queries. The LangGraph pipeline has 7 nodes that query both stores (including scratchpad injection), with dedicated MCP tools for graph operations.
 
 ## Component Details
 

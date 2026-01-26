@@ -1,12 +1,15 @@
 """LangGraph flow for retrieval-augmented reasoning about robot schematics.
 
-This module implements a 6-node RAG pipeline with Knowledge Graph integration:
+This module implements a 7-node RAG pipeline with Knowledge Graph and Scratchpad integration:
 
-    parse_intent -> query_graph -> retrieve -> compress_context -> reason -> respond
+    parse_intent -> query_graph -> inject_scratchpad -> retrieve -> compress_context -> reason -> respond
 
 The query_graph node enriches the context with relationship data from the
 Knowledge Graph, enabling the LLM to understand connections between entities
 that vector search alone cannot capture.
+
+The inject_scratchpad node adds session-scoped working memory context,
+allowing the system to remember observations and inferences from the current session.
 """
 
 import json
@@ -44,6 +47,8 @@ class GraphState(TypedDict):
     # Processing
     intent: Optional[QueryIntent]
     graph_context: List[str]  # Context from Knowledge Graph
+    scratchpad_context: List[str]  # Context from Scratchpad Memory
+    scratchpad_token_count: int  # Tokens used by scratchpad context
     candidates: List[SearchResult]
     compressed_context: str
 
@@ -230,10 +235,43 @@ async def query_graph(state: GraphState) -> GraphState:
     return state
 
 
+async def inject_scratchpad(state: GraphState) -> GraphState:
+    """Inject context from the session-scoped Scratchpad Memory.
+
+    Node 3: Inject Scratchpad
+
+    This node retrieves recent observations and inferences from the scratchpad
+    memory and adds them to the state for use in retrieval and reasoning.
+    The scratchpad provides session-scoped working memory that complements
+    the persistent vector and graph stores.
+    """
+    from app.adapters.scratchpad_store import get_scratchpad_store
+
+    scratchpad_context: List[str] = []
+    token_count = 0
+
+    try:
+        scratchpad = get_scratchpad_store()
+        context_lines, token_count = scratchpad.get_context_for_injection(
+            token_budget=settings.scratchpad_inject_budget,
+            query_context=state["query"],
+        )
+        scratchpad_context = context_lines
+
+    except Exception as e:
+        # Scratchpad failures should not break the pipeline
+        print(f"Scratchpad injection error (non-fatal): {e}", flush=True)
+
+    state["scratchpad_context"] = scratchpad_context
+    state["scratchpad_token_count"] = token_count
+    state["timings"]["inject_scratchpad"] = _elapsed_ms(state["start_time"])
+    return state
+
+
 async def retrieve(state: GraphState) -> GraphState:
     """Retrieve candidate schematics from memory backend.
 
-    Node 2: Retrieve
+    Node 4: Retrieve
     """
     memory = get_memory_store()
 
@@ -280,11 +318,18 @@ async def retrieve(state: GraphState) -> GraphState:
 def compress_context(state: GraphState) -> GraphState:
     """Minimize token bloat by extracting only needed fields.
 
-    Node 4: Compress Context
+    Node 5: Compress Context
 
-    Combines vector search results with Knowledge Graph context.
+    Combines vector search results with Scratchpad and Knowledge Graph context.
     """
     context_parts = []
+
+    # Include scratchpad context first (session working memory)
+    scratchpad_context = state.get("scratchpad_context", [])
+    if scratchpad_context:
+        context_parts.append("=== Session Memory (Scratchpad) ===")
+        context_parts.extend(scratchpad_context)
+        context_parts.append("")
 
     # Include graph context if available
     graph_context = state.get("graph_context", [])
@@ -352,7 +397,7 @@ Statuses: {json.dumps(statuses)}
 async def reason(state: GraphState) -> GraphState:
     """Call LLM for reasoning (stub if no LLM configured).
 
-    Node 5: Reason
+    Node 6: Reason
     """
     # If LLM is configured, use it for enhanced reasoning
     if settings.has_llm_config:
@@ -413,7 +458,7 @@ Provide a concise, technical response that directly addresses the query."""
 def respond(state: GraphState) -> GraphState:
     """Format final response for dashboards and MCP.
 
-    Node 6: Respond
+    Node 7: Respond
     """
     total_time = _elapsed_ms(state["start_time"])
 
@@ -437,6 +482,7 @@ def respond(state: GraphState) -> GraphState:
             for r in state["candidates"]
         ],
         "graph_context": state.get("graph_context", []),
+        "scratchpad_context": state.get("scratchpad_context", []),
         "context_summary": state["compressed_context"],
         "total_matches": len(state["candidates"]),
         "query_time_ms": total_time,
@@ -464,19 +510,21 @@ class SchematicaGraph:
     async def _build_graph(self):
         """Build the LangGraph workflow.
 
-        The workflow follows this 6-node pipeline:
-        parse_intent -> query_graph -> retrieve -> compress_context -> reason -> respond
+        The workflow follows this 7-node pipeline:
+        parse_intent -> query_graph -> inject_scratchpad -> retrieve -> compress_context -> reason -> respond
 
         The query_graph node enriches context with Knowledge Graph relationships.
+        The inject_scratchpad node adds session-scoped working memory.
         """
         try:
             from langgraph.graph import StateGraph, END
 
             workflow = StateGraph(GraphState)
 
-            # Add nodes (6-node pipeline)
+            # Add nodes (7-node pipeline)
             workflow.add_node("parse_intent", parse_intent)
             workflow.add_node("query_graph", query_graph)
+            workflow.add_node("inject_scratchpad", inject_scratchpad)
             workflow.add_node("retrieve", retrieve)
             workflow.add_node("compress_context", compress_context)
             workflow.add_node("reason", reason)
@@ -485,7 +533,8 @@ class SchematicaGraph:
             # Define edges
             workflow.set_entry_point("parse_intent")
             workflow.add_edge("parse_intent", "query_graph")
-            workflow.add_edge("query_graph", "retrieve")
+            workflow.add_edge("query_graph", "inject_scratchpad")
+            workflow.add_edge("inject_scratchpad", "retrieve")
             workflow.add_edge("retrieve", "compress_context")
             workflow.add_edge("compress_context", "reason")
             workflow.add_edge("reason", "respond")
@@ -513,6 +562,8 @@ class SchematicaGraph:
             "top_k": top_k,
             "intent": None,
             "graph_context": [],
+            "scratchpad_context": [],
+            "scratchpad_token_count": 0,
             "candidates": [],
             "compressed_context": "",
             "response": {},
@@ -526,9 +577,10 @@ class SchematicaGraph:
             result = await self._graph.ainvoke(initial_state)
             return result["response"]
         else:
-            # Fallback: run nodes sequentially (6-node pipeline)
+            # Fallback: run nodes sequentially (7-node pipeline)
             state = parse_intent(initial_state)
             state = await query_graph(state)
+            state = await inject_scratchpad(state)
             state = await retrieve(state)
             state = compress_context(state)
             state = await reason(state)

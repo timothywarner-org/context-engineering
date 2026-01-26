@@ -6,7 +6,7 @@ flowchart TB
     subgraph Server["<b>MCP SERVER: warnerco-schematica v2.0</b>"]
         direction TB
 
-        subgraph Tools["<b>TOOLS</b> (11) - Executable Actions"]
+        subgraph Tools["<b>TOOLS</b> (15) - Executable Actions"]
             direction LR
 
             subgraph DataTools["Data Retrieval"]
@@ -30,6 +30,13 @@ flowchart TB
             subgraph IntTools["Interactive (Elicitation)"]
                 T7["<b>warn_guided_search</b><br/>ctx: Context"]
                 T8["<b>warn_feedback_loop</b><br/>ctx: Context, schematic_id"]
+            end
+
+            subgraph ScratchTools["Scratchpad Memory"]
+                T12["<b>warn_scratchpad_write</b><br/>subject, predicate, object_, content"]
+                T13["<b>warn_scratchpad_read</b><br/>subject?, predicate?, enrich?"]
+                T14["<b>warn_scratchpad_clear</b><br/>subject?, older_than_minutes?"]
+                T15["<b>warn_scratchpad_stats</b><br/>no params"]
             end
         end
 
@@ -109,7 +116,7 @@ flowchart TB
     classDef clientBox fill:#dc2626,stroke:#b91c1c,color:#fff,stroke-width:2px
     classDef protoBox fill:#475569,stroke:#334155,color:#fff,stroke-width:2px
 
-    class T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11 toolBox
+    class T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15 toolBox
     class R1,R2,R3,R4,R5,R6,R7,R8,R9,R10 resBox
     class P1,P2,P3,P4,P5 promptBox
     class C1,C2,C3 clientBox
@@ -154,6 +161,14 @@ flowchart TB
 |------|------------------|---------|
 | `warn_guided_search` | Category → Model → Keywords | `GuidedSearchResult` |
 | `warn_feedback_loop` | Rating + Comments form | `FeedbackResult` |
+
+#### Scratchpad Memory Tools
+| Tool | Purpose | Returns |
+|------|---------|---------|
+| `warn_scratchpad_write` | Store observation with LLM minimization | `ScratchpadWriteResult` |
+| `warn_scratchpad_read` | Retrieve entries with optional enrichment | `ScratchpadReadResult` |
+| `warn_scratchpad_clear` | Clear entries by subject or age | `ScratchpadClearResult` |
+| `warn_scratchpad_stats` | Token usage and entry counts | `ScratchpadStatsResult` |
 
 ### Resource URI Schemes
 

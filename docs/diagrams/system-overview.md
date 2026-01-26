@@ -44,15 +44,16 @@ flowchart TB
         end
     end
 
-    subgraph Orchestration["<b>LANGGRAPH HYBRID RAG PIPELINE</b>"]
+    subgraph Orchestration["<b>LANGGRAPH 7-NODE HYBRID RAG PIPELINE</b>"]
         direction LR
         LG1["parse<br/>intent"]
         LG2["query<br/>graph"]
-        LG3["retrieve<br/>vectors"]
-        LG4["compress<br/>context"]
-        LG5["reason<br/>LLM"]
-        LG6["respond<br/>format"]
-        LG1 --> LG2 --> LG3 --> LG4 --> LG5 --> LG6
+        LG3["inject<br/>scratchpad"]
+        LG4["retrieve<br/>vectors"]
+        LG5["compress<br/>context"]
+        LG6["reason<br/>LLM"]
+        LG7["respond<br/>format"]
+        LG1 --> LG2 --> LG3 --> LG4 --> LG5 --> LG6 --> LG7
     end
 
     subgraph Memory["<b>HYBRID MEMORY LAYER</b>"]
@@ -103,7 +104,7 @@ flowchart TB
     class CD,VSC,DASH,API clientBox
     class ROUTES,MCP_EP,STATIC serverBox
     class T_DATA,T_MOD,T_CRUD,T_INT,T_GRAPH,R_MEM,R_CAT,R_HELP,R_META,P_ALL mcpBox
-    class LG1,LG2,LG3,LG4,LG5,LG6 orchBox
+    class LG1,LG2,LG3,LG4,LG5,LG6,LG7 orchBox
     class JSON,CHROMA,AZURE memBox
     class GRAPH graphBox
     class AOAI aiBox
@@ -133,9 +134,9 @@ flowchart TB
 
 ### LangGraph Hybrid RAG Pipeline
 
-6-node flow: `parse_intent` -> `query_graph` -> `retrieve` -> `compress_context` -> `reason` -> `respond`
+7-node flow: `parse_intent` -> `query_graph` -> `inject_scratchpad` -> `retrieve` -> `compress_context` -> `reason` -> `respond`
 
-The `query_graph` node enriches retrieval context with relationship data from the knowledge graph before vector search.
+The `query_graph` node enriches retrieval context with relationship data from the knowledge graph. The `inject_scratchpad` node adds session-scoped working memory observations.
 
 ### Hybrid Memory Layer
 

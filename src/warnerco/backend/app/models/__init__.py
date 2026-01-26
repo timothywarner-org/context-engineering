@@ -22,6 +22,16 @@ from app.models.graph import (
     ENTITY_TYPES,
 )
 
+from app.models.scratchpad import (
+    ScratchpadEntry,
+    ScratchpadStats,
+    ScratchpadWriteResult,
+    ScratchpadReadResult,
+    ScratchpadClearResult,
+    SCRATCHPAD_PREDICATES,
+    VALID_SCRATCHPAD_PREDICATES,
+)
+
 __all__ = [
     # Schematic models
     "Schematic",
@@ -41,4 +51,12 @@ __all__ = [
     "PREDICATES",
     "VALID_PREDICATES",
     "ENTITY_TYPES",
+    # Scratchpad models
+    "ScratchpadEntry",
+    "ScratchpadStats",
+    "ScratchpadWriteResult",
+    "ScratchpadReadResult",
+    "ScratchpadClearResult",
+    "SCRATCHPAD_PREDICATES",
+    "VALID_SCRATCHPAD_PREDICATES",
 ]

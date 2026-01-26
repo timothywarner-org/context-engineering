@@ -6,33 +6,6 @@ Welcome to the training hub for mastering **Context Engineering with Model Conte
 
 ---
 
-## What's New (January 2026)
-
-- **Azure APIM Integration** - Production-ready API Management proxy with rate limiting and analytics
-- **VS Code MCP Support** - Native MCP client configuration with local and Azure endpoints
-- **Environment Management** - PowerShell refresh script for seamless env var updates
-- **Thread-safe singleton patterns** - Factory, graph store, and LangGraph flow now use proper locking for concurrent access
-- **Security hardening** - OData filter injection protection in Azure AI Search adapter
-- **Python 3.12+ compatibility** - Replaced deprecated `datetime.utcnow()` with `datetime.now(timezone.utc)` throughout
-- **Full test coverage** - 82 tests passing across all adapters and components
-- **Input validation** - `top_k` parameter enforced to 1-50 range in semantic search
-- **VS Code Tasks** - Quick access to environment refresh, connection testing, and server startup
-
----
-
-## Course Structure (4 x 50 Minutes)
-
-| Segment | Topic                  | Focus                                                           |
-| ------- | ---------------------- | --------------------------------------------------------------- |
-| **1**   | All About Context      | Token economics, context loss types, why RAG isn't enough       |
-| **2**   | All About MCP          | FastMCP, FastAPI, tools, resources, prompts, elicitations       |
-| **3**   | Semantic Memory Stores | JSON, ChromaDB, Azure AI Search, Graph Memory                   |
-| **4**   | MCP in Production      | Claude Desktop, Claude Code, VS Code, GitHub Copilot, LangGraph |
-
-**Total Duration:** 4 hours (with 10-minute breaks)
-
----
-
 ## Quick Start
 
 ### Prerequisites
@@ -44,41 +17,66 @@ Welcome to the training hub for mastering **Context Engineering with Model Conte
 
 ### Option 1: Hello MCP Lab (Beginner Entry Point)
 
-The hands-on lab is the fastest way to build your first MCP server.
-
 ```bash
-# Clone the repository
 git clone https://github.com/timothywarner-org/context-engineering.git
-cd context-engineering
-
-# Navigate to the starter lab
-cd labs/lab-01-hello-mcp/starter
-npm install
-npm start
+cd context-engineering/labs/lab-01-hello-mcp/starter
+npm install && npm start
 
 # Test with MCP Inspector (in another terminal)
 npx @modelcontextprotocol/inspector node src/index.js
-# Opens http://localhost:5173
 ```
 
 ### Option 2: WARNERCO Schematica (Flagship Teaching App)
 
-The full-featured FastAPI + FastMCP + LangGraph application demonstrates production patterns.
-
 ```bash
-# Navigate to the backend
 cd src/warnerco/backend
-
-# Install dependencies with uv
 uv sync
-
-# Start the server
-uv run uvicorn app.main:app --reload
-# Opens http://localhost:8000
-
-# Or run as MCP stdio server (for Claude Desktop)
-uv run warnerco-mcp
+uv run uvicorn app.main:app --reload    # HTTP server at http://localhost:8000
+uv run warnerco-mcp                      # MCP stdio server for Claude Desktop
 ```
+
+---
+
+## Course Structure (4 x 50 Minutes)
+
+| Segment | Topic                  | Focus                                                           |
+| ------- | ---------------------- | --------------------------------------------------------------- |
+| **1**   | All About Context      | Token economics, context loss types, why RAG isn't enough       |
+| **2**   | All About MCP          | FastMCP, FastAPI, tools, resources, prompts, elicitations       |
+| **3**   | Semantic Memory Stores | JSON, ChromaDB, Azure AI Search, Graph Memory, Scratchpad       |
+| **4**   | MCP in Production      | Claude Desktop, Claude Code, VS Code, GitHub Copilot, LangGraph |
+
+---
+
+## WARNERCO Schematica Architecture
+
+The flagship teaching application demonstrates production MCP patterns with a 7-node hybrid RAG pipeline:
+
+```
++---------------------------------------------------------------+
+|                     FastAPI + FastMCP                         |
++---------------------------------------------------------------+
+|  LangGraph Flow (7-node Hybrid RAG)                           |
+|  parse_intent -> query_graph -> inject_scratchpad -> retrieve |
+|  -> compress -> reason -> respond                             |
++---------------------------------------------------------------+
+|  Hybrid Memory Layer                                          |
+|  +-------------------+  +-------------------+  +-------------+ |
+|  | Vector Store      |  | Graph Store       |  | Scratchpad  | |
+|  | JSON -> Chroma -> |  | SQLite + NetworkX |  | In-memory   | |
+|  | Azure AI Search   |  | (Knowledge Graph) |  | (Session)   | |
+|  +-------------------+  +-------------------+  +-------------+ |
++---------------------------------------------------------------+
+```
+
+### Memory Store Comparison
+
+| Feature              | JSON         | ChromaDB      | Azure AI Search    | Graph       | Scratchpad     |
+| -------------------- | ------------ | ------------- | ------------------ | ----------- | -------------- |
+| Semantic Search      | No           | Yes           | Yes                | No          | No             |
+| Relationship Queries | No           | No            | No                 | Yes         | No             |
+| Session Memory       | No           | No            | No                 | No          | Yes            |
+| Best For             | Prototyping  | Local dev     | Production         | Connections | Working memory |
 
 ---
 
@@ -86,128 +84,31 @@ uv run warnerco-mcp
 
 ```
 context-engineering/
-├── src/warnerco/                   # WARNERCO Robotics Schematica (Primary)
-│   ├── backend/                    # FastAPI + FastMCP + LangGraph
-│   │   ├── app/                    # Application code
-│   │   │   ├── adapters/           # Memory backends (JSON, Chroma, Azure, Graph)
-│   │   │   ├── langgraph/          # 6-node hybrid RAG pipeline
-│   │   │   ├── models/             # Pydantic models
-│   │   │   ├── main.py             # FastAPI application
-│   │   │   └── mcp_tools.py        # FastMCP tool definitions
-│   │   ├── data/                   # JSON schematics + vector stores
-│   │   ├── scripts/                # Indexing utilities
-│   │   ├── static/                 # SPA dashboards
-│   │   └── tests/                  # Test suite
-│   ├── dashboards/                 # Dashboard assets
-│   ├── infra/                      # Azure deployment (Bicep)
-│   └── README.md
-├── labs/                           # Hands-on Exercises
-│   ├── lab-01-hello-mcp/           # Build your first MCP server
-│   │   ├── starter/                # Starting point
-│   │   └── solution/               # Completed version
-│   └── README.md
-├── docs/                           # Student Materials
-│   ├── STUDENT_SETUP_GUIDE.md      # Pre-course setup instructions
-│   ├── TROUBLESHOOTING_FAQ.md      # Common issues and fixes
-│   ├── POST_COURSE_RESOURCES.md    # Continued learning
-│   ├── TUTORIAL_MCP_INSPECTOR.md   # MCP Inspector guide
-│   ├── TUTORIAL_GITHUB_COPILOT.md  # Copilot integration
-│   ├── TUTORIAL_DASHBOARDS.md      # Dashboard usage
-│   ├── diagrams/                   # Architecture diagrams (SVG + Mermaid)
-│   ├── tutorials/                  # Step-by-step tutorials
-│   └── api/                        # API reference docs
-├── diagrams/                       # High-level architecture (Mermaid)
-├── instructor/                     # Instructor Materials
-│   ├── course-plan-jan-2026.md     # Detailed course plan
-│   ├── DEMO_SCRIPT.md              # Live demo walkthrough
-│   ├── DEMO_QUICK_REFERENCE.md     # Quick reference card
-│   ├── RUNBOOK.md                  # Operational runbook
-│   └── *.pptx                      # Slide decks
-├── config/                         # Sample MCP client configurations
-│   ├── mcp.json.example            # VS Code MCP config with Azure examples
-│   ├── claude_desktop_config.json  # Claude Desktop config sample
-│   └── README.md                   # Configuration guide
-├── examples/                       # Configuration examples
-├── reference/                      # External reference implementations
-├── .vscode/                        # VS Code workspace configuration
-│   ├── mcp.json                    # Active MCP server configuration
-│   ├── tasks.json                  # Build and utility tasks
-│   └── refresh-env.ps1             # Environment variable refresh script
-├── .claude/                        # Claude Code extensions
-│   ├── agents/                     # Custom agents
-│   └── skills/                     # Custom skills
-├── .github/                        # GitHub Copilot configuration
-│   ├── agents/                     # Copilot agents
-│   ├── chatmodes/                  # Copilot chat modes
-│   └── copilot-instructions.md
-├── scripts/                        # Utility scripts
-├── images/                         # Course images
-├── CLAUDE.md                       # Claude Code instructions
-├── GEMINI.md                       # Gemini instructions
-├── AGENTS.md                       # Agent guidelines
-└── requirements.txt                # Root Python dependencies
+├── src/warnerco/backend/      # WARNERCO Schematica (FastAPI + FastMCP + LangGraph)
+├── labs/lab-01-hello-mcp/     # Hands-on beginner lab
+├── docs/                      # Student materials, tutorials, diagrams
+├── instructor/                # Instructor-only materials
+├── config/                    # Sample MCP client configurations
+├── .vscode/                   # VS Code workspace configuration
+├── .claude/                   # Claude Code agents and skills
+└── CLAUDE.md                  # Development instructions (SOURCE OF TRUTH)
 ```
+
+**For development details, see [CLAUDE.md](CLAUDE.md)** - the source of truth for:
+- Complete MCP tool reference
+- API endpoint documentation
+- Environment variable configuration
+- LangGraph pipeline details
+- Graph and Scratchpad Memory features
 
 ---
 
-## What You'll Build
+## MCP Client Configuration
 
-### Segment 1: Understanding Context
+### Claude Desktop
 
-Learn why AI "forgets" and how to fix it:
-
-- **Window Overflow** - Messages pushed out of context
-- **Session Boundary** - Complete loss between sessions
-- **Attention Dilution** - Context ignored in noise
-- **Compression Loss** - Summarization loses details
-
-### Segment 2: MCP Server Development
-
-Build production MCP servers with FastMCP:
-
-```python
-from fastmcp import FastMCP
-from pydantic import BaseModel, Field
-
-mcp = FastMCP("memory-server")
-
-class MemoryInput(BaseModel):
-    content: str = Field(..., description="Content to remember")
-    importance: int = Field(default=5, ge=1, le=10)
-
-@mcp.tool()
-async def store_memory(params: MemoryInput) -> str:
-    """Store a memory for future retrieval."""
-    memory_id = save_to_store(params.content, params.importance)
-    return f"Stored memory {memory_id}"
-```
-
-### Segment 3: Semantic Memory Stores
-
-Implement multiple storage backends with the WARNERCO Schematica pattern:
-
-| Backend                   | Best For             | Key Feature                      |
-| ------------------------- | -------------------- | -------------------------------- |
-| JSON                      | Prototyping          | Zero setup, keyword search       |
-| ChromaDB                  | Local development    | Auto embeddings, semantic search |
-| Azure AI Search           | Production           | Enterprise scale, multi-tenant   |
-| Graph (SQLite + NetworkX) | Relationship queries | Connected entities, paths        |
-
-```python
-# WARNERCO Schematica memory backend pattern
-from app.adapters.chroma_store import ChromaMemoryStore
-
-store = ChromaMemoryStore()
-
-# Semantic search across robot schematics
-results = await store.search("hydraulic arm specifications", top_k=5)
-```
-
-### Segment 4: Client Integration
-
-Configure Claude Desktop, Claude Code, and VS Code:
-
-**Claude Desktop** (`%APPDATA%\Claude\claude_desktop_config.json` on Windows):
+**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+**Mac**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 
 ```json
 {
@@ -221,217 +122,17 @@ Configure Claude Desktop, Claude Code, and VS Code:
 }
 ```
 
-**VS Code** (`.vscode/mcp.json`):
+### VS Code
 
-```json
-{
-  "servers": {
-    "warnerco-schematica": {
-      "command": "uv",
-      "args": ["run", "warnerco-mcp"],
-      "cwd": "${workspaceFolder}/src/warnerco/backend",
-      "env": {
-        "MEMORY_BACKEND": "chroma"
-      }
-    },
-    "warnerco-schematica-azure-apim": {
-      "url": "https://warnerco-apim.azure-api.net/mcp",
-      "transport": "http",
-      "headers": {
-        "Content-Type": "application/json",
-        "Ocp-Apim-Subscription-Key": "${env:APIM_SUBSCRIPTION_KEY}"
-      }
-    }
-  }
-}
-```
-
-**Note:** See `config/mcp.json.example` for detailed Azure deployment configuration.
-
----
-
-## WARNERCO Schematica Architecture
-
-The flagship teaching application demonstrates production MCP patterns:
-
-```
-+---------------------------------------------------------------+
-|                     FastAPI + FastMCP                         |
-+---------------------------------------------------------------+
-|  LangGraph Flow (6-node Hybrid RAG)                           |
-|  parse_intent -> query_graph -> retrieve -> compress -> reason -> respond |
-+---------------------------------------------------------------+
-|  Hybrid Memory Layer                                          |
-|  +--------------------------+  +--------------------------+   |
-|  | Vector Store             |  | Graph Store              |   |
-|  | JSON -> Chroma ->        |  | SQLite + NetworkX        |   |
-|  | Azure AI Search          |  | (Knowledge Graph)        |   |
-|  +--------------------------+  +--------------------------+   |
-+---------------------------------------------------------------+
-```
-
-**MCP Tools:**
-
-| Tool                      | Description                                       |
-| ------------------------- | ------------------------------------------------- |
-| `warn_list_robots`        | List all robot schematics with optional filters   |
-| `warn_get_robot`          | Get schematic by ID                               |
-| `warn_semantic_search`    | Semantic search across schematics (top_k: 1-50)   |
-| `warn_memory_stats`       | Backend statistics                                |
-| `warn_index_schematic`    | Index a single schematic for semantic search      |
-| `warn_compare_schematics` | Compare two schematics side-by-side               |
-| `warn_create_schematic`   | Create a new schematic                            |
-| `warn_update_schematic`   | Update an existing schematic                      |
-| `warn_delete_schematic`   | Delete a schematic (requires confirmation)        |
-| `warn_guided_search`      | Interactive multi-step search with elicitation    |
-| `warn_feedback_loop`      | Collect user feedback on a schematic              |
-| `warn_add_relationship`   | Create graph triplet (subject, predicate, object) |
-| `warn_graph_neighbors`    | Get connected entities                            |
-| `warn_graph_path`         | Find shortest path between entities               |
-| `warn_graph_stats`        | Graph node/edge counts                            |
-
-**API Endpoints:**
-
-| Method | Path                        | Description           |
-| ------ | --------------------------- | --------------------- |
-| GET    | `/api/robots`               | List schematics       |
-| GET    | `/api/robots/{id}`          | Get by ID             |
-| POST   | `/api/search`               | Semantic search       |
-| GET    | `/api/memory/stats`         | Backend stats         |
-| GET    | `/api/graph/stats`          | Graph statistics      |
-| GET    | `/api/graph/neighbors/{id}` | Entity neighbors      |
-| GET    | `/docs`                     | OpenAPI documentation |
-
----
-
-## Memory Store Comparison
-
-| Feature              | JSON         | ChromaDB      | Azure AI Search    | Graph       |
-| -------------------- | ------------ | ------------- | ------------------ | ----------- |
-| Setup                | None         | `pip install` | Azure subscription | SQLite      |
-| Semantic Search      | No           | Yes           | Yes                | No          |
-| Relationship Queries | No           | No            | No                 | Yes         |
-| Full-Text Search     | Keyword only | No            | Yes                | No          |
-| Scale                | <1K          | <100K         | Millions           | <100K       |
-| Cost                 | Free         | Free          | Pay-per-use        | Free        |
-| Best For             | Prototyping  | Local dev     | Production         | Connections |
-
----
-
-## Environment Variables
-
-### Application Settings
-
-Set in `src/warnerco/backend/.env`:
-
-| Variable                            | Default                  | Description                                    |
-| ----------------------------------- | ------------------------ | ---------------------------------------------- |
-| `MEMORY_BACKEND`                    | `chroma`                 | Backend type: `json`, `chroma`, `azure_search` |
-| `AZURE_SEARCH_ENDPOINT`             | -                        | Azure AI Search endpoint                       |
-| `AZURE_SEARCH_KEY`                  | -                        | Azure AI Search API key                        |
-| `AZURE_OPENAI_ENDPOINT`             | -                        | Azure OpenAI endpoint                          |
-| `AZURE_OPENAI_API_KEY`              | -                        | Azure OpenAI API key                           |
-| `AZURE_OPENAI_DEPLOYMENT`           | `gpt-4o-mini`            | Chat model deployment name                     |
-| `AZURE_OPENAI_EMBEDDING_DEPLOYMENT` | `text-embedding-ada-002` | Embedding model name                           |
-
-### System Environment Variables
-
-Set at system level (Windows: System Properties → Environment Variables):
-
-| Variable                | Description                                                 |
-| ----------------------- | ----------------------------------------------------------- |
-| `APIM_SUBSCRIPTION_KEY` | Azure API Management subscription key for remote MCP access |
-
-**Tip:** Use `.vscode/refresh-env.ps1` to reload environment variables without restarting VS Code:
-
-```powershell
-& .vscode/refresh-env.ps1
-```
-
----
-
-## VS Code Configuration
-
-### Local Development
-
-The repository includes a pre-configured `.vscode/mcp.json` for local development:
-
-```json
-{
-  "servers": {
-    "warnerco-schematica": {
-      "command": "uv",
-      "args": ["run", "warnerco-mcp"],
-      "cwd": "${workspaceFolder}/src/warnerco/backend",
-      "env": {
-        "MEMORY_BACKEND": "chroma"
-      }
-    }
-  }
-}
-```
-
-### Azure Deployment Access
-
-To connect to your deployed Azure instance, add the APIM server entry:
-
-```json
-{
-  "servers": {
-    "warnerco-schematica-azure-apim": {
-      "url": "https://warnerco-apim.azure-api.net/mcp",
-      "transport": "http",
-      "headers": {
-        "Ocp-Apim-Subscription-Key": "${env:APIM_SUBSCRIPTION_KEY}"
-      }
-    }
-  }
-}
-```
-
-### VS Code Tasks
-
-Press `Ctrl+Shift+P` → "Tasks: Run Task" to access:
-
-- **Refresh Environment Variables** - Reload system env vars without restarting
-- **Test APIM MCP Connection** - Verify Azure deployment connectivity
-- **Start WARNERCO MCP Server (Local)** - Launch local development server
-
-### Getting APIM Subscription Key
-
-```bash
-# Create subscription
-az apim subscription create \
-  --resource-group warnerco \
-  --service-name warnerco-apim \
-  --name vscode-mcp-client \
-  --scope /apis/mcp-tools
-
-# Get primary key
-az rest --method post \
-  --url "https://management.azure.com/subscriptions/$(az account show --query id -o tsv)/resourceGroups/warnerco/providers/Microsoft.ApiManagement/service/warnerco-apim/subscriptions/vscode-mcp-client/listSecrets?api-version=2022-08-01" \
-  --query primaryKey -o tsv
-
-# Set as system environment variable (Windows)
-[System.Environment]::SetEnvironmentVariable('APIM_SUBSCRIPTION_KEY', 'YOUR-KEY', 'Machine')
-```
-
-See `config/mcp.json.example` for complete deployment configuration examples.
+See `.vscode/mcp.json` in the repository for local and Azure APIM configurations.
 
 ---
 
 ## Testing with MCP Inspector
 
-The MCP Inspector is the primary debugging tool for MCP servers:
-
 ```bash
-# Test any MCP server
-npx @modelcontextprotocol/inspector node path/to/server.js
-
-# Test WARNERCO Schematica
 npx @modelcontextprotocol/inspector uv run warnerco-mcp
-
-# Opens web UI at http://localhost:5173
+# Opens http://localhost:5173
 ```
 
 ---
@@ -440,10 +141,7 @@ npx @modelcontextprotocol/inspector uv run warnerco-mcp
 
 - **[MCP Specification](https://spec.modelcontextprotocol.io/)** - Official protocol documentation
 - **[FastMCP Documentation](https://github.com/jlowin/fastmcp)** - Python MCP framework
-- **[MCP TypeScript SDK](https://www.npmjs.com/package/@modelcontextprotocol/sdk)** - Official TypeScript SDK
-- **[Claude Documentation](https://docs.anthropic.com/)** - Anthropic's Claude docs
-- **[ChromaDB Docs](https://docs.trychroma.com/)** - Vector database
-- **[Azure AI Search Docs](https://learn.microsoft.com/azure/search/)** - Enterprise search
+- **[CLAUDE.md](CLAUDE.md)** - Development instructions for this repository
 
 ---
 
@@ -457,7 +155,6 @@ npx @modelcontextprotocol/inspector uv run warnerco-mcp
 - Website: [techtrainertim.com](https://techtrainertim.com)
 - GitHub: [@timothywarner](https://github.com/timothywarner)
 - LinkedIn: [linkedin.com/in/timothywarner](https://www.linkedin.com/in/timothywarner/)
-- YouTube: [youtube.com/timothywarner](https://www.youtube.com/channel/UCim7PFtynyPuzMHtbNyYOXA)
 
 ---
 

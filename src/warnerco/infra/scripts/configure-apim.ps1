@@ -101,29 +101,38 @@ az apim api create `
     --api-id "mcp-tools" `
     --display-name "WARNERCO MCP Tools" `
     --path "mcp" `
-    --service-url "https://$ContainerAppFqdn/mcp" `
+    --service-url "https://$ContainerAppFqdn/mcp/" `
     --protocols https `
     --subscription-required false
 
-# MCP SSE endpoint (for streaming)
+# MCP streamable HTTP endpoints
 az apim api operation create `
     --resource-group $ResourceGroup `
     --service-name $ApimName `
     --api-id "mcp-tools" `
-    --operation-id "mcp-sse" `
-    --display-name "MCP SSE Stream" `
+    --operation-id "mcp-get" `
+    --display-name "MCP GET" `
     --method GET `
-    --url-template "/sse"
+    --url-template "/"
 
 # MCP messages endpoint
 az apim api operation create `
     --resource-group $ResourceGroup `
     --service-name $ApimName `
     --api-id "mcp-tools" `
-    --operation-id "mcp-messages" `
-    --display-name "MCP Messages" `
+    --operation-id "mcp-post" `
+    --display-name "MCP POST" `
     --method POST `
-    --url-template "/messages"
+    --url-template "/"
+
+az apim api operation create `
+    --resource-group $ResourceGroup `
+    --service-name $ApimName `
+    --api-id "mcp-tools" `
+    --operation-id "mcp-delete" `
+    --display-name "MCP DELETE" `
+    --method DELETE `
+    --url-template "/"
 
 # Create Dashboard API (static files)
 Write-Host "Creating Dashboard API..." -ForegroundColor Yellow

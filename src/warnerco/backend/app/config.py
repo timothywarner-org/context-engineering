@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     port: int = 8000
     debug: bool = False
 
+    # Azure APIM (optional front-end)
+    apim_subscription_key: Optional[str] = None
+
     # LLM Provider
     openai_api_key: Optional[str] = None
     azure_openai_endpoint: Optional[str] = None
@@ -53,6 +56,11 @@ class Settings(BaseSettings):
 
     # Telemetry
     telemetry_enabled: bool = True
+
+    # Scratchpad Memory Configuration
+    scratchpad_max_tokens: int = 2000  # Total token budget for scratchpad
+    scratchpad_entry_ttl_minutes: int = 30  # Entry expiration time
+    scratchpad_inject_budget: int = 1500  # Tokens for LangGraph injection
 
     @property
     def chroma_path(self) -> Path:
