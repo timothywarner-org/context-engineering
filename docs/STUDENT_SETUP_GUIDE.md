@@ -268,7 +268,7 @@ Example configuration for WARNERCO Schematica:
 ```json
 {
   "mcpServers": {
-    "warnerco-schematica": {
+    "warnerco": {
       "command": "uv",
       "args": ["run", "warnerco-mcp"],
       "cwd": "C:/github/context-engineering/src/warnerco/backend",
@@ -284,7 +284,7 @@ Example configuration for WARNERCO Schematica:
 
 The repository includes a pre-configured `.vscode/mcp.json` file. Simply open the repo in VS Code and the MCP server will be available to GitHub Copilot.
 
-See [docs/TUTORIAL_GITHUB_COPILOT.md](TUTORIAL_GITHUB_COPILOT.md) for detailed instructions.
+See [INSTRUCTOR_DEMO_WALKTHROUGH.md](INSTRUCTOR_DEMO_WALKTHROUGH.md) Section D for VS Code setup details.
 
 ---
 
@@ -423,21 +423,21 @@ If you want to get a head start:
 3. **Quick Browse**:
    - `README.md` - Project overview
    - `CLAUDE.md` - Comprehensive development guide
-   - `docs/TUTORIAL_DASHBOARDS.md` - Dashboard walkthrough
+   - `docs/INSTRUCTOR_DEMO_WALKTHROUGH.md` - Demo walkthrough with sample data
 
 ---
 
 ## What to Expect During Training
 
-During the 4-hour course, we will:
+During the 4-hour course (4 x 50-minute segments), we will:
 
-1. **Segment 1** (60 min): MCP fundamentals, tool calling, your first MCP server with Lab 01
+1. **Segment 1** (50 min): All About Context - Token economics, context loss types, why RAG isn't enough
 
-2. **Segment 2** (60 min): Memory patterns, resources, context engineering with WARNERCO Schematica
+2. **Segment 2** (50 min): All About MCP - FastMCP, FastAPI, tools, resources, prompts, elicitations
 
-3. **Segment 3** (60 min): Production deployment, Azure Container Apps, semantic search with ChromaDB
+3. **Segment 3** (50 min): Semantic Memory Stores - JSON, ChromaDB, Azure AI Search, Graph Memory, Scratchpad
 
-4. **Segment 4** (60 min): Advanced patterns, Graph Memory, hybrid RAG, LangGraph orchestration
+4. **Segment 4** (50 min): MCP in Production - Claude Desktop, Claude Code, VS Code, GitHub Copilot, LangGraph
 
 You will be running code, testing MCP tools, and exploring the dashboards throughout.
 
@@ -465,7 +465,7 @@ uv run uvicorn app.main:app --reload
 
 - **Before Training**: Check the troubleshooting section above or [TROUBLESHOOTING_FAQ.md](TROUBLESHOOTING_FAQ.md)
 - **During Training**: Ask questions in the live session
-- **After Training**: Refer to [POST_COURSE_RESOURCES.md](POST_COURSE_RESOURCES.md)
+- **After Training**: Review the [INSTRUCTOR_DEMO_WALKTHROUGH.md](INSTRUCTOR_DEMO_WALKTHROUGH.md) for reference examples
 
 ---
 

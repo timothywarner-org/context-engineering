@@ -13,17 +13,16 @@ Agentic robot schematics system with semantic memory and retrieval-augmented gen
 ┌─────────────────────────────────────────────────────────────┐
 │                     FastAPI + FastMCP                       │
 ├─────────────────────────────────────────────────────────────┤
-│  LangGraph Flow                                             │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐    │
-│  │ Parse    │→ │ Retrieve │→ │ Compress │→ │ Reason   │→ ··│
-│  │ Intent   │  │          │  │ Context  │  │ (LLM)    │    │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘    │
+│  LangGraph Flow (7-node Hybrid RAG)                         │
+│  parse_intent -> query_graph -> inject_scratchpad -> retrieve│
+│  -> compress -> reason -> respond                            │
 ├─────────────────────────────────────────────────────────────┤
-│  3-Tier Memory                                              │
-│  ┌───────────┐  ┌───────────┐  ┌─────────────────┐         │
-│  │ JSON      │→ │ Chroma    │→ │ Azure AI Search │         │
-│  │ (source)  │  │ (vectors) │  │ (enterprise)    │         │
-│  └───────────┘  └───────────┘  └─────────────────┘         │
+│  Hybrid Memory Layer                                        │
+│  +-------------------+  +-------------------+  +-----------+│
+│  | Vector Store      |  | Graph Store       |  | Scratchpad|│
+│  | JSON->Chroma->    |  | SQLite + NetworkX |  | In-memory |│
+│  | Azure AI Search   |  | (Knowledge Graph) |  | (Session) |│
+│  +-------------------+  +-------------------+  +-----------+│
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -40,9 +39,11 @@ src/warnerco/backend/
 │   ├── adapters/         # Memory backend implementations
 │   │   ├── json_store.py
 │   │   ├── chroma_store.py
-│   │   └── azure_store.py
+│   │   ├── azure_search_store.py
+│   │   ├── graph_store.py
+│   │   └── scratchpad_store.py
 │   └── langgraph/
-│       └── flow.py       # 5-node RAG orchestration
+│       └── flow.py       # 7-node hybrid RAG orchestration
 ├── data/
 │   ├── schematics/       # JSON source of truth
 │   └── chroma/           # Vector embeddings
@@ -84,16 +85,26 @@ Set `MEMORY_BACKEND` in `.env`:
 | `warn_get_robot` | Get schematic by ID |
 | `warn_semantic_search` | Natural language search |
 | `warn_memory_stats` | Backend statistics |
+| `warn_add_relationship` | Create graph triplet (subject, predicate, object) |
+| `warn_graph_neighbors` | Get connected entities |
+| `warn_graph_path` | Find shortest path between entities |
+| `warn_graph_stats` | Graph node/edge statistics |
+| `warn_scratchpad_write` | Store session observation |
+| `warn_scratchpad_read` | Retrieve session entries |
+| `warn_scratchpad_clear` | Clear session entries |
+| `warn_scratchpad_stats` | Token budget statistics |
 
 ## LangGraph Flow
 
-5-node retrieval-augmented generation:
+7-node hybrid retrieval-augmented generation:
 
 1. **parse_intent** - Classify query (lookup/diagnostic/analytics/search)
-2. **retrieve** - Fetch candidates from memory backend
-3. **compress_context** - Minimize token bloat
-4. **reason** - LLM generates response (Azure OpenAI gpt-4o-mini)
-5. **respond** - Format for dashboards/MCP
+2. **query_graph** - Enrich with knowledge graph relationships
+3. **inject_scratchpad** - Add session working memory
+4. **retrieve** - Fetch candidates from memory backend
+5. **compress_context** - Minimize token bloat
+6. **reason** - LLM generates response (Azure OpenAI gpt-4o-mini)
+7. **respond** - Format for dashboards/MCP
 
 ## Adding Schematics
 

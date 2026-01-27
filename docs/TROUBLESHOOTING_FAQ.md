@@ -394,7 +394,7 @@ tail -f ~/.config/Claude/logs/mcp*.log
 ```json
 {
   "mcpServers": {
-    "warnerco-schematica": {
+    "warnerco": {
       "command": "uv",
       "args": ["run", "warnerco-mcp"],
       "cwd": "C:/github/context-engineering/src/warnerco/backend",
@@ -618,7 +618,7 @@ tail -f ~/Library/Logs/Claude/mcp*.log  # macOS
 ```json
 {
   "mcpServers": {
-    "warnerco-schematica": {
+    "warnerco": {
       "command": "uv",
       "args": ["run", "warnerco-mcp"],
       "cwd": "C:/github/context-engineering/src/warnerco/backend"
@@ -1161,9 +1161,7 @@ If your issue is not covered here:
 
 1. **Check server logs** - most issues show up there
 
-2. **Review TUTORIAL_DASHBOARDS.md** - see working examples with the dashboards
-
-3. **Review TUTORIAL_MCP_INSPECTOR.md** - debugging with MCP Inspector
+2. **Review INSTRUCTOR_DEMO_WALKTHROUGH.md** - see working examples with dashboards and MCP Inspector
 
 4. **Check the OpenAPI docs** - http://localhost:8000/docs shows all API endpoints
 

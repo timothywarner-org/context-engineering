@@ -72,9 +72,10 @@ Add to your Claude Desktop config:
 ```json
 {
   "mcpServers": {
-    "warnerco-schematica": {
+    "warnerco": {
       "command": "uv",
-      "args": ["--directory", "C:/github/context-engineering/src/warnerco/backend", "run", "warnerco-mcp"]
+      "args": ["run", "warnerco-mcp"],
+      "cwd": "C:/github/context-engineering/src/warnerco/backend"
     }
   }
 }
@@ -87,9 +88,10 @@ Create `.vscode/mcp.json` in your workspace:
 ```json
 {
   "mcpServers": {
-    "warnerco-schematica": {
+    "warnerco": {
       "command": "uv",
-      "args": ["--directory", "${workspaceFolder}/src/warnerco/backend", "run", "warnerco-mcp"]
+      "args": ["run", "warnerco-mcp"],
+      "cwd": "${workspaceFolder}/src/warnerco/backend"
     }
   }
 }
@@ -103,6 +105,14 @@ Create `.vscode/mcp.json` in your workspace:
 | `warn_get_robot` | Get detailed information about a specific schematic |
 | `warn_semantic_search` | Search schematics using natural language |
 | `warn_memory_stats` | Get statistics about the memory system |
+| `warn_add_relationship` | Create graph triplet (subject, predicate, object) |
+| `warn_graph_neighbors` | Get connected entities from knowledge graph |
+| `warn_graph_path` | Find shortest path between entities |
+| `warn_graph_stats` | Graph node/edge/density statistics |
+| `warn_scratchpad_write` | Store session observation with optional minimization |
+| `warn_scratchpad_read` | Retrieve session entries with filtering |
+| `warn_scratchpad_clear` | Clear session entries by subject or age |
+| `warn_scratchpad_stats` | Token budget and savings statistics |
 
 ## API Endpoints
 
