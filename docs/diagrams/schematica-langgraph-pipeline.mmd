@@ -1,0 +1,81 @@
+%%{init: {'theme': 'base'}}%%
+flowchart LR
+    subgraph Input["📥 Input"]
+        Q["Query"]
+        F["Filters"]
+    end
+
+    subgraph Node1["1️⃣ PARSE INTENT"]
+        I1["LOOKUP: WRN-* patterns"]
+        I2["DIAGNOSTIC: status/problem"]
+        I3["ANALYTICS: count/total"]
+        I4["SEARCH: semantic default"]
+    end
+
+    subgraph Node2["2️⃣ QUERY GRAPH"]
+        G1["Extract entities"]
+        G2["Get neighbors"]
+        G3["Build graph_context"]
+    end
+
+    subgraph Node3["3️⃣ INJECT SCRATCHPAD"]
+        S1["Get recent entries"]
+        S2["Apply token budget"]
+        S3["Format context"]
+    end
+
+    subgraph Node4["4️⃣ RETRIEVE"]
+        R1["Vector search"]
+        R2["Score & rank"]
+        R3["Return candidates"]
+    end
+
+    subgraph Node5["5️⃣ COMPRESS"]
+        C1["Merge all contexts"]
+        C2["Format by intent"]
+        C3["Trim to budget"]
+    end
+
+    subgraph Node6["6️⃣ REASON"]
+        L1["Build prompt"]
+        L2["Azure OpenAI call"]
+        L3["Generate reasoning"]
+    end
+
+    subgraph Node7["7️⃣ RESPOND"]
+        O1["Build QueryResponse"]
+        O2["Include timings"]
+    end
+
+    subgraph Output["📤 Output"]
+        OUT["results + reasoning\n+ graph_context\n+ scratchpad_context"]
+    end
+
+    Input --> Node1
+    Node1 --> Node2
+    Node2 --> Node3
+    Node3 --> Node4
+    Node4 --> Node5
+    Node5 --> Node6
+    Node6 --> Node7
+    Node7 --> Output
+
+    GDB[("🕸️ Graph\nStore")]
+    SPD[("📝 Scratchpad\nStore")]
+    VDB[("📊 Vector\nStore")]
+    LLM[("🧠 Azure\nOpenAI")]
+
+    Node2 <-.-> GDB
+    Node3 <-.-> SPD
+    Node4 <-.-> VDB
+    Node6 <-.-> LLM
+
+    classDef inputNode fill:#e3f2fd,stroke:#1565c0
+    classDef nodeBox fill:#e8f5e9,stroke:#2e7d32
+    classDef storeNode fill:#fce4ec,stroke:#c2185b
+    classDef outputNode fill:#f3e5f5,stroke:#7b1fa2
+
+    class Q,F inputNode
+    class Node1,Node2,Node3,Node4,Node5,Node6,Node7 nodeBox
+    class GDB,SPD,VDB,LLM storeNode
+    class OUT outputNode

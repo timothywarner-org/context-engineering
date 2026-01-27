@@ -1,0 +1,65 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e8f5e9', 'secondaryColor': '#fce4ec', 'tertiaryColor': '#fff3e0'}}}%%
+flowchart TB
+    subgraph Clients["🖥️ MCP Clients"]
+        CD["Claude Desktop"]
+        VSC["VS Code/Copilot"]
+        INSP["MCP Inspector"]
+    end
+
+    subgraph FastAPI["⚡ FastAPI + FastMCP"]
+        API["/api/* REST"]
+        MCP["/mcp SSE"]
+        DASH["/dash/* SPA"]
+    end
+
+    subgraph Tools["🔧 MCP Tools (12 Core)"]
+        direction TB
+        VT["Vector Tools\nlist, get, search, stats"]
+        GT["Graph Tools\nadd_rel, neighbors, path, stats"]
+        ST["Scratchpad Tools\nwrite, read, clear, stats"]
+    end
+
+    subgraph Pipeline["🔄 LangGraph 7-Node Pipeline"]
+        direction LR
+        N1["1️⃣ parse\nintent"] --> N2["2️⃣ query\ngraph"]
+        N2 --> N3["3️⃣ inject\nscratchpad"]
+        N3 --> N4["4️⃣ retrieve\nvectors"]
+        N4 --> N5["5️⃣ compress\ncontext"]
+        N5 --> N6["6️⃣ reason\nLLM"]
+        N6 --> N7["7️⃣ respond"]
+    end
+
+    subgraph Memory["💾 Hybrid Memory Layer"]
+        direction TB
+        VS["📊 Vector Store\nJSON→Chroma→Azure"]
+        GS["🕸️ Graph Store\nSQLite+NetworkX"]
+        SP["📝 Scratchpad\nIn-Memory Session"]
+    end
+
+    subgraph Data["📁 Data"]
+        JSON[("schematics.json\n25 Robots")]
+        GRAPH[("graph.db")]
+    end
+
+    Clients --> FastAPI
+    FastAPI --> Tools
+    Tools --> Pipeline
+    N2 -.-> GS
+    N3 -.-> SP
+    N4 -.-> VS
+    VS --> JSON
+    GS --> GRAPH
+
+    classDef client fill:#e3f2fd,stroke:#1565c0
+    classDef api fill:#fff3e0,stroke:#e65100
+    classDef tool fill:#f3e5f5,stroke:#7b1fa2
+    classDef pipeline fill:#e8f5e9,stroke:#2e7d32
+    classDef memory fill:#fce4ec,stroke:#c2185b
+    classDef data fill:#eceff1,stroke:#546e7a
+
+    class CD,VSC,INSP client
+    class API,MCP,DASH api
+    class VT,GT,ST tool
+    class N1,N2,N3,N4,N5,N6,N7 pipeline
+    class VS,GS,SP memory
+    class JSON,GRAPH data

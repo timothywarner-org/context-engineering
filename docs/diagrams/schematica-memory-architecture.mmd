@@ -1,0 +1,77 @@
+%%{init: {'theme': 'base'}}%%
+flowchart TB
+    subgraph Queries["🔍 Query Types"]
+        Q1["'thermal sensors for cold'\n→ Semantic Search"]
+        Q2["'what connects to WRN-00006?'\n→ Graph Traversal"]
+        Q3["'based on what we discussed'\n→ Session Memory"]
+    end
+
+    subgraph Vector["📊 TIER 1: Vector Store"]
+        direction TB
+        subgraph Backends["Backend Options (MEMORY_BACKEND)"]
+            JSON["JSON\n─────\nKeyword match\n~100ms startup\nNo deps"]
+            CHROMA["Chroma\n─────\nLocal vectors\nsentence-transformers\n~2-5s startup"]
+            AZURE["Azure AI Search\n─────\nHybrid search\nEnterprise scale\nCloud hosted"]
+        end
+        VAPI["MemoryStore Interface\nlist() | get() | search() | index()"]
+    end
+
+    subgraph Graph["🕸️ TIER 2: Graph Store"]
+        direction TB
+        GAPI["GraphStore API\nadd_entity | add_relationship\nget_neighbors | shortest_path"]
+        subgraph Predicates["Relationship Types"]
+            P1["depends_on"]
+            P2["contains"]
+            P3["has_category"]
+            P4["compatible_with"]
+            P5["belongs_to_model"]
+        end
+        GDB[("SQLite + NetworkX\n117 entities\n221 relationships")]
+    end
+
+    subgraph Scratch["📝 TIER 3: Scratchpad"]
+        direction TB
+        SAPI["ScratchpadStore API\nwrite() | read() | clear()\nget_context_for_injection()"]
+        subgraph Cognitive["Cognitive Predicates"]
+            C1["observed"]
+            C2["inferred"]
+            C3["relevant_to"]
+            C4["contradicts"]
+        end
+        SCONF["Config: 2000 tokens max\n30 min TTL | LLM minimize"]
+    end
+
+    subgraph Data["📁 Persistent Data"]
+        SJSON[("schematics.json\n25 Robot Schematics")]
+        SGRPH[("graph.db\nKnowledge Graph")]
+        SCHRM[("chroma_db/\nVector Index")]
+    end
+
+    Q1 --> VAPI
+    Q2 --> GAPI
+    Q3 --> SAPI
+
+    VAPI --> Backends
+    JSON --> SJSON
+    CHROMA --> SJSON
+    CHROMA --> SCHRM
+    AZURE --> SJSON
+
+    GAPI --> Predicates
+    GAPI --> GDB
+    GDB --> SGRPH
+
+    SAPI --> Cognitive
+    SAPI --> SCONF
+
+    classDef queryNode fill:#e3f2fd,stroke:#1565c0
+    classDef vectorNode fill:#c8e6c9,stroke:#2e7d32
+    classDef graphNode fill:#ffe0b2,stroke:#e65100
+    classDef scratchNode fill:#f8bbd9,stroke:#c2185b
+    classDef dataNode fill:#cfd8dc,stroke:#546e7a
+
+    class Q1,Q2,Q3 queryNode
+    class JSON,CHROMA,AZURE,VAPI vectorNode
+    class GAPI,P1,P2,P3,P4,P5,GDB graphNode
+    class SAPI,C1,C2,C3,C4,SCONF scratchNode
+    class SJSON,SGRPH,SCHRM dataNode
