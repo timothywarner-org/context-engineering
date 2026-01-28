@@ -1,4 +1,5 @@
 # PPT cruft
+~*.pptx
 ~$warner-context-engineering-oct-2025.pptx
 settings.local.json
 
