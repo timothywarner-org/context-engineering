@@ -1,0 +1,452 @@
+[
+  {
+    "id": "WRN-00001",
+    "model": "WC-100",
+    "name": "Atlas Prime",
+    "component": "force feedback sensor array",
+    "version": "v3.4",
+    "summary": "High-precision force sensing system for WC-100 manipulation tasks. Enables delicate object handling with 0.1N resolution.",
+    "url": "https://schematics.warnerco.io/wc-100/force_feedback_sensor_v3_4.pdf",
+    "last_verified": "2025-01-15",
+    "category": "sensors",
+    "status": "active",
+    "tags": ["manipulation", "precision", "feedback"],
+    "specifications": {
+      "resolution": "0.1N",
+      "range": "0-500N",
+      "response_time": "2ms"
+    }
+  },
+  {
+    "id": "WRN-00002",
+    "model": "WC-200",
+    "name": "Titan Handler",
+    "component": "thermal management unit",
+    "version": "v2.1",
+    "summary": "Advanced thermal regulation system for WC-200 heavy-duty platforms. Maintains optimal operating temperatures under sustained loads.",
+    "url": "https://schematics.warnerco.io/wc-200/thermal_management_v2_1.pdf",
+    "last_verified": "2025-01-10",
+    "category": "thermal",
+    "status": "active",
+    "tags": ["cooling", "industrial", "heavy-duty"],
+    "specifications": {
+      "cooling_capacity": "500W",
+      "temp_range": "-20C to 85C",
+      "fan_speed": "variable"
+    }
+  },
+  {
+    "id": "WRN-00003",
+    "model": "WC-300",
+    "name": "Nimbus Scout",
+    "component": "battery management system",
+    "version": "v1.8",
+    "summary": "Intelligent power management for WC-300 mobile reconnaissance units. Optimizes battery life with predictive charging algorithms.",
+    "url": "https://schematics.warnerco.io/wc-300/battery_management_v1_8.pdf",
+    "last_verified": "2025-01-18",
+    "category": "power",
+    "status": "active",
+    "tags": ["mobile", "battery", "efficiency"],
+    "specifications": {
+      "capacity": "48V 20Ah",
+      "charge_time": "45min",
+      "cycles": "2000+"
+    }
+  },
+  {
+    "id": "WRN-00004",
+    "model": "WC-400",
+    "name": "Aegis Guardian",
+    "component": "vision processing module",
+    "version": "v4.0",
+    "summary": "Multi-spectral vision system for WC-400 security robots. Combines RGB, thermal, and depth sensing for comprehensive situational awareness.",
+    "url": "https://schematics.warnerco.io/wc-400/vision_processing_v4_0.pdf",
+    "last_verified": "2025-01-12",
+    "category": "sensors",
+    "status": "active",
+    "tags": ["vision", "security", "multi-spectral"],
+    "specifications": {
+      "resolution": "4K RGB + 640x480 thermal",
+      "frame_rate": "60fps",
+      "range": "100m"
+    }
+  },
+  {
+    "id": "WRN-00005",
+    "model": "WC-100",
+    "name": "Atlas Prime",
+    "component": "precision gripper assembly",
+    "version": "v2.5",
+    "summary": "Adaptive gripper system for WC-100 precision handling. Features variable force control and tactile feedback for delicate operations.",
+    "url": "https://schematics.warnerco.io/wc-100/precision_gripper_v2_5.pdf",
+    "last_verified": "2025-01-08",
+    "category": "manipulation",
+    "status": "active",
+    "tags": ["gripper", "precision", "adaptive"],
+    "specifications": {
+      "grip_force": "0.1-50N",
+      "finger_count": "3",
+      "accuracy": "0.01mm"
+    }
+  },
+  {
+    "id": "WRN-00006",
+    "model": "WC-500",
+    "name": "Hercules Lifter",
+    "component": "hydraulic actuator system",
+    "version": "v3.2",
+    "summary": "Heavy-lift hydraulic system for WC-500 industrial robots. Provides 2000kg lifting capacity with smooth motion control.",
+    "url": "https://schematics.warnerco.io/wc-500/hydraulic_actuator_v3_2.pdf",
+    "last_verified": "2025-01-05",
+    "category": "actuators",
+    "status": "active",
+    "tags": ["hydraulic", "heavy-lift", "industrial"],
+    "specifications": {
+      "lift_capacity": "2000kg",
+      "pressure": "350bar",
+      "speed": "0.5m/s"
+    }
+  },
+  {
+    "id": "WRN-00007",
+    "model": "WC-300",
+    "name": "Nimbus Scout",
+    "component": "LIDAR navigation module",
+    "version": "v2.0",
+    "summary": "360-degree LIDAR system for WC-300 autonomous navigation. Enables real-time mapping and obstacle avoidance in dynamic environments.",
+    "url": "https://schematics.warnerco.io/wc-300/lidar_navigation_v2_0.pdf",
+    "last_verified": "2025-01-14",
+    "category": "sensors",
+    "status": "active",
+    "tags": ["lidar", "navigation", "autonomous"],
+    "specifications": {
+      "range": "200m",
+      "points_per_second": "1.2M",
+      "accuracy": "2cm"
+    }
+  },
+  {
+    "id": "WRN-00008",
+    "model": "WC-600",
+    "name": "Mercury Courier",
+    "component": "motor controller board",
+    "version": "v5.1",
+    "summary": "High-efficiency motor control for WC-600 delivery robots. Supports regenerative braking and precise velocity control.",
+    "url": "https://schematics.warnerco.io/wc-600/motor_controller_v5_1.pdf",
+    "last_verified": "2025-01-16",
+    "category": "control",
+    "status": "active",
+    "tags": ["motor", "efficiency", "delivery"],
+    "specifications": {
+      "channels": "4",
+      "max_current": "50A per channel",
+      "efficiency": "98%"
+    }
+  },
+  {
+    "id": "WRN-00009",
+    "model": "WC-400",
+    "name": "Aegis Guardian",
+    "component": "safety interlock system",
+    "version": "v3.0",
+    "summary": "Comprehensive safety system for WC-400 human interaction scenarios. Implements emergency stop, zone monitoring, and force limiting.",
+    "url": "https://schematics.warnerco.io/wc-400/safety_interlock_v3_0.pdf",
+    "last_verified": "2025-01-11",
+    "category": "safety",
+    "status": "active",
+    "tags": ["safety", "interlock", "human-robot"],
+    "specifications": {
+      "response_time": "10ms",
+      "zones": "8 configurable",
+      "compliance": "ISO 13849 PLe"
+    }
+  },
+  {
+    "id": "WRN-00010",
+    "model": "WC-200",
+    "name": "Titan Handler",
+    "component": "wireless communication module",
+    "version": "v2.3",
+    "summary": "Industrial-grade wireless system for WC-200 fleet coordination. Supports mesh networking and low-latency control signals.",
+    "url": "https://schematics.warnerco.io/wc-200/wireless_comm_v2_3.pdf",
+    "last_verified": "2025-01-09",
+    "category": "communication",
+    "status": "active",
+    "tags": ["wireless", "mesh", "fleet"],
+    "specifications": {
+      "protocol": "5G + WiFi 6E",
+      "latency": "<5ms",
+      "range": "500m"
+    }
+  },
+  {
+    "id": "WRN-00011",
+    "model": "WC-700",
+    "name": "Vulcan Welder",
+    "component": "arc welding head assembly",
+    "version": "v1.5",
+    "summary": "Precision welding system for WC-700 manufacturing robots. Supports MIG, TIG, and spot welding with adaptive seam tracking.",
+    "url": "https://schematics.warnerco.io/wc-700/arc_welding_v1_5.pdf",
+    "last_verified": "2024-12-20",
+    "category": "tooling",
+    "status": "active",
+    "tags": ["welding", "manufacturing", "precision"],
+    "specifications": {
+      "current_range": "5-500A",
+      "wire_feed": "2-20 m/min",
+      "accuracy": "0.1mm"
+    }
+  },
+  {
+    "id": "WRN-00012",
+    "model": "WC-100",
+    "name": "Atlas Prime",
+    "component": "joint encoder module",
+    "version": "v4.2",
+    "summary": "High-resolution position sensing for WC-100 articulated arms. Provides absolute position feedback for precise motion control.",
+    "url": "https://schematics.warnerco.io/wc-100/joint_encoder_v4_2.pdf",
+    "last_verified": "2025-01-17",
+    "category": "sensors",
+    "status": "active",
+    "tags": ["encoder", "position", "precision"],
+    "specifications": {
+      "resolution": "23-bit",
+      "accuracy": "0.005 degrees",
+      "protocol": "BiSS-C"
+    }
+  },
+  {
+    "id": "WRN-00013",
+    "model": "WC-500",
+    "name": "Hercules Lifter",
+    "component": "load cell array",
+    "version": "v2.0",
+    "summary": "Distributed load sensing for WC-500 payload management. Enables weight distribution monitoring and overload protection.",
+    "url": "https://schematics.warnerco.io/wc-500/load_cell_v2_0.pdf",
+    "last_verified": "2025-01-13",
+    "category": "sensors",
+    "status": "active",
+    "tags": ["load", "weight", "safety"],
+    "specifications": {
+      "capacity": "5000kg total",
+      "accuracy": "0.1%",
+      "cells": "6"
+    }
+  },
+  {
+    "id": "WRN-00014",
+    "model": "WC-600",
+    "name": "Mercury Courier",
+    "component": "navigation computer",
+    "version": "v3.1",
+    "summary": "Central processing unit for WC-600 autonomous delivery operations. Runs path planning and traffic negotiation algorithms.",
+    "url": "https://schematics.warnerco.io/wc-600/navigation_computer_v3_1.pdf",
+    "last_verified": "2025-01-19",
+    "category": "control",
+    "status": "active",
+    "tags": ["navigation", "autonomous", "computing"],
+    "specifications": {
+      "processor": "ARM Cortex-A78 octa-core",
+      "memory": "32GB",
+      "storage": "512GB NVMe"
+    }
+  },
+  {
+    "id": "WRN-00015",
+    "model": "WC-700",
+    "name": "Vulcan Welder",
+    "component": "fume extraction system",
+    "version": "v1.2",
+    "summary": "Integrated fume removal for WC-700 welding operations. Maintains air quality and protects sensitive electronics.",
+    "url": "https://schematics.warnerco.io/wc-700/fume_extraction_v1_2.pdf",
+    "last_verified": "2024-11-30",
+    "category": "environmental",
+    "status": "active",
+    "tags": ["safety", "ventilation", "welding"],
+    "specifications": {
+      "flow_rate": "2000 m3/h",
+      "filter_efficiency": "99.97%",
+      "noise": "<65dB"
+    }
+  },
+  {
+    "id": "WRN-00016",
+    "model": "WC-800",
+    "name": "Phoenix Inspector",
+    "component": "thermal imaging camera",
+    "version": "v2.8",
+    "summary": "High-resolution thermal imaging for WC-800 inspection robots. Detects temperature anomalies in industrial equipment.",
+    "url": "https://schematics.warnerco.io/wc-800/thermal_imaging_v2_8.pdf",
+    "last_verified": "2025-01-20",
+    "category": "sensors",
+    "status": "active",
+    "tags": ["thermal", "inspection", "imaging"],
+    "specifications": {
+      "resolution": "1024x768",
+      "sensitivity": "0.02K",
+      "range": "-40C to 2000C"
+    }
+  },
+  {
+    "id": "WRN-00017",
+    "model": "WC-200",
+    "name": "Titan Handler",
+    "component": "emergency stop module",
+    "version": "v4.0",
+    "summary": "Failsafe emergency stop system for WC-200 industrial operations. Provides redundant shutdown paths and status monitoring.",
+    "url": "https://schematics.warnerco.io/wc-200/emergency_stop_v4_0.pdf",
+    "last_verified": "2025-01-07",
+    "category": "safety",
+    "status": "active",
+    "tags": ["emergency", "safety", "industrial"],
+    "specifications": {
+      "channels": "2 redundant",
+      "response": "<8ms",
+      "compliance": "SIL 3"
+    }
+  },
+  {
+    "id": "WRN-00018",
+    "model": "WC-300",
+    "name": "Nimbus Scout",
+    "component": "ultrasonic sensor array",
+    "version": "v1.6",
+    "summary": "Close-range obstacle detection for WC-300 navigation. Complements LIDAR with reliable short-range sensing.",
+    "url": "https://schematics.warnerco.io/wc-300/ultrasonic_array_v1_6.pdf",
+    "last_verified": "2025-01-06",
+    "category": "sensors",
+    "status": "active",
+    "tags": ["ultrasonic", "proximity", "navigation"],
+    "specifications": {
+      "range": "0.02-4m",
+      "sensors": "12",
+      "frequency": "40kHz"
+    }
+  },
+  {
+    "id": "WRN-00019",
+    "model": "WC-400",
+    "name": "Aegis Guardian",
+    "component": "audio detection module",
+    "version": "v2.2",
+    "summary": "Acoustic monitoring for WC-400 security applications. Detects glass breaking, alarms, and voice commands.",
+    "url": "https://schematics.warnerco.io/wc-400/audio_detection_v2_2.pdf",
+    "last_verified": "2024-12-15",
+    "category": "sensors",
+    "status": "active",
+    "tags": ["audio", "security", "detection"],
+    "specifications": {
+      "frequency_range": "20Hz-20kHz",
+      "channels": "8 MEMS mics",
+      "processing": "on-edge ML"
+    }
+  },
+  {
+    "id": "WRN-00020",
+    "model": "WC-500",
+    "name": "Hercules Lifter",
+    "component": "structural frame assembly",
+    "version": "v3.0",
+    "summary": "High-strength chassis for WC-500 heavy-duty applications. Modular design supports various payload configurations.",
+    "url": "https://schematics.warnerco.io/wc-500/structural_frame_v3_0.pdf",
+    "last_verified": "2024-12-28",
+    "category": "structural",
+    "status": "active",
+    "tags": ["frame", "chassis", "heavy-duty"],
+    "specifications": {
+      "material": "7075-T6 Aluminum",
+      "weight": "450kg",
+      "payload": "2000kg"
+    }
+  },
+  {
+    "id": "WRN-00021",
+    "model": "WC-100",
+    "name": "Atlas Prime",
+    "component": "cable management system",
+    "version": "v1.3",
+    "summary": "Internal cable routing for WC-100 articulated robots. Prevents tangling and wear during continuous operation.",
+    "url": "https://schematics.warnerco.io/wc-100/cable_management_v1_3.pdf",
+    "last_verified": "2024-10-15",
+    "category": "structural",
+    "status": "deprecated",
+    "tags": ["cable", "internal", "routing"],
+    "specifications": {
+      "cables": "24 conductors",
+      "bend_radius": "50mm min",
+      "cycles": "10M+"
+    }
+  },
+  {
+    "id": "WRN-00022",
+    "model": "WC-600",
+    "name": "Mercury Courier",
+    "component": "cargo bay mechanism",
+    "version": "v2.4",
+    "summary": "Secure cargo compartment for WC-600 delivery operations. Features automated locking and environmental control.",
+    "url": "https://schematics.warnerco.io/wc-600/cargo_bay_v2_4.pdf",
+    "last_verified": "2025-01-04",
+    "category": "mechanical",
+    "status": "active",
+    "tags": ["cargo", "delivery", "security"],
+    "specifications": {
+      "volume": "120L",
+      "load": "50kg",
+      "temp_control": "-10C to 40C"
+    }
+  },
+  {
+    "id": "WRN-00023",
+    "model": "WC-700",
+    "name": "Vulcan Welder",
+    "component": "wire feed mechanism",
+    "version": "v2.1",
+    "summary": "Precision wire feeding for WC-700 MIG welding operations. Maintains consistent wire speed for quality welds.",
+    "url": "https://schematics.warnerco.io/wc-700/wire_feed_v2_1.pdf",
+    "last_verified": "2024-11-20",
+    "category": "mechanical",
+    "status": "active",
+    "tags": ["wire", "welding", "feed"],
+    "specifications": {
+      "wire_diameter": "0.6-1.6mm",
+      "speed": "1-25 m/min",
+      "accuracy": "1%"
+    }
+  },
+  {
+    "id": "WRN-00024",
+    "model": "WC-800",
+    "name": "Phoenix Inspector",
+    "component": "articulated inspection arm",
+    "version": "v1.9",
+    "summary": "Flexible inspection arm for WC-800 access to confined spaces. 6-DOF articulation with camera mount.",
+    "url": "https://schematics.warnerco.io/wc-800/inspection_arm_v1_9.pdf",
+    "last_verified": "2025-01-03",
+    "category": "mechanical",
+    "status": "active",
+    "tags": ["arm", "inspection", "articulated"],
+    "specifications": {
+      "reach": "1.2m",
+      "dof": "6",
+      "payload": "5kg"
+    }
+  },
+  {
+    "id": "WRN-00025",
+    "model": "WC-900",
+    "name": "Orion Assembler",
+    "component": "precision screw driver unit",
+    "version": "v3.5",
+    "summary": "Automated fastening system for WC-900 assembly operations. Supports torque-controlled tightening with verification.",
+    "url": "https://schematics.warnerco.io/wc-900/screw_driver_v3_5.pdf",
+    "last_verified": "2025-01-21",
+    "category": "tooling",
+    "status": "draft",
+    "tags": ["assembly", "fastening", "torque"],
+    "specifications": {
+      "torque_range": "0.1-50 Nm",
+      "accuracy": "2%",
+      "bits": "interchangeable"
+    }
+  }
+]

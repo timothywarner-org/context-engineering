@@ -1,0 +1,829 @@
+================================================================================
+WARNERCO Schematics - ChromaDB Vector Store Export
+Source: src/warnerco/backend/data/chroma/chroma.sqlite3
+================================================================================
+
+--------------------------------------------------------------------------------
+1. COLLECTIONS
+--------------------------------------------------------------------------------
+  ID:        44697520-fe00-498a-bfe2-48402dd16197
+  Name:      warnerco_schematics
+  Dimension: 384
+
+--------------------------------------------------------------------------------
+2. EMBEDDINGS (one row per schematic)
+--------------------------------------------------------------------------------
+ Row   DB ID   Seq  Document Key
+ ---   -----   ---  ------------
+   1       1     1  WRN-00001
+   2       2     2  WRN-00002
+   3       3     3  WRN-00003
+   4       4     4  WRN-00004
+   5       5     5  WRN-00005
+   6       6     6  WRN-00006
+   7       7     7  WRN-00007
+   8       8     8  WRN-00008
+   9       9     9  WRN-00009
+  10      10    10  WRN-00010
+  11      11    11  WRN-00011
+  12      12    12  WRN-00012
+  13      13    13  WRN-00013
+  14      14    14  WRN-00014
+  15      15    15  WRN-00015
+  16      16    16  WRN-00016
+  17      17    17  WRN-00017
+  18      18    18  WRN-00018
+  19      19    19  WRN-00019
+  20      20    20  WRN-00020
+  21      21    21  WRN-00021
+  22      22    22  WRN-00022
+  23      23    23  WRN-00023
+  24      24    24  WRN-00024
+  25      25    25  WRN-00025
+
+--------------------------------------------------------------------------------
+3. FULL-TEXT SEARCH CONTENT (the actual document text ChromaDB indexed)
+--------------------------------------------------------------------------------
+  [ 1] Model: WC-100 (Atlas Prime)
+Component: force feedback sensor array
+Version: v3.4
+Category: sensors
+Summary: High-precision force sensing system for WC-100 manipulation tasks. Enables delicate object handling with 0.1N resolution.
+Tags: manipulation, precision, feedback
+Specifications: resolution: 0.1N, range: 0-500N, response_time: 2ms
+  [ 2] Model: WC-200 (Titan Handler)
+Component: thermal management unit
+Version: v2.1
+Category: thermal
+Summary: Advanced thermal regulation system for WC-200 heavy-duty platforms. Maintains optimal operating temperatures under sustained loads.
+Tags: cooling, industrial, heavy-duty
+Specifications: cooling_capacity: 500W, temp_range: -20C to 85C, fan_speed: variable
+  [ 3] Model: WC-300 (Nimbus Scout)
+Component: battery management system
+Version: v1.8
+Category: power
+Summary: Intelligent power management for WC-300 mobile reconnaissance units. Optimizes battery life with predictive charging algorithms.
+Tags: mobile, battery, efficiency
+Specifications: capacity: 48V 20Ah, charge_time: 45min, cycles: 2000+
+  [ 4] Model: WC-400 (Aegis Guardian)
+Component: vision processing module
+Version: v4.0
+Category: sensors
+Summary: Multi-spectral vision system for WC-400 security robots. Combines RGB, thermal, and depth sensing for comprehensive situational awareness.
+Tags: vision, security, multi-spectral
+Specifications: resolution: 4K RGB + 640x480 thermal, frame_rate: 60fps, range: 100m
+  [ 5] Model: WC-100 (Atlas Prime)
+Component: precision gripper assembly
+Version: v2.5
+Category: manipulation
+Summary: Adaptive gripper system for WC-100 precision handling. Features variable force control and tactile feedback for delicate operations.
+Tags: gripper, precision, adaptive
+Specifications: grip_force: 0.1-50N, finger_count: 3, accuracy: 0.01mm
+  [ 6] Model: WC-500 (Hercules Lifter)
+Component: hydraulic actuator system
+Version: v3.2
+Category: actuators
+Summary: Heavy-lift hydraulic system for WC-500 industrial robots. Provides 2000kg lifting capacity with smooth motion control.
+Tags: hydraulic, heavy-lift, industrial
+Specifications: lift_capacity: 2000kg, pressure: 350bar, speed: 0.5m/s
+  [ 7] Model: WC-300 (Nimbus Scout)
+Component: LIDAR navigation module
+Version: v2.0
+Category: sensors
+Summary: 360-degree LIDAR system for WC-300 autonomous navigation. Enables real-time mapping and obstacle avoidance in dynamic environments.
+Tags: lidar, navigation, autonomous
+Specifications: range: 200m, points_per_second: 1.2M, accuracy: 2cm
+  [ 8] Model: WC-600 (Mercury Courier)
+Component: motor controller board
+Version: v5.1
+Category: control
+Summary: High-efficiency motor control for WC-600 delivery robots. Supports regenerative braking and precise velocity control.
+Tags: motor, efficiency, delivery
+Specifications: channels: 4, max_current: 50A per channel, efficiency: 98%
+  [ 9] Model: WC-400 (Aegis Guardian)
+Component: safety interlock system
+Version: v3.0
+Category: safety
+Summary: Comprehensive safety system for WC-400 human interaction scenarios. Implements emergency stop, zone monitoring, and force limiting.
+Tags: safety, interlock, human-robot
+Specifications: response_time: 10ms, zones: 8 configurable, compliance: ISO 13849 PLe
+  [10] Model: WC-200 (Titan Handler)
+Component: wireless communication module
+Version: v2.3
+Category: communication
+Summary: Industrial-grade wireless system for WC-200 fleet coordination. Supports mesh networking and low-latency control signals.
+Tags: wireless, mesh, fleet
+Specifications: protocol: 5G + WiFi 6E, latency: <5ms, range: 500m
+  [11] Model: WC-700 (Vulcan Welder)
+Component: arc welding head assembly
+Version: v1.5
+Category: tooling
+Summary: Precision welding system for WC-700 manufacturing robots. Supports MIG, TIG, and spot welding with adaptive seam tracking.
+Tags: welding, manufacturing, precision
+Specifications: current_range: 5-500A, wire_feed: 2-20 m/min, accuracy: 0.1mm
+  [12] Model: WC-100 (Atlas Prime)
+Component: joint encoder module
+Version: v4.2
+Category: sensors
+Summary: High-resolution position sensing for WC-100 articulated arms. Provides absolute position feedback for precise motion control.
+Tags: encoder, position, precision
+Specifications: resolution: 23-bit, accuracy: 0.005 degrees, protocol: BiSS-C
+  [13] Model: WC-500 (Hercules Lifter)
+Component: load cell array
+Version: v2.0
+Category: sensors
+Summary: Distributed load sensing for WC-500 payload management. Enables weight distribution monitoring and overload protection.
+Tags: load, weight, safety
+Specifications: capacity: 5000kg total, accuracy: 0.1%, cells: 6
+  [14] Model: WC-600 (Mercury Courier)
+Component: navigation computer
+Version: v3.1
+Category: control
+Summary: Central processing unit for WC-600 autonomous delivery operations. Runs path planning and traffic negotiation algorithms.
+Tags: navigation, autonomous, computing
+Specifications: processor: ARM Cortex-A78 octa-core, memory: 32GB, storage: 512GB NVMe
+  [15] Model: WC-700 (Vulcan Welder)
+Component: fume extraction system
+Version: v1.2
+Category: environmental
+Summary: Integrated fume removal for WC-700 welding operations. Maintains air quality and protects sensitive electronics.
+Tags: safety, ventilation, welding
+Specifications: flow_rate: 2000 m3/h, filter_efficiency: 99.97%, noise: <65dB
+  [16] Model: WC-800 (Phoenix Inspector)
+Component: thermal imaging camera
+Version: v2.8
+Category: sensors
+Summary: High-resolution thermal imaging for WC-800 inspection robots. Detects temperature anomalies in industrial equipment.
+Tags: thermal, inspection, imaging
+Specifications: resolution: 1024x768, sensitivity: 0.02K, range: -40C to 2000C
+  [17] Model: WC-200 (Titan Handler)
+Component: emergency stop module
+Version: v4.0
+Category: safety
+Summary: Failsafe emergency stop system for WC-200 industrial operations. Provides redundant shutdown paths and status monitoring.
+Tags: emergency, safety, industrial
+Specifications: channels: 2 redundant, response: <8ms, compliance: SIL 3
+  [18] Model: WC-300 (Nimbus Scout)
+Component: ultrasonic sensor array
+Version: v1.6
+Category: sensors
+Summary: Close-range obstacle detection for WC-300 navigation. Complements LIDAR with reliable short-range sensing.
+Tags: ultrasonic, proximity, navigation
+Specifications: range: 0.02-4m, sensors: 12, frequency: 40kHz
+  [19] Model: WC-400 (Aegis Guardian)
+Component: audio detection module
+Version: v2.2
+Category: sensors
+Summary: Acoustic monitoring for WC-400 security applications. Detects glass breaking, alarms, and voice commands.
+Tags: audio, security, detection
+Specifications: frequency_range: 20Hz-20kHz, channels: 8 MEMS mics, processing: on-edge ML
+  [20] Model: WC-500 (Hercules Lifter)
+Component: structural frame assembly
+Version: v3.0
+Category: structural
+Summary: High-strength chassis for WC-500 heavy-duty applications. Modular design supports various payload configurations.
+Tags: frame, chassis, heavy-duty
+Specifications: material: 7075-T6 Aluminum, weight: 450kg, payload: 2000kg
+  [21] Model: WC-100 (Atlas Prime)
+Component: cable management system
+Version: v1.3
+Category: structural
+Summary: Internal cable routing for WC-100 articulated robots. Prevents tangling and wear during continuous operation.
+Tags: cable, internal, routing
+Specifications: cables: 24 conductors, bend_radius: 50mm min, cycles: 10M+
+  [22] Model: WC-600 (Mercury Courier)
+Component: cargo bay mechanism
+Version: v2.4
+Category: mechanical
+Summary: Secure cargo compartment for WC-600 delivery operations. Features automated locking and environmental control.
+Tags: cargo, delivery, security
+Specifications: volume: 120L, load: 50kg, temp_control: -10C to 40C
+  [23] Model: WC-700 (Vulcan Welder)
+Component: wire feed mechanism
+Version: v2.1
+Category: mechanical
+Summary: Precision wire feeding for WC-700 MIG welding operations. Maintains consistent wire speed for quality welds.
+Tags: wire, welding, feed
+Specifications: wire_diameter: 0.6-1.6mm, speed: 1-25 m/min, accuracy: 1%
+  [24] Model: WC-800 (Phoenix Inspector)
+Component: articulated inspection arm
+Version: v1.9
+Category: mechanical
+Summary: Flexible inspection arm for WC-800 access to confined spaces. 6-DOF articulation with camera mount.
+Tags: arm, inspection, articulated
+Specifications: reach: 1.2m, dof: 6, payload: 5kg
+  [25] Model: WC-900 (Orion Assembler)
+Component: precision screw driver unit
+Version: v3.5
+Category: tooling
+Summary: Automated fastening system for WC-900 assembly operations. Supports torque-controlled tightening with verification.
+Tags: assembly, fastening, torque
+Specifications: torque_range: 0.1-50 Nm, accuracy: 2%, bits: interchangeable
+
+--------------------------------------------------------------------------------
+4. EMBEDDING METADATA (key-value pairs stored alongside each vector)
+--------------------------------------------------------------------------------
+  Metadata keys: ['category', 'chroma:document', 'component', 'id', 'model', 'name', 'status', 'version']
+
+  -- WRN-00001 --
+                category: sensors
+         chroma:document: Model: WC-100 (Atlas Prime)
+Component: force feedback sensor array
+Version: v3.4
+Category: sensors
+Summary: High-precision force sensing system for WC-100 manipulation tasks. Enables delicate object handling with 0.1N resolution.
+Tags: manipulation, precision, feedback
+Specifications: resolution: 0.1N, range: 0-500N, response_time: 2ms
+               component: force feedback sensor array
+                      id: WRN-00001
+                   model: WC-100
+                    name: Atlas Prime
+                  status: active
+                 version: v3.4
+  -- WRN-00002 --
+                category: thermal
+         chroma:document: Model: WC-200 (Titan Handler)
+Component: thermal management unit
+Version: v2.1
+Category: thermal
+Summary: Advanced thermal regulation system for WC-200 heavy-duty platforms. Maintains optimal operating temperatures under sustained loads.
+Tags: cooling, industrial, heavy-duty
+Specifications: cooling_capacity: 500W, temp_range: -20C to 85C, fan_speed: variable
+               component: thermal management unit
+                      id: WRN-00002
+                   model: WC-200
+                    name: Titan Handler
+                  status: active
+                 version: v2.1
+  -- WRN-00003 --
+                category: power
+         chroma:document: Model: WC-300 (Nimbus Scout)
+Component: battery management system
+Version: v1.8
+Category: power
+Summary: Intelligent power management for WC-300 mobile reconnaissance units. Optimizes battery life with predictive charging algorithms.
+Tags: mobile, battery, efficiency
+Specifications: capacity: 48V 20Ah, charge_time: 45min, cycles: 2000+
+               component: battery management system
+                      id: WRN-00003
+                   model: WC-300
+                    name: Nimbus Scout
+                  status: active
+                 version: v1.8
+  -- WRN-00004 --
+                category: sensors
+         chroma:document: Model: WC-400 (Aegis Guardian)
+Component: vision processing module
+Version: v4.0
+Category: sensors
+Summary: Multi-spectral vision system for WC-400 security robots. Combines RGB, thermal, and depth sensing for comprehensive situational awareness.
+Tags: vision, security, multi-spectral
+Specifications: resolution: 4K RGB + 640x480 thermal, frame_rate: 60fps, range: 100m
+               component: vision processing module
+                      id: WRN-00004
+                   model: WC-400
+                    name: Aegis Guardian
+                  status: active
+                 version: v4.0
+  -- WRN-00005 --
+                category: manipulation
+         chroma:document: Model: WC-100 (Atlas Prime)
+Component: precision gripper assembly
+Version: v2.5
+Category: manipulation
+Summary: Adaptive gripper system for WC-100 precision handling. Features variable force control and tactile feedback for delicate operations.
+Tags: gripper, precision, adaptive
+Specifications: grip_force: 0.1-50N, finger_count: 3, accuracy: 0.01mm
+               component: precision gripper assembly
+                      id: WRN-00005
+                   model: WC-100
+                    name: Atlas Prime
+                  status: active
+                 version: v2.5
+  -- WRN-00006 --
+                category: actuators
+         chroma:document: Model: WC-500 (Hercules Lifter)
+Component: hydraulic actuator system
+Version: v3.2
+Category: actuators
+Summary: Heavy-lift hydraulic system for WC-500 industrial robots. Provides 2000kg lifting capacity with smooth motion control.
+Tags: hydraulic, heavy-lift, industrial
+Specifications: lift_capacity: 2000kg, pressure: 350bar, speed: 0.5m/s
+               component: hydraulic actuator system
+                      id: WRN-00006
+                   model: WC-500
+                    name: Hercules Lifter
+                  status: active
+                 version: v3.2
+  -- WRN-00007 --
+                category: sensors
+         chroma:document: Model: WC-300 (Nimbus Scout)
+Component: LIDAR navigation module
+Version: v2.0
+Category: sensors
+Summary: 360-degree LIDAR system for WC-300 autonomous navigation. Enables real-time mapping and obstacle avoidance in dynamic environments.
+Tags: lidar, navigation, autonomous
+Specifications: range: 200m, points_per_second: 1.2M, accuracy: 2cm
+               component: LIDAR navigation module
+                      id: WRN-00007
+                   model: WC-300
+                    name: Nimbus Scout
+                  status: active
+                 version: v2.0
+  -- WRN-00008 --
+                category: control
+         chroma:document: Model: WC-600 (Mercury Courier)
+Component: motor controller board
+Version: v5.1
+Category: control
+Summary: High-efficiency motor control for WC-600 delivery robots. Supports regenerative braking and precise velocity control.
+Tags: motor, efficiency, delivery
+Specifications: channels: 4, max_current: 50A per channel, efficiency: 98%
+               component: motor controller board
+                      id: WRN-00008
+                   model: WC-600
+                    name: Mercury Courier
+                  status: active
+                 version: v5.1
+  -- WRN-00009 --
+                category: safety
+         chroma:document: Model: WC-400 (Aegis Guardian)
+Component: safety interlock system
+Version: v3.0
+Category: safety
+Summary: Comprehensive safety system for WC-400 human interaction scenarios. Implements emergency stop, zone monitoring, and force limiting.
+Tags: safety, interlock, human-robot
+Specifications: response_time: 10ms, zones: 8 configurable, compliance: ISO 13849 PLe
+               component: safety interlock system
+                      id: WRN-00009
+                   model: WC-400
+                    name: Aegis Guardian
+                  status: active
+                 version: v3.0
+  -- WRN-00010 --
+                category: communication
+         chroma:document: Model: WC-200 (Titan Handler)
+Component: wireless communication module
+Version: v2.3
+Category: communication
+Summary: Industrial-grade wireless system for WC-200 fleet coordination. Supports mesh networking and low-latency control signals.
+Tags: wireless, mesh, fleet
+Specifications: protocol: 5G + WiFi 6E, latency: <5ms, range: 500m
+               component: wireless communication module
+                      id: WRN-00010
+                   model: WC-200
+                    name: Titan Handler
+                  status: active
+                 version: v2.3
+  -- WRN-00011 --
+                category: tooling
+         chroma:document: Model: WC-700 (Vulcan Welder)
+Component: arc welding head assembly
+Version: v1.5
+Category: tooling
+Summary: Precision welding system for WC-700 manufacturing robots. Supports MIG, TIG, and spot welding with adaptive seam tracking.
+Tags: welding, manufacturing, precision
+Specifications: current_range: 5-500A, wire_feed: 2-20 m/min, accuracy: 0.1mm
+               component: arc welding head assembly
+                      id: WRN-00011
+                   model: WC-700
+                    name: Vulcan Welder
+                  status: active
+                 version: v1.5
+  -- WRN-00012 --
+                category: sensors
+         chroma:document: Model: WC-100 (Atlas Prime)
+Component: joint encoder module
+Version: v4.2
+Category: sensors
+Summary: High-resolution position sensing for WC-100 articulated arms. Provides absolute position feedback for precise motion control.
+Tags: encoder, position, precision
+Specifications: resolution: 23-bit, accuracy: 0.005 degrees, protocol: BiSS-C
+               component: joint encoder module
+                      id: WRN-00012
+                   model: WC-100
+                    name: Atlas Prime
+                  status: active
+                 version: v4.2
+  -- WRN-00013 --
+                category: sensors
+         chroma:document: Model: WC-500 (Hercules Lifter)
+Component: load cell array
+Version: v2.0
+Category: sensors
+Summary: Distributed load sensing for WC-500 payload management. Enables weight distribution monitoring and overload protection.
+Tags: load, weight, safety
+Specifications: capacity: 5000kg total, accuracy: 0.1%, cells: 6
+               component: load cell array
+                      id: WRN-00013
+                   model: WC-500
+                    name: Hercules Lifter
+                  status: active
+                 version: v2.0
+  -- WRN-00014 --
+                category: control
+         chroma:document: Model: WC-600 (Mercury Courier)
+Component: navigation computer
+Version: v3.1
+Category: control
+Summary: Central processing unit for WC-600 autonomous delivery operations. Runs path planning and traffic negotiation algorithms.
+Tags: navigation, autonomous, computing
+Specifications: processor: ARM Cortex-A78 octa-core, memory: 32GB, storage: 512GB NVMe
+               component: navigation computer
+                      id: WRN-00014
+                   model: WC-600
+                    name: Mercury Courier
+                  status: active
+                 version: v3.1
+  -- WRN-00015 --
+                category: environmental
+         chroma:document: Model: WC-700 (Vulcan Welder)
+Component: fume extraction system
+Version: v1.2
+Category: environmental
+Summary: Integrated fume removal for WC-700 welding operations. Maintains air quality and protects sensitive electronics.
+Tags: safety, ventilation, welding
+Specifications: flow_rate: 2000 m3/h, filter_efficiency: 99.97%, noise: <65dB
+               component: fume extraction system
+                      id: WRN-00015
+                   model: WC-700
+                    name: Vulcan Welder
+                  status: active
+                 version: v1.2
+  -- WRN-00016 --
+                category: sensors
+         chroma:document: Model: WC-800 (Phoenix Inspector)
+Component: thermal imaging camera
+Version: v2.8
+Category: sensors
+Summary: High-resolution thermal imaging for WC-800 inspection robots. Detects temperature anomalies in industrial equipment.
+Tags: thermal, inspection, imaging
+Specifications: resolution: 1024x768, sensitivity: 0.02K, range: -40C to 2000C
+               component: thermal imaging camera
+                      id: WRN-00016
+                   model: WC-800
+                    name: Phoenix Inspector
+                  status: active
+                 version: v2.8
+  -- WRN-00017 --
+                category: safety
+         chroma:document: Model: WC-200 (Titan Handler)
+Component: emergency stop module
+Version: v4.0
+Category: safety
+Summary: Failsafe emergency stop system for WC-200 industrial operations. Provides redundant shutdown paths and status monitoring.
+Tags: emergency, safety, industrial
+Specifications: channels: 2 redundant, response: <8ms, compliance: SIL 3
+               component: emergency stop module
+                      id: WRN-00017
+                   model: WC-200
+                    name: Titan Handler
+                  status: active
+                 version: v4.0
+  -- WRN-00018 --
+                category: sensors
+         chroma:document: Model: WC-300 (Nimbus Scout)
+Component: ultrasonic sensor array
+Version: v1.6
+Category: sensors
+Summary: Close-range obstacle detection for WC-300 navigation. Complements LIDAR with reliable short-range sensing.
+Tags: ultrasonic, proximity, navigation
+Specifications: range: 0.02-4m, sensors: 12, frequency: 40kHz
+               component: ultrasonic sensor array
+                      id: WRN-00018
+                   model: WC-300
+                    name: Nimbus Scout
+                  status: active
+                 version: v1.6
+  -- WRN-00019 --
+                category: sensors
+         chroma:document: Model: WC-400 (Aegis Guardian)
+Component: audio detection module
+Version: v2.2
+Category: sensors
+Summary: Acoustic monitoring for WC-400 security applications. Detects glass breaking, alarms, and voice commands.
+Tags: audio, security, detection
+Specifications: frequency_range: 20Hz-20kHz, channels: 8 MEMS mics, processing: on-edge ML
+               component: audio detection module
+                      id: WRN-00019
+                   model: WC-400
+                    name: Aegis Guardian
+                  status: active
+                 version: v2.2
+  -- WRN-00020 --
+                category: structural
+         chroma:document: Model: WC-500 (Hercules Lifter)
+Component: structural frame assembly
+Version: v3.0
+Category: structural
+Summary: High-strength chassis for WC-500 heavy-duty applications. Modular design supports various payload configurations.
+Tags: frame, chassis, heavy-duty
+Specifications: material: 7075-T6 Aluminum, weight: 450kg, payload: 2000kg
+               component: structural frame assembly
+                      id: WRN-00020
+                   model: WC-500
+                    name: Hercules Lifter
+                  status: active
+                 version: v3.0
+  -- WRN-00021 --
+                category: structural
+         chroma:document: Model: WC-100 (Atlas Prime)
+Component: cable management system
+Version: v1.3
+Category: structural
+Summary: Internal cable routing for WC-100 articulated robots. Prevents tangling and wear during continuous operation.
+Tags: cable, internal, routing
+Specifications: cables: 24 conductors, bend_radius: 50mm min, cycles: 10M+
+               component: cable management system
+                      id: WRN-00021
+                   model: WC-100
+                    name: Atlas Prime
+                  status: deprecated
+                 version: v1.3
+  -- WRN-00022 --
+                category: mechanical
+         chroma:document: Model: WC-600 (Mercury Courier)
+Component: cargo bay mechanism
+Version: v2.4
+Category: mechanical
+Summary: Secure cargo compartment for WC-600 delivery operations. Features automated locking and environmental control.
+Tags: cargo, delivery, security
+Specifications: volume: 120L, load: 50kg, temp_control: -10C to 40C
+               component: cargo bay mechanism
+                      id: WRN-00022
+                   model: WC-600
+                    name: Mercury Courier
+                  status: active
+                 version: v2.4
+  -- WRN-00023 --
+                category: mechanical
+         chroma:document: Model: WC-700 (Vulcan Welder)
+Component: wire feed mechanism
+Version: v2.1
+Category: mechanical
+Summary: Precision wire feeding for WC-700 MIG welding operations. Maintains consistent wire speed for quality welds.
+Tags: wire, welding, feed
+Specifications: wire_diameter: 0.6-1.6mm, speed: 1-25 m/min, accuracy: 1%
+               component: wire feed mechanism
+                      id: WRN-00023
+                   model: WC-700
+                    name: Vulcan Welder
+                  status: active
+                 version: v2.1
+  -- WRN-00024 --
+                category: mechanical
+         chroma:document: Model: WC-800 (Phoenix Inspector)
+Component: articulated inspection arm
+Version: v1.9
+Category: mechanical
+Summary: Flexible inspection arm for WC-800 access to confined spaces. 6-DOF articulation with camera mount.
+Tags: arm, inspection, articulated
+Specifications: reach: 1.2m, dof: 6, payload: 5kg
+               component: articulated inspection arm
+                      id: WRN-00024
+                   model: WC-800
+                    name: Phoenix Inspector
+                  status: active
+                 version: v1.9
+  -- WRN-00025 --
+                category: tooling
+         chroma:document: Model: WC-900 (Orion Assembler)
+Component: precision screw driver unit
+Version: v3.5
+Category: tooling
+Summary: Automated fastening system for WC-900 assembly operations. Supports torque-controlled tightening with verification.
+Tags: assembly, fastening, torque
+Specifications: torque_range: 0.1-50 Nm, accuracy: 2%, bits: interchangeable
+               component: precision screw driver unit
+                      id: WRN-00025
+                   model: WC-900
+                    name: Orion Assembler
+                  status: draft
+                 version: v3.5
+
+--------------------------------------------------------------------------------
+5. SAMPLE VECTORS FROM EMBEDDINGS QUEUE
+   These are the actual floating-point embedding vectors.
+   Each vector is a point in high-dimensional space.
+--------------------------------------------------------------------------------
+  Seq 1:
+    Operation:  2
+    Doc ID:     WRN-00001
+    Metadata:   {
+              "status": "active",
+              "name": "Atlas Prime",
+              "version": "v3.4",
+              "id": "WRN-00001",
+              "chroma:document": "Model: WC-100 (Atlas Prime)\nComponent: force feedback sensor array\nVersion: v3.4\nCategory: sensors\nSummary: High-precision force sensing system for WC-100 manipulation tasks. Enables delicate object handling with 0.1N resolution.\nTags: manipulation, precision, feedback\nSpecifications: resolution: 0.1N, range: 0-500N, response_time: 2ms",
+              "category": "sensors",
+              "component": "force feedback sensor array",
+              "model": "WC-100"
+}
+    Vector dim: 384
+    First 10:   [-0.045083, -0.004026, -0.051810, 0.005728, 0.000332, -0.024852, -0.011304, 0.042423, 0.027884, 0.036952]
+    Last 5:     [-0.011973, 0.079259, -0.020836, -0.069289, -0.034403]
+
+  Seq 2:
+    Operation:  2
+    Doc ID:     WRN-00002
+    Metadata:   {
+              "chroma:document": "Model: WC-200 (Titan Handler)\nComponent: thermal management unit\nVersion: v2.1\nCategory: thermal\nSummary: Advanced thermal regulation system for WC-200 heavy-duty platforms. Maintains optimal operating temperatures under sustained loads.\nTags: cooling, industrial, heavy-duty\nSpecifications: cooling_capacity: 500W, temp_range: -20C to 85C, fan_speed: variable",
+              "id": "WRN-00002",
+              "version": "v2.1",
+              "model": "WC-200",
+              "name": "Titan Handler",
+              "component": "thermal management unit",
+              "category": "thermal",
+              "status": "active"
+}
+    Vector dim: 384
+    First 10:   [-0.060204, -0.027068, -0.044788, 0.079425, 0.052861, 0.040015, 0.037049, 0.079858, -0.057325, 0.038001]
+    Last 5:     [0.001845, 0.030408, 0.001355, -0.025794, -0.029938]
+
+  Seq 3:
+    Operation:  2
+    Doc ID:     WRN-00003
+    Metadata:   {
+              "id": "WRN-00003",
+              "chroma:document": "Model: WC-300 (Nimbus Scout)\nComponent: battery management system\nVersion: v1.8\nCategory: power\nSummary: Intelligent power management for WC-300 mobile reconnaissance units. Optimizes battery life with predictive charging algorithms.\nTags: mobile, battery, efficiency\nSpecifications: capacity: 48V 20Ah, charge_time: 45min, cycles: 2000+",
+              "status": "active",
+              "version": "v1.8",
+              "name": "Nimbus Scout",
+              "component": "battery management system",
+              "model": "WC-300",
+              "category": "power"
+}
+    Vector dim: 384
+    First 10:   [-0.096598, 0.075237, -0.118570, 0.024517, 0.002736, 0.013038, -0.008274, 0.032386, -0.061465, 0.049368]
+    Last 5:     [0.001932, 0.126087, -0.041232, -0.002560, 0.026921]
+
+--------------------------------------------------------------------------------
+6. ALL 25 EMBEDDING VECTORS (first 10 of N dimensions each)
+   This is what "vectorizing text" looks like: each document becomes
+   a list of floating-point numbers. Similar documents have vectors
+   that are close together in this high-dimensional space.
+--------------------------------------------------------------------------------
+  WRN-00001
+    dims=384  [-0.045083, -0.004026, -0.051810, 0.005728, 0.000332, -0.024852, -0.011304, 0.042423, 0.027884, 0.036952, ...]
+  WRN-00002
+    dims=384  [-0.060204, -0.027068, -0.044788, 0.079425, 0.052861, 0.040015, 0.037049, 0.079858, -0.057325, 0.038001, ...]
+  WRN-00003
+    dims=384  [-0.096598, 0.075237, -0.118570, 0.024517, 0.002736, 0.013038, -0.008274, 0.032386, -0.061465, 0.049368, ...]
+  WRN-00004
+    dims=384  [0.001966, -0.016255, -0.077880, -0.048858, 0.070762, 0.017248, 0.018312, 0.000631, -0.001337, 0.023880, ...]
+  WRN-00005
+    dims=384  [-0.064225, -0.036625, -0.042568, 0.019609, -0.065652, 0.006989, 0.013541, 0.097558, -0.018735, -0.001050, ...]
+  WRN-00006
+    dims=384  [-0.104640, -0.078736, -0.033667, 0.002884, -0.040934, 0.012690, -0.024215, 0.068525, -0.040783, -0.038527, ...]
+  WRN-00007
+    dims=384  [-0.024153, -0.035786, -0.091600, -0.012802, 0.037705, -0.032679, 0.032741, -0.020452, -0.043890, -0.014397, ...]
+  WRN-00008
+    dims=384  [-0.056388, -0.054570, -0.048331, 0.054834, -0.022234, 0.086646, -0.031007, 0.056604, -0.090923, -0.018634, ...]
+  WRN-00009
+    dims=384  [-0.047546, -0.027844, -0.048932, -0.065923, 0.076967, 0.005693, 0.003193, 0.059818, -0.042899, 0.044507, ...]
+  WRN-00010
+    dims=384  [-0.070552, -0.038154, -0.049170, -0.013376, 0.013906, 0.070464, 0.000492, 0.055463, -0.038570, 0.038070, ...]
+  WRN-00011
+    dims=384  [-0.136179, -0.018542, -0.024776, 0.011653, -0.023280, 0.011493, 0.027863, 0.116760, -0.067757, -0.012644, ...]
+  WRN-00012
+    dims=384  [-0.042939, -0.029028, -0.063626, -0.080945, 0.014191, 0.055725, -0.011328, 0.043208, -0.010729, 0.008990, ...]
+  WRN-00013
+    dims=384  [-0.101517, 0.013918, -0.039845, 0.026517, -0.022132, -0.016672, 0.041023, 0.051382, -0.001630, 0.005329, ...]
+  WRN-00014
+    dims=384  [-0.016349, -0.077109, -0.060165, -0.003429, -0.015414, 0.024825, -0.035194, 0.037521, -0.105607, -0.012739, ...]
+  WRN-00015
+    dims=384  [-0.092406, 0.044904, -0.021567, 0.018813, 0.070072, -0.022021, 0.034359, 0.093770, -0.051240, -0.017596, ...]
+  WRN-00016
+    dims=384  [-0.076568, 0.035595, -0.055909, 0.056410, 0.023431, -0.007366, 0.053562, 0.023440, -0.068227, -0.038778, ...]
+  WRN-00017
+    dims=384  [-0.047022, -0.034754, -0.026351, 0.003417, 0.063889, 0.067495, 0.027319, 0.091246, -0.015990, 0.029403, ...]
+  WRN-00018
+    dims=384  [-0.004954, -0.043877, -0.055204, -0.023703, 0.040990, 0.004849, 0.047142, -0.028488, -0.075889, -0.047501, ...]
+  WRN-00019
+    dims=384  [0.001960, -0.049061, -0.024352, -0.051004, 0.071458, 0.023206, 0.041277, -0.038772, -0.027619, -0.057973, ...]
+  WRN-00020
+    dims=384  [-0.090576, -0.011542, -0.050198, -0.000565, -0.011147, -0.009284, 0.005425, 0.096584, -0.021858, -0.025858, ...]
+  WRN-00021
+    dims=384  [-0.106163, -0.008700, -0.084266, -0.023384, -0.016869, 0.012465, -0.058512, 0.117883, -0.110380, 0.044754, ...]
+  WRN-00022
+    dims=384  [-0.062098, 0.012009, -0.064272, 0.030686, 0.012265, 0.068838, 0.036111, 0.066390, -0.072926, -0.014167, ...]
+  WRN-00023
+    dims=384  [-0.153445, -0.005702, -0.031759, 0.041845, -0.019475, 0.035350, 0.017347, 0.123151, -0.056692, -0.053670, ...]
+  WRN-00024
+    dims=384  [-0.065275, 0.037871, -0.049507, -0.037636, -0.011830, 0.021991, 0.078254, 0.053326, -0.052498, -0.025192, ...]
+  WRN-00025
+    dims=384  [-0.104106, -0.049215, -0.042051, -0.010548, -0.133758, 0.039248, -0.024443, 0.018366, -0.029118, -0.037114, ...]
+
+--------------------------------------------------------------------------------
+7. FULL DATABASE SCHEMA (all 20 tables)
+--------------------------------------------------------------------------------
+  acquire_write (17 rows)
+                                id  INTEGER PK
+                       lock_status  INTEGER NOT NULL
+
+  collection_metadata (1 rows)
+                     collection_id  TEXT PK
+                               key  TEXT NOT NULL PK
+                         str_value  TEXT
+                         int_value  INTEGER
+                       float_value  REAL
+                        bool_value  INTEGER
+
+  collections (1 rows)
+                                id  TEXT PK
+                              name  TEXT NOT NULL
+                         dimension  INTEGER
+                       database_id  TEXT NOT NULL
+                   config_json_str  TEXT
+                        schema_str  TEXT
+
+  databases (1 rows)
+                                id  TEXT PK
+                              name  TEXT NOT NULL
+                         tenant_id  TEXT NOT NULL
+
+  embedding_fulltext_search (25 rows)
+                      string_value  
+
+  embedding_fulltext_search_config (1 rows)
+                                 k   NOT NULL PK
+                                 v  
+
+  embedding_fulltext_search_content (25 rows)
+                                id  INTEGER PK
+                                c0  
+
+  embedding_fulltext_search_data (17 rows)
+                                id  INTEGER PK
+                             block  BLOB
+
+  embedding_fulltext_search_docsize (25 rows)
+                                id  INTEGER PK
+                                sz  BLOB
+
+  embedding_fulltext_search_idx (15 rows)
+                             segid   NOT NULL PK
+                              term   NOT NULL PK
+                              pgno  
+
+  embedding_metadata (200 rows)
+                                id  INTEGER PK
+                               key  TEXT NOT NULL PK
+                      string_value  TEXT
+                         int_value  INTEGER
+                       float_value  REAL
+                        bool_value  INTEGER
+
+  embeddings (25 rows)
+                                id  INTEGER PK
+                        segment_id  TEXT NOT NULL
+                      embedding_id  TEXT NOT NULL
+                            seq_id  BLOB NOT NULL
+                        created_at  TIMESTAMP NOT NULL
+
+  embeddings_queue (25 rows)
+                            seq_id  INTEGER PK
+                        created_at  TIMESTAMP NOT NULL
+                         operation  INTEGER NOT NULL
+                             topic  TEXT NOT NULL
+                                id  TEXT NOT NULL
+                            vector  BLOB
+                          encoding  TEXT
+                          metadata  TEXT
+
+  embeddings_queue_config (1 rows)
+                                id  INTEGER PK
+                   config_json_str  TEXT
+
+  maintenance_log (0 rows)
+                                id  INT PK
+                         timestamp  INT NOT NULL
+                         operation  TEXT NOT NULL
+
+  max_seq_id (1 rows)
+                        segment_id  TEXT PK
+                            seq_id  INTEGER
+
+  migrations (17 rows)
+                               dir  TEXT NOT NULL PK
+                           version  INTEGER NOT NULL PK
+                          filename  TEXT NOT NULL
+                               sql  TEXT NOT NULL
+                              hash  TEXT NOT NULL
+
+  segment_metadata (0 rows)
+                        segment_id  TEXT PK
+                               key  TEXT NOT NULL PK
+                         str_value  TEXT
+                         int_value  INTEGER
+                       float_value  REAL
+                        bool_value  INTEGER
+
+  segments (2 rows)
+                                id  TEXT PK
+                              type  TEXT NOT NULL
+                             scope  TEXT NOT NULL
+                        collection  TEXT NOT NULL
+
+  tenants (1 rows)
+                                id  TEXT PK

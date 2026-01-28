@@ -45,7 +45,8 @@
       "Bash(az deployment group create:*)",
       "Bash(az cosmosdb list:*)",
       "Bash(az containerapp list:*)",
-      "Bash(az containerapp show:*)"
+      "Bash(az containerapp show:*)",
+      "Bash(python:*)"
     ],
     "deny": []
   }
