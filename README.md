@@ -103,7 +103,8 @@ Both meta-tools self-exclude from `warn_search_tools` results, so `count` is up 
 ```
 context-engineering/
 ├── src/warnerco/backend/      # WARNERCO Schematica (FastAPI + FastMCP + LangGraph)
-├── labs/lab-01-hello-mcp/     # Hands-on beginner lab
+├── labs/lab-01-hello-mcp/     # Hands-on beginner lab (JS)
+├── labs/lab-02-mcp-chat/      # MCP client + server + chat REPL (Python, vendored)
 ├── docs/                      # Student materials, tutorials, diagrams
 ├── instructor/                # Instructor-only materials
 ├── config/                    # Sample MCP client configurations

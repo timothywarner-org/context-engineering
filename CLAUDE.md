@@ -59,6 +59,15 @@ Lab 01 is JS — the snippets in this section apply only there. The flagship is 
 - Tool returns `{ content: [{ type: 'text', text: JSON.stringify(result) }] }`
 - Logging via `console.error()` — stdout is reserved for MCP protocol
 
+### Lab 02 (MCP Chat CLI, Python)
+
+```bash
+cd labs/lab-02-mcp-chat
+./run.ps1                                   # on-rails: bootstraps .env, lifts key, uv run main.py
+```
+
+Vendored Anthropic course scaffold (attribution in `labs/lab-02-mcp-chat/NOTICE.md`). It is the smallest **complete Python MCP client + stdio FastMCP server + REPL** in the repo — the conceptual bridge between Lab 01 (JS hello-world) and WARNERCO (production-shaped). Server registers 2 tools (`read_doc_contents`, `edit_document`), 1 resource + 1 template (`docs://documents`, `docs://documents/{id}`), 1 prompt (`format`). The `run.ps1` launcher lifts `ANTHROPIC_API_KEY` from the repo-root `.env`. Needs `ANTHROPIC_API_KEY` and `CLAUDE_MODEL` (default `claude-sonnet-4-6`). The app is fully implemented — the upstream `# TODO` markers are kept inline as a before/after teaching artifact.
+
 ## WARNERCO Architecture
 
 ```
