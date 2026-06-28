@@ -302,7 +302,7 @@ class TestWarnExplainSchematicAudience:
         mock_ctx.sample = AsyncMock(return_value=sampling_result)
 
         with patch("app.mcp_tools.get_memory_store", return_value=mock_memory), \
-             patch("app.mcp_tools.get_graph_store", side_effect=ImportError("no graph")):
+             patch("app.adapters.graph_store.get_graph_store", side_effect=ImportError("no graph")):
             result = await warn_explain_schematic.fn(
                 ctx=mock_ctx,
                 schematic_id="WRN-001",

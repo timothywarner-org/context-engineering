@@ -1,0 +1,1 @@
+- [markdownlint config location](feedback_markdownlint_config.md) — use `markdownlint.json` at the repo root; do not check variants or create a baseline

@@ -89,7 +89,7 @@ The knowledge graph is indexed at `src/warnerco/backend/data/graph/knowledge.db`
 
 ### Progressive Tool Loading
 
-The server registers **28 MCP tools**, **11 resources**, and **5 prompts**. Two meta-discovery tools implement progressive tool loading per Anthropic's "code execution with MCP" guidance:
+The server registers **28 MCP tools**, **12 resources**, and **5 prompts**. Two meta-discovery tools implement progressive tool loading per Anthropic's "code execution with MCP" guidance:
 
 - `warn_search_tools(query, detail, limit)` — keyword discovery with detail levels `name`, `summary`, `full`
 - `warn_describe_tool(name)` — full schema for a single tool by name
@@ -150,7 +150,7 @@ context-engineering/
 
 ### VS Code Copilot
 
-`.vscode/mcp.json` is checked in with `warnerco-schematica-vscode` (basic) and `warnerco-coala-memory` (with `dev.watch` for hot-reload during class). To list servers in VS Code: `Cmd/Ctrl+Shift+P → MCP: List Servers`.
+`.vscode/mcp.json` is checked in with a single `oreilly-warnerco-schematica` entry (`MEMORY_BACKEND=chroma`) plus the GitHub Copilot remote MCP server. To list servers in VS Code: `Cmd/Ctrl+Shift+P → MCP: List Servers`.
 
 ---
 

@@ -103,7 +103,7 @@ Create `.vscode/mcp.json` in your workspace:
 
 ## Available MCP Tools
 
-The server exposes **28 MCP tools** plus **11 resources** and **5 prompts**, organized by CoALA tier:
+The server exposes **28 MCP tools** plus **12 resources** and **5 prompts**, organized by CoALA tier:
 
 | Group | Tools |
 |-------|-------|

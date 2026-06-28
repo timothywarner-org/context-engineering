@@ -1035,7 +1035,7 @@ What depends on the precision gripper assembly?
 ### Graph Queries Return Empty
 
 1. Run `scripts/index_graph.py` to populate the graph
-2. Check if `data/graph.db` exists
+2. Check if `data/graph/knowledge.db` exists
 
 ### Scratchpad Entries Disappear
 

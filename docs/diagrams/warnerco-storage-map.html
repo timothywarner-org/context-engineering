@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>WARNERCO Schematica — Storage Map</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<style>
+  :root {
+    --bg: #0e1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --working: #f0883e;
+    --episodic: #d2a8ff;
+    --semantic: #56d364;
+    --procedural: #79c0ff;
+    --graph: #ff7b72;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 32px 48px;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+  }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  h2 { font-size: 18px; margin: 32px 0 12px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  .lede { color: var(--muted); margin: 0 0 24px; }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+  }
+  .mermaid { background: transparent; text-align: center; }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--accent); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  td code { background: #21262d; padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #ffa657; }
+  .pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; margin-right: 6px; }
+  .pill.w { background: rgba(240,136,62,0.2); color: var(--working); }
+  .pill.e { background: rgba(210,168,255,0.2); color: var(--episodic); }
+  .pill.s { background: rgba(86,211,100,0.2); color: var(--semantic); }
+  .pill.p { background: rgba(121,192,255,0.2); color: var(--procedural); }
+  .pill.g { background: rgba(255,123,114,0.2); color: var(--graph); }
+  .legend { font-size: 13px; color: var(--muted); margin-top: -8px; margin-bottom: 16px; }
+  .footer { color: var(--muted); font-size: 12px; margin-top: 32px; border-top: 1px solid var(--border); padding-top: 16px; }
+</style>
+</head>
+<body>
+  <h1>WARNERCO Schematica — Storage Map</h1>
+  <p class="lede">Which file format holds which kind of memory, and why. Mapped to the CoALA four-tier model (Sumers et al. 2024).</p>
+
+  <h2>1. The big picture: storage backend → CoALA tier</h2>
+  <p class="legend">
+    <span class="pill w">Working</span>
+    <span class="pill e">Episodic</span>
+    <span class="pill s">Semantic</span>
+    <span class="pill p">Procedural</span>
+    <span class="pill g">Graph (relational overlay)</span>
+  </p>
+  <div class="panel">
+    <pre class="mermaid">
+flowchart LR
+  subgraph FORMAT[FILE FORMAT ON DISK]
+    JSON["JSON file<br/>schematics.json"]
+    CHROMA["Chroma<br/>vector DB"]
+    AZURE["Azure AI Search<br/>vector index"]
+    SQL_SCRATCH["SQLite<br/>scratchpad/notes.db"]
+    SQL_EPI["SQLite<br/>episodic/events.db"]
+    SQL_GRAPH["SQLite<br/>graph/knowledge.db"]
+    PROMPTS["Python source<br/>mcp.prompt decorators"]
+  end
+
+  subgraph TIER[COALA MEMORY TIER]
+    W["Working memory<br/>this-session notes"]
+    E["Episodic memory<br/>timestamped events"]
+    S["Semantic memory<br/>durable facts"]
+    P["Procedural memory<br/>versioned skills"]
+    G["Graph overlay<br/>relationships"]
+  end
+
+  JSON --> S
+  CHROMA --> S
+  AZURE --> S
+  SQL_SCRATCH --> W
+  SQL_EPI --> E
+  SQL_GRAPH --> G
+  PROMPTS --> P
+
+  classDef working fill:#f0883e,stroke:#f0883e,color:#0e1117
+  classDef episodic fill:#d2a8ff,stroke:#d2a8ff,color:#0e1117
+  classDef semantic fill:#56d364,stroke:#56d364,color:#0e1117
+  classDef procedural fill:#79c0ff,stroke:#79c0ff,color:#0e1117
+  classDef gtier fill:#ff7b72,stroke:#ff7b72,color:#0e1117
+  classDef store fill:#161b22,stroke:#30363d,color:#e6edf3
+  class JSON,CHROMA,AZURE,SQL_SCRATCH,SQL_EPI,SQL_GRAPH,PROMPTS store
+  class W working
+  class E episodic
+  class S semantic
+  class P procedural
+  class G gtier
+    </pre>
+  </div>
+
+  <h2>2. Storage cheat sheet</h2>
+  <div class="panel">
+    <table>
+      <thead>
+        <tr>
+          <th>Format</th>
+          <th>File / location</th>
+          <th>What lives there</th>
+          <th>CoALA tier</th>
+          <th>Read pattern</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>JSON</b><br/><span style="color:var(--muted);font-size:12px">flat file</span></td>
+          <td><code>data/schematics/schematics.json</code></td>
+          <td>25 robot schematics — the source of truth. Loaded into RAM at startup.</td>
+          <td><span class="pill s">Semantic</span></td>
+          <td>Keyword match on text fields. <i>Fastest to start, no embeddings.</i></td>
+        </tr>
+        <tr>
+          <td><b>Chroma</b><br/><span style="color:var(--muted);font-size:12px">vector DB</span></td>
+          <td><code>data/chroma/chroma.sqlite3</code> + segment dirs</td>
+          <td>Same 25 schematics, embedded as dense vectors. Indexed once via <code>ChromaMemoryStore.index_all()</code>.</td>
+          <td><span class="pill s">Semantic</span></td>
+          <td>Cosine similarity over embeddings — <i>finds similar things</i>.</td>
+        </tr>
+        <tr>
+          <td><b>Azure AI Search</b><br/><span style="color:var(--muted);font-size:12px">cloud index</span></td>
+          <td>External Azure resource (no local file)</td>
+          <td>Production-grade replacement for Chroma. Same schematics, hybrid keyword + vector.</td>
+          <td><span class="pill s">Semantic</span></td>
+          <td>Same role as Chroma, just enterprise-deployed.</td>
+        </tr>
+        <tr>
+          <td><b>SQLite</b><br/><span style="color:var(--muted);font-size:12px">scratchpad</span></td>
+          <td><code>data/scratchpad/notes.db</code></td>
+          <td>Session-scoped observations and inferences (<code>predicate, subject, object, content</code>). Accumulates across the conversation.</td>
+          <td><span class="pill w">Working</span></td>
+          <td>Filter by subject/age, inject top-N into prompt context.</td>
+        </tr>
+        <tr>
+          <td><b>SQLite</b><br/><span style="color:var(--muted);font-size:12px">episodic</span></td>
+          <td><code>data/episodic/events.db</code></td>
+          <td>Timestamped events (turns, tool calls, observations) with importance scores.</td>
+          <td><span class="pill e">Episodic</span></td>
+          <td>Park et al. recall: <code>α·recency + α·importance + α·relevance</code>.</td>
+        </tr>
+        <tr>
+          <td><b>SQLite</b><br/><span style="color:var(--muted);font-size:12px">knowledge graph</span></td>
+          <td><code>data/graph/knowledge.db</code></td>
+          <td>117 entities + 221 relationships as <code>(subject, predicate, object)</code> triplets. NetworkX in front of SQLite.</td>
+          <td><span class="pill g">Graph overlay</span></td>
+          <td>Traversal — <i>finds connected things</i> (neighbors, shortest path).</td>
+        </tr>
+        <tr>
+          <td><b>Python source</b><br/><span style="color:var(--muted);font-size:12px">decorators</span></td>
+          <td><code>app/mcp_tools.py</code> (<code>@mcp.prompt()</code>)</td>
+          <td>Versioned skills/workflows ("how to compare two robots", "how to diagnose"). Code is the storage; git is the version control.</td>
+          <td><span class="pill p">Procedural</span></td>
+          <td>Listed at <code>memory://procedural-catalog</code>. Invoked by the user, not the pipeline.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>3. JSON vs Chroma vs Azure — the semantic-memory choice</h2>
+  <p class="lede">All three are <b>different implementations of the same CoALA tier (semantic memory)</b>. You pick one with <code>MEMORY_BACKEND</code> in <code>.env</code> or <code>mcp.json</code>. The tools and API shapes do not change.</p>
+  <div class="panel">
+    <pre class="mermaid">
+flowchart TB
+  classDef store fill:#161b22,stroke:#30363d,color:#e6edf3
+  classDef good fill:#56d364,stroke:#56d364,color:#0e1117
+  classDef neutral fill:#30363d,stroke:#8b949e,color:#e6edf3
+
+  subgraph CHOICE["MEMORY_BACKEND = ?"]
+    direction LR
+    JSON_C["json\nRawJsonStore"]:::store
+    CHROMA_C["chroma\nChromaMemoryStore"]:::store
+    AZURE_C["azure_search\nAzureAiSearchMemoryStore"]:::store
+  end
+
+  JSON_C -. "fastest start\nkeyword search\nno embeddings" .-> JSON_OUT["good for: lessons,\nquick start, offline"]:::good
+  CHROMA_C -. "local vectors\nsemantic similarity\npersists to disk" .-> CHROMA_OUT["good for: dev,\nrealistic search"]:::good
+  AZURE_C -. "cloud index\nhybrid + scale\nneeds Azure config" .-> AZURE_OUT["good for: production"]:::good
+
+  FACTORY["app/adapters/factory.py\nget_memory_store()"]:::neutral
+  JSON_C --> FACTORY
+  CHROMA_C --> FACTORY
+  AZURE_C --> FACTORY
+  FACTORY --> SAME["Same MemoryStore interface\nsame MCP tools\nsame FastAPI routes"]:::store
+    </pre>
+  </div>
+
+  <h2>4. SQLite is doing three different jobs</h2>
+  <p class="lede">SQLite shows up three times because it is the right tool for each — local, embedded, durable, fast. But each <code>.db</code> file is a different memory tier with a different schema.</p>
+  <div class="panel">
+    <pre class="mermaid">
+flowchart LR
+  SQLITE["SQLite\nembedded RDBMS"]
+  SCRATCH["scratchpad/notes.db\npredicate subject\nobject content ts\ntools: warn_scratchpad"]
+  EPI["episodic/events.db\nkind summary content\nimportance ts\ntools: warn_episodic"]
+  KG["graph/knowledge.db\nentities and edges\nsubject predicate object\ntools: warn_graph"]
+  W["Notes from THIS session"]
+  E["Events with timestamps\nand importance scores"]
+  G["Who connects to what\nacross all schematics"]
+
+  SQLITE --> SCRATCH
+  SQLITE --> EPI
+  SQLITE --> KG
+  SCRATCH -.->|working memory| W
+  EPI -.->|episodic memory| E
+  KG -.->|graph overlay| G
+
+  classDef working fill:#f0883e,stroke:#f0883e,color:#0e1117
+  classDef episodic fill:#d2a8ff,stroke:#d2a8ff,color:#0e1117
+  classDef gtier fill:#ff7b72,stroke:#ff7b72,color:#0e1117
+  classDef sql fill:#161b22,stroke:#30363d,color:#e6edf3
+  classDef neutral fill:#30363d,stroke:#8b949e,color:#e6edf3
+  class SQLITE sql
+  class SCRATCH working
+  class EPI episodic
+  class KG gtier
+  class W,E,G neutral
+    </pre>
+  </div>
+
+  <h2>5. One request through every tier</h2>
+  <p class="lede">9-node LangGraph pipeline. Color = which CoALA tier each node touches.</p>
+  <div class="panel">
+    <pre class="mermaid">
+flowchart LR
+  N1["1 parse_intent"]
+  N2["2 query_graph"]
+  N3["3 inject_scratchpad"]
+  N4["4 recall_episodes"]
+  N5["5 retrieve\nJSON or Chroma or Azure"]
+  N6["6 compress_context"]
+  N7["7 reason"]
+  N8["8 respond"]
+  N9["9 log_episode"]
+
+  N1 --> N2
+  N2 --> N3
+  N3 --> N4
+  N4 --> N5
+  N5 --> N6
+  N6 --> N7
+  N7 --> N8
+  N8 --> N9
+
+  classDef working fill:#f0883e,stroke:#f0883e,color:#0e1117
+  classDef episodic fill:#d2a8ff,stroke:#d2a8ff,color:#0e1117
+  classDef semantic fill:#56d364,stroke:#56d364,color:#0e1117
+  classDef gtier fill:#ff7b72,stroke:#ff7b72,color:#0e1117
+  classDef neutral fill:#30363d,stroke:#8b949e,color:#e6edf3
+  class N1 neutral
+  class N6 neutral
+  class N7 neutral
+  class N8 neutral
+  class N2 gtier
+  class N3 working
+  class N4 episodic
+  class N9 episodic
+  class N5 semantic
+    </pre>
+  </div>
+
+  <h2>6. Consolidation — the "sleep cycle"</h2>
+  <p class="lede">Working + episodic memory are short-lived. Periodically (or on demand via <code>warn_consolidate_memory</code>), the agent reads them, distills durable facts via <code>ctx.sample()</code>, and writes them back to the semantic store as synthetic <code>FACT-*</code> records.</p>
+  <div class="panel">
+    <pre class="mermaid">
+flowchart LR
+  classDef working fill:#f0883e,stroke:#f0883e,color:#0e1117
+  classDef episodic fill:#d2a8ff,stroke:#d2a8ff,color:#0e1117
+  classDef semantic fill:#56d364,stroke:#56d364,color:#0e1117
+  classDef neutral fill:#161b22,stroke:#30363d,color:#e6edf3
+
+  SCRATCH["Scratchpad\nSQLite"]:::working --> CONS["consolidate_memory\nuses ctx.sample()"]:::neutral
+  EPI["Episodic\nSQLite"]:::episodic --> CONS
+  CONS --> SEM["Semantic store\nJSON / Chroma / Azure\nnew FACT-* records"]:::semantic
+  CONS --> EPI2["Episodic SQLite\nlog consolidation event"]:::episodic
+    </pre>
+  </div>
+
+  <p class="footer">
+    Source files: <code>app/adapters/</code> · <code>app/langgraph/flow.py</code> · <code>app/langgraph/consolidate.py</code> · <code>app/mcp_tools.py</code><br/>
+    Reference: Sumers, T. R., et al. (2024). <i>Cognitive Architectures for Language Agents</i> (CoALA).
+  </p>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    themeVariables: {
+      darkMode: true,
+      background: '#161b22',
+      primaryColor: '#161b22',
+      primaryTextColor: '#e6edf3',
+      lineColor: '#8b949e',
+      fontFamily: '-apple-system, "Segoe UI", Roboto, sans-serif'
+    },
+    flowchart: { curve: 'basis', padding: 20 }
+  });
+</script>
+</body>
+</html>

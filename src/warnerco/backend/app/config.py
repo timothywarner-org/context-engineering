@@ -4,6 +4,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Optional
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -30,7 +31,7 @@ class Settings(BaseSettings):
     # Server Configuration
     host: str = "0.0.0.0"
     port: int = 8000
-    debug: bool = False
+    debug: bool = Field(default=False, validation_alias="APP_DEBUG")
 
     # Azure APIM (optional front-end)
     apim_subscription_key: Optional[str] = None

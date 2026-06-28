@@ -1,65 +1,27 @@
 {
   "servers": {
-    "warnerco-schematica-vscode": {
+    "oreilly-warnerco-schematica": {
+      "type": "stdio",
       "command": "uv",
       "args": ["run", "warnerco-mcp"],
       "cwd": "${workspaceFolder}/src/warnerco/backend",
       "env": {
         "MEMORY_BACKEND": "chroma"
-      },
-      "type": "stdio"
-    },
-    "warnerco-coala-memory": {
-      "command": "uv",
-      "args": ["run", "warnerco-mcp"],
-      "cwd": "${workspaceFolder}/src/warnerco/backend",
-      "env": {
-        "MEMORY_BACKEND": "chroma",
-        "EPISODIC_DB_PATH": "data/episodic/events.db",
-        "EPISODIC_MAX_RETRIEVAL_K": "5",
-        "EPISODIC_RECENCY_HALF_LIFE_HOURS": "24.0"
-      },
-      "type": "stdio",
-      "dev": {
-        "watch": "src/warnerco/backend/app/**/*.py",
-        "debug": { "type": "python" }
       }
     },
-    "warnerco-schematica-azure-apim": {
-      "url": "https://warnerco-apim.azure-api.net/mcp",
-      "transport": "http",
-      "headers": {
-        "Content-Type": "application/json",
-        "Ocp-Apim-Subscription-Key": "${env:APIM_SUBSCRIPTION_KEY}"
-      },
-      "type": "http"
-    },
-    "com.figma.mcp/mcp": {
+    "github": {
       "type": "http",
-      "url": "https://mcp.figma.com/mcp",
-      "gallery": "https://api.mcp.github.com",
-      "version": "1.0.3"
-    },
-    "io.github.github/github-mcp-server": {
-      "type": "stdio",
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "-e",
-        "GITHUB_PERSONAL_ACCESS_TOKEN=${input:token}",
-        "ghcr.io/github/github-mcp-server:0.30.2"
-      ],
-      "gallery": "https://api.mcp.github.com",
-      "version": "0.30.2"
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer ${input:github_pat}"
+      }
     }
   },
   "inputs": [
     {
-      "id": "token",
+      "id": "github_pat",
       "type": "promptString",
-      "description": "",
+      "description": "GitHub Personal Access Token",
       "password": true
     }
   ]
