@@ -11,21 +11,22 @@ MCP Chat is a command-line interface application that enables interactive chat c
 
 ## Quickstart (on-rails, one command)
 
-From the repo root, the wrapper script handles `.env` bootstrap and the `uv run` handoff in one shot:
+From this lab directory, the wrapper script handles `.env` bootstrap and the `uv run` handoff in one shot:
 
 ```powershell
-.\scripts\run-mcp-cli.ps1
+cd labs/lab-02-mcp-chat
+.\run.ps1
 ```
 
 What it does on **first run**:
 
-1. Creates `examples/mcp_cli/.env` from `.env.example` if it does not exist.
-2. Lifts `ANTHROPIC_API_KEY` from the repo-root `.env` (the one the teaching notebooks already use) so you do not paste the key twice.
-3. Invokes `uv run --directory examples/mcp_cli main.py`. uv auto-creates `examples/mcp_cli/.venv` and installs all deps (~20s cold, ~1.5s warm thereafter).
+1. Creates `labs/lab-02-mcp-chat/.env` from `.env.example` if it does not exist.
+2. Lifts `ANTHROPIC_API_KEY` from the repo-root `.env` (the one the rest of the course already uses) so you do not paste the key twice.
+3. Invokes `uv run --directory labs/lab-02-mcp-chat main.py`. uv auto-creates `labs/lab-02-mcp-chat/.venv` and installs all deps (~20s cold, ~1.5s warm thereafter).
 
 Subsequent runs skip step 1 and 2 and go straight to the REPL. The script is idempotent.
 
-If you have **no repo-root `.env`**, the wrapper creates a stub `.env` inside `examples/mcp_cli/` and exits non-zero with a "fill in your key" message so you do not burn tokens on a placeholder.
+If you have **no repo-root `.env`**, the wrapper creates a stub `.env` inside `labs/lab-02-mcp-chat/` and exits non-zero with a "fill in your key" message so you do not burn tokens on a placeholder.
 
 The manual ceremony below is preserved for reference fidelity with the upstream Skilljar course.
 
@@ -120,7 +121,7 @@ Use the @ symbol followed by a document ID to include document content in your q
 Use the / prefix to execute commands defined in the MCP server:
 
 ```
-> /summarize deposition.md
+> /format deposition.md
 ```
 
 Commands will auto-complete when you press Tab.

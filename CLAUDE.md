@@ -56,7 +56,7 @@ npx @modelcontextprotocol/inspector node src/index.js
 Lab 01 is JS — the snippets in this section apply only there. The flagship is Python/FastMCP and follows FastMCP conventions (decorators on `@mcp.tool()` / `@mcp.resource()` / `@mcp.prompt()`).
 
 **Lab 01 conventions** (JS only):
-- Tool returns `{ content: [{ type: 'text', text: JSON.stringify(result) }] }`
+- Tool returns `{ content: [{ type: 'text', text: <human-readable string> }] }` (the `add` tool returns `` `The sum of ${a} and ${b} is ${sum}` ``, not JSON)
 - Logging via `console.error()` — stdout is reserved for MCP protocol
 
 ### Lab 02 (MCP Chat CLI, Python)

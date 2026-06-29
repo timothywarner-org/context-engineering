@@ -6,7 +6,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "test": "node test-client.js"
+    "test": "echo \"No unit test harness yet. Validate with: npx @modelcontextprotocol/inspector node src/index.js\" && exit 0"
   },
   "keywords": ["mcp", "model-context-protocol", "lab", "learning"],
   "author": "MCP Training",

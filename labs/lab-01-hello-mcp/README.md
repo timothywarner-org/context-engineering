@@ -52,7 +52,6 @@ cd labs/lab-01-hello-mcp/starter
 Examine the files:
 - `src/index.js` - Main server file (has TODO sections)
 - `package.json` - Dependencies and scripts
-- `.env.example` - Environment configuration template
 
 ### Step 2: Install Dependencies
 
@@ -62,7 +61,6 @@ npm install
 
 This installs:
 - `@modelcontextprotocol/sdk` - Core MCP library
-- `dotenv` - Environment variable management
 
 ### Step 3: Implement the Server (Fill in TODOs)
 
@@ -274,26 +272,16 @@ Your lab is complete when:
 
 ## Testing
 
-Run the included test to validate your implementation:
+Validate your implementation with the MCP Inspector — it connects to your server, lists tools, and lets you call `add` interactively:
 
 ```bash
-npm test
+npx @modelcontextprotocol/inspector node src/index.js
 ```
 
-Or manually test with the test client:
-
-```bash
-node test-client.js
-```
-
-Expected output:
-```
-✅ Server connection: OK
-✅ Tool list: Found 'add'
-✅ add(5, 3) = 8
-✅ Error handling: OK
-All tests passed!
-```
+In the Inspector UI (default <http://localhost:5173>):
+1. Confirm the server connects and the **Tools** tab lists `add`.
+2. Call `add` with `{ "a": 5, "b": 3 }` and confirm the response text reads `The sum of 5 and 3 is 8`.
+3. Call `add` with a non-number (e.g. `"a": "x"`) and confirm you get a clean validation error, not a crash.
 
 ---
 

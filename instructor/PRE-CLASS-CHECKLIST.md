@@ -9,6 +9,13 @@ Run top to bottom. If a step fails, fix before moving on; nothing below assumes 
 
 ## 1. Environment
 
+- [ ] **Anthropic API key is alive** (5-second probe, do this first; a dead key sinks Lab 02)
+  ```powershell
+  pwsh -c '$b=@{model="claude-haiku-4-5-20251001";max_tokens=1;messages=@(@{role="user";content="hi"})}|ConvertTo-Json -Depth 5; try { (Invoke-WebRequest https://api.anthropic.com/v1/messages -Method Post -Headers @{"x-api-key"=$env:ANTHROPIC_API_KEY;"anthropic-version"="2023-06-01";"content-type"="application/json"} -Body $b).StatusCode | %{ "HTTP $_ - TOKEN ALIVE" } } catch { "HTTP $($_.Exception.Response.StatusCode.value__) - TOKEN DEAD" }'
+  ```
+  - Expect: `HTTP 200 - TOKEN ALIVE`. Costs ~1 token.
+  - If `401`/`TOKEN DEAD`: mint a fresh key at <https://console.anthropic.com/settings/keys>, update repo-root `.env` (`ANTHROPIC_API_KEY=`), then delete `labs/lab-02-mcp-chat/.env` so `run.ps1` re-lifts the new key on next launch.
+
 - [ ] **Python 3.13 active**
   ```bash
   python --version
@@ -84,7 +91,7 @@ Run top to bottom. If a step fails, fix before moving on; nothing below assumes 
     ```
     warn_search_tools(query="", detail="name")
     ```
-  - Expect: **21 tools listed** (the two meta tools `warn_search_tools` and `warn_describe_tool` self-skip; total decorated tools is 23).
+  - Expect: **20 tools listed** of **28 total** (`detail="name"` uses the default `limit=20`, so the result is capped at 20; the two meta tools `warn_search_tools` and `warn_describe_tool` also self-skip). Pass `limit=100` to see all 26 non-meta tools.
 
 - [ ] **Verify graph stats**
   - Call: `warn_graph_stats`

@@ -224,7 +224,7 @@ curl http://localhost:8000/api/graph/stats              # knowledge graph stats
 # Direct SQLite peek when you want to skip the layer entirely
 sqlite3 data/episodic/events.db   "select id, kind, importance, summary from events order by created_at desc"
 sqlite3 data/scratchpad/notes.db  "select subject, predicate, content from entries order by created_at desc"
-sqlite3 data/graph/knowledge.db   "select count(*) from entities; select count(*) from relationships;"
+sqlite3 data/graph/knowledge.db   "select count(*) from entities; select count(*) from triplets;"
 ```
 
 API docs are at <http://localhost:8000/docs>.

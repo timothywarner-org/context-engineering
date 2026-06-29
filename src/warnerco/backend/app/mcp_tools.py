@@ -4833,7 +4833,7 @@ async def warn_search_tools(
 
     This implements the progressive tool-loading pattern from Anthropic's
     "Code execution with MCP" guidance. Instead of every client pre-loading
-    all 21 tool schemas (~15-20K tokens), call this first to find the tools
+    all 28 tool schemas (~15-20K tokens), call this first to find the tools
     you need, then call warn_describe_tool for the full schema of just the
     one you want to use.
 

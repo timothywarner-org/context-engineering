@@ -7,7 +7,7 @@ This hands-on tutorial teaches you to use the **progressive tool-loading** patte
 By the end of this tutorial, you will:
 
 - Understand why "load all tool schemas" scales badly as servers grow
-- Measure the real token cost of WARNERCO's 23 tools at three detail levels
+- Measure the real token cost of WARNERCO's 28 tools at three detail levels
 - Use `warn_search_tools` to discover tools by keyword and detail level
 - Use `warn_describe_tool` to fetch one full schema on demand
 - Decide when this pattern is worth the extra round-trip and when it is not
@@ -34,7 +34,7 @@ Visit http://localhost:8000/docs to confirm the API is running. In a second term
 npx @modelcontextprotocol/inspector uv run warnerco-mcp
 ```
 
-You should see **23 tools** listed.
+You should see **28 tools** listed.
 
 ## Part 1: The Problem (10 minutes)
 
@@ -46,9 +46,9 @@ For a small server (3-5 tools) this is fine. For a maturing server it gets expen
 
 ### Measure It on This Server
 
-WARNERCO Schematica registers 23 tools. The full schema dump - description plus JSON input schema for every tool - measures:
+WARNERCO Schematica registers 28 tools. The full schema dump - description plus JSON input schema for every tool - measures:
 
-| Detail level | Tokens for 23 tools | Per-tool cost | Saving vs. full |
+| Detail level | Tokens for 28 tools | Per-tool cost | Saving vs. full |
 |--------------|---------------------|---------------|-----------------|
 | `full` (default MCP behavior) | ~9064 | ~394 | baseline |
 | `summary` (name + first docstring line) | ~533 | ~23 | **94.1%** |
@@ -95,13 +95,13 @@ Returns a dict with `name`, `description`, `inputSchema`, and `outputSchema`. Ra
 ```
 Old way:                          Progressive way:
 +----------------------+          +-------------------------+
-| handshake: 23 full   |          | handshake: 2 tools      |
+| handshake: 28 full   |          | handshake: 2 tools      |
 | schemas (~9K tokens) |          | (search + describe)     |
 +----------+-----------+          +-----------+-------------+
            |                                  |
            v                                  v
      model picks one              model: search_tools("graph")
-     of 23 it can see                        |
+     of 28 it can see                        |
                                              v
                                   ~140 tokens of summaries
                                              |
@@ -140,8 +140,8 @@ Expected (truncated):
 {
   "query": "",
   "detail": "name",
-  "count": 21,
-  "total": 23,
+  "count": 20,
+  "total": 28,
   "tools": [
     {"name": "warn_add_relationship"},
     {"name": "warn_compare_schematics"},
@@ -157,7 +157,7 @@ Expected (truncated):
 }
 ```
 
-Note `count: 21` vs `total: 23`: the search tool excludes itself and `warn_describe_tool` from results so the index does not list its own escape hatches.
+Note `count: 20` vs `total: 28`: the search tool excludes itself and `warn_describe_tool` from results, and the default `limit=20` caps the listing at 20 (pass `limit=100` to see all 26 non-meta tools).
 
 This payload is ~176 tokens. Compare with the ~9064 tokens of dumping every full schema. **98% cheaper, same coverage.**
 
@@ -179,7 +179,7 @@ Expected:
   "query": "graph",
   "detail": "summary",
   "count": 4,
-  "total": 23,
+  "total": 28,
   "tools": [
     {
       "name": "warn_add_relationship",
@@ -293,7 +293,7 @@ asyncio.run(demo())
 "
 ```
 
-You should see `count=21 total=23` (the two discovery tools omit themselves from results).
+You should see `count=20 total=28` (the default `limit=20` caps the listing; the two discovery tools also omit themselves from results).
 
 ## Part 5: When NOT to Use This
 
@@ -313,7 +313,7 @@ If two or more of those conditions apply, keep the default behavior and revisit 
 
 You have learned:
 
-1. **Cost the problem first.** WARNERCO's 23 tools cost ~9064 tokens fully expanded, ~533 in summary form, ~176 by name. Measure your own server before deciding it is "fine."
+1. **Cost the problem first.** WARNERCO's 28 tools cost ~9064 tokens fully expanded, ~533 in summary form, ~176 by name. Measure your own server before deciding it is "fine."
 
 2. **Two-step discovery beats blast-everything.** `warn_search_tools` returns a tiny index; `warn_describe_tool` returns one full schema on demand. Together they replicate the "code execution with MCP" pattern Anthropic published.
 
@@ -323,7 +323,7 @@ You have learned:
 
 ## Exercises
 
-**Exercise 1**: Run `warn_search_tools` with `detail="full"` and `limit=23`, capture the response, and count tokens with the tokenizer your client uses. Compare to your own measurement of `detail="summary"`. Does the ratio match the ~94% saving claimed above?
+**Exercise 1**: Run `warn_search_tools` with `detail="full"` and `limit=100`, capture the response, and count tokens with the tokenizer your client uses. Compare to your own measurement of `detail="summary"`. Does the ratio match the ~94% saving claimed above?
 
 **Exercise 2**: Use `warn_search_tools(query="scratchpad", detail="summary")` and pick the right tool to clear all scratchpad entries older than 5 minutes. Confirm via `warn_describe_tool` before calling it.
 
@@ -337,9 +337,9 @@ You have learned:
 
 ## Troubleshooting
 
-**`warn_search_tools` returns `count: 21` but I expected 23**
+**`warn_search_tools` returns `count: 20` but I expected 28**
 
-That is correct. The discovery tools intentionally omit themselves and each other from results so the index does not advertise the index machinery. Use `total` to confirm the real registered count.
+That is correct. Two things shrink the listing: the default `limit=20` caps the rows returned, and the discovery tools intentionally omit themselves and each other from results so the index does not advertise the index machinery. Use `total` (28) to confirm the real registered count, and pass `limit=100` to see all 26 non-meta tools.
 
 **`warn_describe_tool` raises ValueError**
 

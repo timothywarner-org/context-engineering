@@ -63,7 +63,7 @@ tokens that reliably produce the desired behavior."
 (150K → 2K) by loading tool definitions from a filesystem on demand instead of pinning
 all schemas. This is the single most viral idea in MCP teaching right now.
 **Where:** New `labs/lab-02-progressive-tools/` OR a 10-min demo in Segment 4.
-**Concrete demo:** Show WARNERCO's 22 tools loaded normally, then show a `search_tools`
+**Concrete demo:** Show WARNERCO's 28 tools loaded normally, then show a `search_tools`
 shim that exposes only matching tool schemas.
 **Source:** [Code execution with MCP](https://www.anthropic.com/engineering/code-execution-with-mcp)
 
@@ -126,7 +126,7 @@ gateway patterns turns the course from "intro" into "intermediate."
 
 ### 11. Add a "Tool Design Anti-Patterns" appendix
 **Why:** Anthropic explicitly calls out: bloated toolsets, overlapping functionality,
-exhaustive edge-case enumerations, hardcoded if-else logic. WARNERCO's 22 tools are a
+exhaustive edge-case enumerations, hardcoded if-else logic. WARNERCO's 28 tools are a
 useful case study — some (like `warn_explain_schematic` vs `warn_get_robot`) walk
 right up to the overlap line and would generate great discussion.
 
@@ -142,7 +142,7 @@ positions the course as current and gives students a "what's next" hook.
 - **Don't rebuild the LangGraph flow.** The 7-node hybrid RAG pipeline is unusually
   well-aligned with the 2026 agentic-RAG patterns (plan → retrieve → reason → respond
   with hybrid memory). It's a strength.
-- **Don't rename the 22 tools.** They're frozen and tested. Surface the overlap as
+- **Don't rename the 28 tools.** They're frozen and tested. Surface the overlap as
   *teaching material* (rec #11), not as cleanup.
 - **Don't gate Lab 01 on the new labs.** Lab 01 is the entry point and works as-is.
 
