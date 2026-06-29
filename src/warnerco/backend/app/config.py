@@ -37,6 +37,10 @@ class Settings(BaseSettings):
     apim_subscription_key: Optional[str] = None
 
     # LLM Provider
+    # Anthropic is preferred for the reason node (single verified key for the
+    # whole course); OpenAI/Azure remain as fallbacks.
+    anthropic_api_key: Optional[str] = None
+    claude_model: str = "claude-sonnet-4-6"
     openai_api_key: Optional[str] = None
     azure_openai_endpoint: Optional[str] = None
     azure_openai_api_key: Optional[str] = None
@@ -102,8 +106,12 @@ class Settings(BaseSettings):
 
     @property
     def has_llm_config(self) -> bool:
-        """Check if LLM configuration is available."""
-        return bool(self.openai_api_key or (self.azure_openai_endpoint and self.azure_openai_api_key))
+        """Check if LLM configuration is available (any provider)."""
+        return bool(
+            self.anthropic_api_key
+            or self.openai_api_key
+            or (self.azure_openai_endpoint and self.azure_openai_api_key)
+        )
 
 
 # Global settings instance

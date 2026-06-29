@@ -449,24 +449,7 @@ async def reason(state: GraphState) -> GraphState:
     """
     # If LLM is configured, use it for enhanced reasoning
     if settings.has_llm_config:
-        try:
-            from langchain_openai import ChatOpenAI
-
-            if settings.azure_openai_endpoint:
-                from langchain_openai import AzureChatOpenAI
-                llm = AzureChatOpenAI(
-                    azure_endpoint=settings.azure_openai_endpoint,
-                    api_key=settings.azure_openai_api_key,
-                    azure_deployment=settings.azure_openai_deployment,
-                    api_version=settings.azure_openai_api_version,
-                )
-            else:
-                llm = ChatOpenAI(
-                    api_key=settings.openai_api_key,
-                    model="gpt-4o-mini",
-                )
-
-            prompt = f"""You are a robotics engineer assistant. Based on the query and context, provide a helpful response.
+        prompt = f"""You are a robotics engineer assistant. Based on the query and context, provide a helpful response.
 
 Query: {state['query']}
 Intent: {state['intent'].value if state['intent'] else 'unknown'}
@@ -476,8 +459,46 @@ Context:
 
 Provide a concise, technical response that directly addresses the query."""
 
-            response = await llm.ainvoke(prompt)
-            state["response"]["reasoning"] = response.content
+        try:
+            # Anthropic is preferred: one verified key for the whole course.
+            # Direct httpx call to /v1/messages avoids adding the anthropic SDK
+            # as a hard dependency (httpx is already present).
+            if settings.anthropic_api_key:
+                import httpx
+
+                async with httpx.AsyncClient(timeout=30.0) as client:
+                    resp = await client.post(
+                        "https://api.anthropic.com/v1/messages",
+                        headers={
+                            "x-api-key": settings.anthropic_api_key,
+                            "anthropic-version": "2023-06-01",
+                            "content-type": "application/json",
+                        },
+                        json={
+                            "model": settings.claude_model,
+                            "max_tokens": 1024,
+                            "messages": [{"role": "user", "content": prompt}],
+                        },
+                    )
+                    resp.raise_for_status()
+                    state["response"]["reasoning"] = resp.json()["content"][0]["text"]
+
+            elif settings.azure_openai_endpoint:
+                from langchain_openai import AzureChatOpenAI
+                llm = AzureChatOpenAI(
+                    azure_endpoint=settings.azure_openai_endpoint,
+                    api_key=settings.azure_openai_api_key,
+                    azure_deployment=settings.azure_openai_deployment,
+                    api_version=settings.azure_openai_api_version,
+                )
+                response = await llm.ainvoke(prompt)
+                state["response"]["reasoning"] = response.content
+
+            else:
+                from langchain_openai import ChatOpenAI
+                llm = ChatOpenAI(api_key=settings.openai_api_key, model="gpt-4o-mini")
+                response = await llm.ainvoke(prompt)
+                state["response"]["reasoning"] = response.content
 
         except Exception as e:
             # Fallback to stub reasoning
