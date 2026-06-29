@@ -460,28 +460,19 @@ Context:
 Provide a concise, technical response that directly addresses the query."""
 
         try:
-            # Anthropic is preferred: one verified key for the whole course.
-            # Direct httpx call to /v1/messages avoids adding the anthropic SDK
-            # as a hard dependency (httpx is already present).
+            # Anthropic is preferred: one verified key for the whole course, and
+            # the official `anthropic` SDK is what the course teaches. Using it
+            # here keeps the demo honest - no raw HTTP while we preach the SDK.
             if settings.anthropic_api_key:
-                import httpx
+                from anthropic import AsyncAnthropic
 
-                async with httpx.AsyncClient(timeout=30.0) as client:
-                    resp = await client.post(
-                        "https://api.anthropic.com/v1/messages",
-                        headers={
-                            "x-api-key": settings.anthropic_api_key,
-                            "anthropic-version": "2023-06-01",
-                            "content-type": "application/json",
-                        },
-                        json={
-                            "model": settings.claude_model,
-                            "max_tokens": 1024,
-                            "messages": [{"role": "user", "content": prompt}],
-                        },
-                    )
-                    resp.raise_for_status()
-                    state["response"]["reasoning"] = resp.json()["content"][0]["text"]
+                client = AsyncAnthropic(api_key=settings.anthropic_api_key)
+                message = await client.messages.create(
+                    model=settings.claude_model,
+                    max_tokens=1024,
+                    messages=[{"role": "user", "content": prompt}],
+                )
+                state["response"]["reasoning"] = message.content[0].text
 
             elif settings.azure_openai_endpoint:
                 from langchain_openai import AzureChatOpenAI
