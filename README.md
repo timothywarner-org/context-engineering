@@ -26,6 +26,15 @@ npm install && npm start
 npx @modelcontextprotocol/inspector node src/index.js
 ```
 
+### Option 1.5: MCP Chat CLI Lab (Python Bridge)
+
+```powershell
+cd labs/lab-02-mcp-chat
+.\run.ps1
+```
+
+`run.ps1` is the **on-rails launcher**: it bootstraps `.env`, lifts `ANTHROPIC_API_KEY` from the repo-root `.env`, and launches the chat REPL. **Lab 02** is the smallest complete Python **MCP client + stdio server + REPL** in the repo - the conceptual bridge between Lab 01 (JS hello-world) and WARNERCO (production-shaped).
+
 ### Option 2: WARNERCO Schematica (Flagship Teaching App)
 
 ```bash
@@ -48,6 +57,12 @@ The `warnerco-restart` command (from `scripts/restart_server.py`) terminates any
 | **2**   | All About MCP          | FastMCP, FastAPI, tools, resources, prompts, elicitations              |
 | **3**   | CoALA Four-Tier Memory | Working / Episodic / Semantic / Procedural — all four tiers in one app |
 | **4**   | MCP in Production      | Claude Desktop, Claude Code, VS Code, GitHub Copilot, LangGraph        |
+
+A **v2 context-first plan** (context-first framing, official-SDK-first, orchestration de-emphasized) is in **draft** at `instructor/course-plan-april-2026-v2-context-first.md`. It is not yet approved; the table above remains the current plan.
+
+### Segment Notebooks
+
+`notebooks/segment-1.ipynb` through `segment-4.ipynb` are four **prepopulated, verified teaching notebooks**, one per 50-minute segment. Each opens with a **repo-root anchor cell** that walks up to `.git`, so it runs from any working directory. They print **live counts** (never hardcoded), and Segment 3 runs the full pipeline with live Anthropic prose. Open them in **VS Code with the Jupyter extension** and **Run All**. Verified to run error-free from both the repo root and `notebooks/`.
 
 ---
 
@@ -83,6 +98,8 @@ The flagship teaching application exercises **all four CoALA memory tiers** (Sum
 | Semantic    | Durable facts (incl. consolidated `FACT-*`)   | Vector store (Chroma / Azure / JSON) | `retrieve`                              |
 | Procedural  | Versioned skills/workflows                    | MCP `@mcp.prompt()` registrations    | (user-invoked, not in pipeline)         |
 
+The **`reason` node** (LangGraph node 6) synthesizes prose via the official **`anthropic` Python SDK** (`AsyncAnthropic`); if the backend `.env` lacks the key it degrades gracefully - retrieval still works and the prose shows a fallback message.
+
 Episodic recall uses **Park et al.'s scoring formula** — `α_recency · 0.5^(hours/half_life) + α_importance · stored + α_relevance · cosine(query, summary)` — and `warn_episodic_recall` returns the per-event score breakdown so students can see why each memory surfaced.
 
 The knowledge graph is indexed at `src/warnerco/backend/data/graph/knowledge.db` with **117 entities** and **221 relationships** across 6 predicates (`has_tag`, `compatible_with`, `belongs_to_model`, `has_status`, `has_category`, `contains`).
@@ -105,6 +122,7 @@ context-engineering/
 ├── src/warnerco/backend/      # WARNERCO Schematica (FastAPI + FastMCP + LangGraph)
 ├── labs/lab-01-hello-mcp/     # Hands-on beginner lab (JS)
 ├── labs/lab-02-mcp-chat/      # MCP client + server + chat REPL (Python, vendored)
+├── notebooks/                 # Four verified segment teaching notebooks (segment-1..4)
 ├── docs/                      # Student materials, tutorials, diagrams
 ├── instructor/                # Instructor-only materials
 ├── config/                    # Sample MCP client configurations

@@ -55,6 +55,12 @@ npx @modelcontextprotocol/inspector node src/index.js
 
 Lab 01 is JS — the snippets in this section apply only there. The flagship is Python/FastMCP and follows FastMCP conventions (decorators on `@mcp.tool()` / `@mcp.resource()` / `@mcp.prompt()`).
 
+**Two-SDK honesty note.** Two distinct FastMCP imports are in play, both installed:
+- **WARNERCO** imports `from fastmcp import FastMCP` — the **standalone `fastmcp` package** (now Anthropic-stewarded). Introspection uses `get_tools()`.
+- **Lab 02** imports `from mcp.server.fastmcp import FastMCP` — the **official `mcp` SDK's bundled FastMCP**. Introspection uses `list_tools()`.
+
+Their introspection APIs differ (`get_tools()` vs `list_tools()`), which matters when writing introspection code against either server.
+
 **Lab 01 conventions** (JS only):
 - Tool returns `{ content: [{ type: 'text', text: <human-readable string> }] }` (the `add` tool returns `` `The sum of ${a} and ${b} is ${sum}` ``, not JSON)
 - Logging via `console.error()` — stdout is reserved for MCP protocol
@@ -83,6 +89,8 @@ Consolidation ("sleep cycle"): scratchpad+episodic --(ctx.sample)--> semantic
 ```
 
 **Counts: 28 tools, 12 resources, 5 prompts.** These drift fastest in a teaching repo — verify against `app/mcp_tools.py` before quoting numbers.
+
+**`reason` node (node 6) synthesizes prose via the official `anthropic` Python SDK** (`AsyncAnthropic`), reading `ANTHROPIC_API_KEY` and `CLAUDE_MODEL` from the backend `.env`. It degrades gracefully to a stub if no key is set. `anthropic>=0.113.0` is a backend dependency. Provider order is **Anthropic preferred**, then Azure OpenAI, then OpenAI as ordered fallbacks (`app/langgraph/flow.py`, `async def reason`).
 
 ### CoALA Tier Map (Sumers et al. 2024)
 
@@ -121,9 +129,15 @@ Per Anthropic's "code execution with MCP". `warn_search_tools(query, detail, lim
 - `app/models/{schematic,graph,scratchpad,episodic}.py`
 - `data/schematics/schematics.json` — source of truth (25 robots)
 
+### Teaching notebooks
+
+`notebooks/segment-1.ipynb` .. `segment-4.ipynb` — one notebook per 50-min course segment, all prepopulated and verified to run **error-free headless** from BOTH the repo root and `notebooks/`. Each opens with a **repo-root anchor cell** that walks up to the `.git` marker, so paths resolve regardless of launch directory. Live counts (tools/resources/prompts) are printed at runtime, never hardcoded. Built and validated via the user-scope **`jupyter-notebook` skill** (scaffold + headless execute + per-cell error scan).
+
 ## Environment Variables (`src/warnerco/backend/.env`)
 
 ```bash
+ANTHROPIC_API_KEY=...                     # read by the reason node (node 6)
+CLAUDE_MODEL=claude-sonnet-4-6            # default model for the reason node
 MEMORY_BACKEND=json                       # json | chroma | azure_search
 SCRATCHPAD_DB_PATH=data/scratchpad/notes.db
 SCRATCHPAD_INJECT_BUDGET=1500
@@ -166,6 +180,8 @@ npx @modelcontextprotocol/inspector uv run warnerco-mcp   # http://localhost:517
 
 ## Instructor Materials
 
+- `instructor/course-plan-april-2026.md` — current/v1 course plan
+- `instructor/course-plan-april-2026-v2-context-first.md` — **draft** repositioning: "consumer LLMs hide context, dev tools expose it", official-SDK-first, orchestration de-emphasized, GitHub Copilot first-class. Both v1 and v2 kept side by side.
 - `instructor/COURSE-UPGRADE-RECOMMENDATIONS.md` — 12 ranked recommendations (P0/P1/P2) grounded in 2026 sources
 - `instructor/PRE-CLASS-CHECKLIST.md` — morning-of verification flow
 - `docs/tutorials/coala-explainer.md` — 15-min framework explainer with code pointers
