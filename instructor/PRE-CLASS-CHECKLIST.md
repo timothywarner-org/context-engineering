@@ -1,6 +1,6 @@
 # Pre-Class Checklist - Tomorrow Morning
 
-**Class date:** 2026-04-27
+**Class date:** 2026-06-30 (Tuesday, late morning)
 **Owner:** Tim Warner
 **Repo:** `C:\github\context-engineering`
 **Run from:** `src/warnerco/backend/` unless noted

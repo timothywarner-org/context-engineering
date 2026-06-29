@@ -2,7 +2,7 @@
 
 **Author:** Claude (audit on behalf of Tim Warner)
 **Date:** 2026-04-26
-**For:** Context Engineering with MCP — class 2026-04-27 and beyond
+**For:** Context Engineering with MCP — class 2026-06-30 and beyond
 
 This memo nominates targeted, high-leverage changes informed by the latest Anthropic
 engineering posts and the **MCP 2025-11-25** specification. Each recommendation is

@@ -58,7 +58,7 @@ The `warnerco-restart` command (from `scripts/restart_server.py`) terminates any
 | **3**   | Memory Tiers in a Real App     | WARNERCO's four CoALA tiers live; orchestration kept under the hood          |
 | **4**   | MCP in the Tools You Use       | Claude Code + GitHub Copilot in VS Code as context-engineering surfaces      |
 
-Full plan: `instructor/course-plan-april-2026.md` (context-first, official-SDK-first). The earlier orchestration-forward plan is archived under `instructor/archive/`.
+Full plan: `instructor/course-plan-june-2026.md` (context-first, official-SDK-first; delivered 2026-06-30). The earlier orchestration-forward plan is archived under `instructor/archive/`.
 
 ### Segment Notebooks
 
