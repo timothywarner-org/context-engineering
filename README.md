@@ -51,14 +51,14 @@ The `warnerco-restart` command (from `scripts/restart_server.py`) terminates any
 
 ## Course Structure (4 x 50 Minutes)
 
-| Segment | Topic                  | Focus                                                                  |
-| ------- | ---------------------- | ---------------------------------------------------------------------- |
-| **1**   | All About Context      | Token economics, context loss types, why RAG isn't enough              |
-| **2**   | All About MCP          | FastMCP, FastAPI, tools, resources, prompts, elicitations              |
-| **3**   | CoALA Four-Tier Memory | Working / Episodic / Semantic / Procedural — all four tiers in one app |
-| **4**   | MCP in Production      | Claude Desktop, Claude Code, VS Code, GitHub Copilot, LangGraph        |
+| Segment | Topic                          | Focus                                                                       |
+| ------- | ------------------------------ | --------------------------------------------------------------------------- |
+| **1**   | Context, Made Visible          | Consumer LLMs hide context; dev tools (Claude Code, Copilot) expose it       |
+| **2**   | MCP: Standard for Context      | The protocol + a server on the official `mcp` SDK; current best practices    |
+| **3**   | Memory Tiers in a Real App     | WARNERCO's four CoALA tiers live; orchestration kept under the hood          |
+| **4**   | MCP in the Tools You Use       | Claude Code + GitHub Copilot in VS Code as context-engineering surfaces      |
 
-A **v2 context-first plan** (context-first framing, official-SDK-first, orchestration de-emphasized) is in **draft** at `instructor/course-plan-april-2026-v2-context-first.md`. It is not yet approved; the table above remains the current plan.
+Full plan: `instructor/course-plan-april-2026.md` (context-first, official-SDK-first). The earlier orchestration-forward plan is archived under `instructor/archive/`.
 
 ### Segment Notebooks
 

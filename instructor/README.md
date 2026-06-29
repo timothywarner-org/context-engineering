@@ -6,14 +6,15 @@ This folder contains materials for course instructors.
 
 | File | Description |
 |------|-------------|
-| [course-plan-jan-2026.md](course-plan-jan-2026.md) | Complete course plan with learning objectives |
-| [course-plan-memory-edition.md](course-plan-memory-edition.md) | Alternative course plan |
+| [course-plan-april-2026.md](course-plan-april-2026.md) | **Canonical** course plan (context-first) for the 2026-04-27 delivery |
+| [COURSE-UPGRADE-RECOMMENDATIONS.md](COURSE-UPGRADE-RECOMMENDATIONS.md) | Ranked upgrade recommendations |
+| [PRE-CLASS-CHECKLIST.md](PRE-CLASS-CHECKLIST.md) | Morning-of verification flow |
 | [WARNERS-LAWS.md](WARNERS-LAWS.md) | Tim's teaching principles |
-| context-engineering-mcp.pptx | MCP presentation deck |
-| warner-context-engineering-jan-2026.pptx | January 2026 presentation deck |
+| [showcase-three-apps.ipynb](showcase-three-apps.ipynb) | Overview notebook (all three apps) |
+| `archive/` | Superseded plans and older decks (v1, memory-edition, Jan 2026) |
 
 ## Quick Access
 
-- **Before class**: Review [course-plan-jan-2026.md](course-plan-jan-2026.md)
+- **Before class**: Review [course-plan-april-2026.md](course-plan-april-2026.md) and run [PRE-CLASS-CHECKLIST.md](PRE-CLASS-CHECKLIST.md)
 - **During class**: Use WARNERCO Schematica at `src/warnerco/backend/`
 - **Demo commands**: See [CLAUDE.md](../CLAUDE.md) for all development commands

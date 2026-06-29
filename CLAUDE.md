@@ -180,8 +180,7 @@ npx @modelcontextprotocol/inspector uv run warnerco-mcp   # http://localhost:517
 
 ## Instructor Materials
 
-- `instructor/course-plan-april-2026.md` — current/v1 course plan
-- `instructor/course-plan-april-2026-v2-context-first.md` — **draft** repositioning: "consumer LLMs hide context, dev tools expose it", official-SDK-first, orchestration de-emphasized, GitHub Copilot first-class. Both v1 and v2 kept side by side.
+- `instructor/course-plan-april-2026.md` — **canonical** course plan (context-first): "consumer LLMs hide context, dev tools expose it", official-SDK-first, orchestration de-emphasized, GitHub Copilot first-class. The earlier orchestration-forward plan is archived at `instructor/archive/course-plan-april-2026-v1-ARCHIVED.md`.
 - `instructor/COURSE-UPGRADE-RECOMMENDATIONS.md` — 12 ranked recommendations (P0/P1/P2) grounded in 2026 sources
 - `instructor/PRE-CLASS-CHECKLIST.md` — morning-of verification flow
 - `docs/tutorials/coala-explainer.md` — 15-min framework explainer with code pointers
