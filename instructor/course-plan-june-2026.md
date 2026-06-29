@@ -121,12 +121,14 @@ Talk track: *"If you're not a dev, the front-end gives you almost no clues about
 
 ---
 
-## Open decisions for Tim (before I touch notebooks)
+## Design decisions (and their rationale)
 
-1. **~~`anthropic` SDK vs raw httpx in the reason node.~~ DONE.** The reason node now uses the official `anthropic` SDK (`AsyncAnthropic`), added to the backend deps. Verified: `run_query` returns live grounded prose via the SDK. The demo no longer calls raw HTTP while teaching the SDK.
+These four shaped how the course is built. Recording them here so the "why" is explicit.
 
-2. **WARNERCO on standalone `fastmcp` vs official `mcp.server.fastmcp`.** The flagship imports `from fastmcp import FastMCP`. Migrating to the official SDK is a real refactor (decorators differ subtly). Options: (a) keep standalone, label it clearly as Anthropic-stewarded; (b) migrate WARNERCO to the official SDK (significant, not a night-before move); (c) build a *small* official-SDK server for Seg 2 and keep WARNERCO standalone for Seg 3. **(c) is my recommendation** - teaches the official path without risking the flagship.
+1. **Reason node uses the official `anthropic` SDK.** WARNERCO's prose-synthesis node calls `AsyncAnthropic`, not raw HTTP. A course that preaches "official SDKs" should not demo hand-rolled API calls.
 
-3. **Lab 01 placement.** v2 moves the Lab 01 anatomy from Seg 1 into Seg 2 (where the protocol is actually taught). Confirm that's the right home.
+2. **WARNERCO stays on standalone `fastmcp`; Segment 2 teaches the official `mcp.server.fastmcp`.** Migrating the flagship to the official SDK is a real refactor (decorators differ). Instead, a small official-SDK server demonstrates the official path in Segment 2, while WARNERCO keeps running on the standalone package (now Anthropic-stewarded) for Segment 3. The two-SDK distinction becomes a teaching point, not a hidden inconsistency.
 
-4. **Does Seg 3 keep the consolidation/"sleep cycle" exercise?** It's the strongest memory-engineering moment but it's also the most orchestration-flavored. Keep as a demo, drop as an exercise, or keep both?
+3. **Lab 01 anatomy lives in Segment 2,** where the protocol is actually taught, rather than Segment 1's concept-first framing.
+
+4. **The consolidation "sleep cycle" is a demo, not a graded exercise.** It is the strongest memory-engineering moment, but also the most orchestration-flavored - so it is shown live without asking the room to build it.

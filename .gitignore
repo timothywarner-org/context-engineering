@@ -239,3 +239,7 @@ src/warnerco/backend/data/episodic/
 # Keep the JSON source-of-truth and the indexed graph DB tracked
 !src/warnerco/backend/data/schematics/
 !src/warnerco/backend/data/graph/
+
+# Instructor tooling state - machine-local, not learner content (2026-06-29 audit)
+.claude/agent-memory/
+.claude/settings.local.json

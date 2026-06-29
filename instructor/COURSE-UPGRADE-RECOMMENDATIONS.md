@@ -1,6 +1,6 @@
 # Course Upgrade Recommendations — "Best Run Ever" Edition
 
-**Author:** Claude (audit on behalf of Tim Warner)
+**Owner:** Tim Warner
 **Date:** 2026-04-26
 **For:** Context Engineering with MCP — class 2026-06-30 and beyond
 
