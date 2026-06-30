@@ -24,7 +24,7 @@ urlFragment: remote-mcp-apim-functions-python
 > Licensed under the **MIT License** (see [`LICENSE.md`](LICENSE.md)).
 >
 > **What changed in this copy** (for the *Context Engineering with MCP* course, by Tim Warner):
-> deploy-safe defaults for a short-lived teaching environment — `vnetEnabled` defaults to **false**
+> deploy-safe defaults for a short-lived teaching environment. `vnetEnabled` defaults to **false**
 > (skips the VNet + private endpoints), and the `apimSku` parameter is now wired through `main.bicep`
 > so the documented SKU knob actually takes effect (`APIM_SKU` env var, default `Basicv2`).
 > The OAuth/auth path (APIM policies, Entra app registration, Functions backend) is **unchanged**.
