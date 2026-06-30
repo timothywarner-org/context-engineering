@@ -35,6 +35,18 @@ cd labs/lab-02-mcp-chat
 
 `run.ps1` is the **on-rails launcher**: it bootstraps `.env`, lifts `ANTHROPIC_API_KEY` from the repo-root `.env`, and launches the chat REPL. **Lab 02** is the smallest complete Python **MCP client + stdio server + REPL** in the repo - the conceptual bridge between Lab 01 (JS hello-world) and WARNERCO (production-shaped).
 
+### Option 1.7: MCP Apps Lab (Interactive UI Surfaces)
+
+```bash
+cd labs/lab-03-mcp-apps
+```
+
+**Lab 03** ships three npm MCP servers (budget-allocator, map, system-monitor) that render interactive `ui://` surfaces in Claude Desktop via SEP-1865 (MCP Apps extension, spec 2026-01-26). See [`labs/lab-03-mcp-apps/README.md`](labs/lab-03-mcp-apps/README.md).
+
+### Option 1.9: Remote MCP + OAuth on Azure
+
+**Lab 04** is a remote MCP server secured by Entra ID OAuth, fronted by Azure API Management as the authorization-server facade, with an Azure Functions Python backend. Deploy with `azd up`, connect per [`remote-mcp-apim-functions-python/QUICKSTART.md`](remote-mcp-apim-functions-python/QUICKSTART.md), then tear down the same day with `azd down --purge --force`.
+
 ### Option 2: WARNERCO Schematica (Flagship Teaching App)
 
 ```bash
@@ -120,8 +132,10 @@ Both meta-tools self-exclude from `warn_search_tools` results, so `count` is up 
 ```
 context-engineering/
 ├── src/warnerco/backend/      # WARNERCO Schematica (FastAPI + FastMCP + LangGraph)
-├── labs/lab-01-hello-mcp/     # Hands-on beginner lab (JS)
-├── labs/lab-02-mcp-chat/      # MCP client + server + chat REPL (Python, vendored)
+├── labs/lab-01-hello-mcp/     # Lab 01: Hello MCP, single add tool (JS)
+├── labs/lab-02-mcp-chat/      # Lab 02: MCP client + server + chat REPL (Python, vendored)
+├── labs/lab-03-mcp-apps/      # Lab 03: MCP Apps, interactive ui:// surfaces (JS/TS, SEP-1865)
+├── remote-mcp-apim-functions-python/  # Lab 04: remote MCP + Entra ID OAuth via APIM (Python + bicep)
 ├── notebooks/                 # Four verified segment teaching notebooks (segment-1..4)
 ├── docs/                      # Student materials, tutorials, diagrams
 ├── instructor/                # Instructor-only materials
@@ -177,7 +191,7 @@ context-engineering/
 
 ```bash
 npx @modelcontextprotocol/inspector uv run warnerco-mcp
-# Opens http://localhost:5173
+# Opens http://localhost:6274
 ```
 
 ---

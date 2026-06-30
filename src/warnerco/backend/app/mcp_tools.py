@@ -2935,9 +2935,9 @@ Access resource: `schematic://WRN-00001`
                                 |
                                 v
 +-----------------------------------------------------------------------------------+
-|                      LangGraph RAG Pipeline (7 nodes)                             |
-|  parse_intent -> query_graph -> inject_scratchpad -> retrieve                     |
-|  -> compress_context -> reason -> respond                                         |
+|                      LangGraph RAG Pipeline (9 nodes)                             |
+|  parse_intent -> query_graph -> inject_scratchpad -> recall_episodes ->           |
+|  retrieve -> compress_context -> reason -> respond -> log_episode                 |
 +-----------------------------------------------------------------------------------+
                                 |
                                 v

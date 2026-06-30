@@ -27,6 +27,7 @@ Located in [diagrams/](diagrams/):
 - **[tutorials/graph-memory-tutorial.md](tutorials/graph-memory-tutorial.md)** - Hands-on knowledge graph tutorial
 - **[tutorials/progressive-tool-loading.md](tutorials/progressive-tool-loading.md)** - Cheap tool discovery via `warn_search_tools` / `warn_describe_tool`
 - **[tutorials/demo-sampling-vscode.md](tutorials/demo-sampling-vscode.md)** - MCP Sampling demo in VS Code
+- **[tutorials/remote-mcp-oauth-azure.md](tutorials/remote-mcp-oauth-azure.md)** - Lab 04 explainer: remote MCP secured by Entra ID OAuth via APIM (the AAA lesson)
 
 ## Reference
 

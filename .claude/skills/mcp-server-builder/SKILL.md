@@ -177,7 +177,7 @@ uv run mcp dev server.py
 npx @modelcontextprotocol/inspector node src/index.js
 ```
 
-Opens `http://localhost:5173` for interactive testing.
+Opens `http://localhost:6274` for interactive testing.
 
 ### Programmatic Testing
 

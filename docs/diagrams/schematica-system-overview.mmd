@@ -20,14 +20,16 @@ flowchart TB
         MT["Meta Tools\nwarn_search_tools\nwarn_describe_tool"]
     end
 
-    subgraph Pipeline["🔄 LangGraph 7-Node Pipeline"]
+    subgraph Pipeline["🔄 LangGraph 9-Node Pipeline"]
         direction LR
         N1["1️⃣ parse\nintent"] --> N2["2️⃣ query\ngraph"]
         N2 --> N3["3️⃣ inject\nscratchpad"]
-        N3 --> N4["4️⃣ retrieve\nvectors"]
-        N4 --> N5["5️⃣ compress\ncontext"]
-        N5 --> N6["6️⃣ reason\nLLM"]
-        N6 --> N7["7️⃣ respond"]
+        N3 --> N3b["4️⃣ recall\nepisodes"]
+        N3b --> N4["5️⃣ retrieve\nvectors"]
+        N4 --> N5["6️⃣ compress\ncontext"]
+        N5 --> N6["7️⃣ reason\nLLM"]
+        N6 --> N7["8️⃣ respond"]
+        N7 --> N8["9️⃣ log\nepisode"]
     end
 
     subgraph Memory["💾 Hybrid Memory Layer"]
@@ -39,7 +41,7 @@ flowchart TB
 
     subgraph Data["📁 Data"]
         JSON[("schematics.json\n25 Robots")]
-        GRAPH[("graph.db")]
+        GRAPH[("data/graph/<br/>knowledge.db")]
     end
 
     Clients --> FastAPI

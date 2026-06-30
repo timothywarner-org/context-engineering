@@ -137,7 +137,7 @@ Navigate to http://localhost:8000/docs to show:
 npx @modelcontextprotocol/inspector uv run warnerco-mcp
 ```
 
-Opens web UI at: **http://localhost:5173**
+Opens web UI at: **http://localhost:6274**
 
 ### Demo Sequence
 
@@ -1008,7 +1008,7 @@ What depends on the precision gripper assembly?
 | http://localhost:8000/dash/scratchpad/ | Scratchpad viewer |
 | http://localhost:8000/docs | OpenAPI/Swagger UI |
 | http://localhost:8000/mcp | MCP HTTP endpoint |
-| http://localhost:5173 | MCP Inspector (when running) |
+| http://localhost:6274 | MCP Inspector (when running) |
 
 ---
 

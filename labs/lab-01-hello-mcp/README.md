@@ -196,7 +196,7 @@ From the `starter` directory, run:
 npm run inspect
 ```
 
-This launches MCP Inspector **with the server already wired up** (`node src/index.js`), opens your browser to `http://localhost:5173`, and connects. Because `npm run` always sets the working directory to this package, the relative path `src/index.js` resolves every time, regardless of where you started.
+This launches MCP Inspector **with the server already wired up** (`node src/index.js`), opens your browser to `http://localhost:6274`, and connects. Because `npm run` always sets the working directory to this package, the relative path `src/index.js` resolves every time, regardless of where you started.
 
 > **Why not type the path into the Inspector GUI?** A relative path like `.\src\index.js` is resolved against whatever directory you launched Inspector in. Launch from the wrong place and `node` cannot find the file, the child process exits instantly, and Inspector reports **"HTTP 404: Session not found"**. The `npm run inspect` script removes that failure mode. If you must use the GUI, supply the **full absolute path** to `src/index.js`.
 
@@ -265,7 +265,7 @@ Validate your implementation with the MCP Inspector — it connects to your serv
 npm run inspect
 ```
 
-In the Inspector UI (default <http://localhost:5173>):
+In the Inspector UI (default <http://localhost:6274>):
 1. Confirm the server connects and the **Tools** tab lists `add`.
 2. Call `add` with `{ "a": 5, "b": 3 }` and confirm the response text reads `The sum of 5 and 3 is 8`.
 3. Call `add` with a non-number (e.g. `"a": "x"`) and confirm you get a clean validation error, not a crash.
@@ -396,11 +396,12 @@ Then ask Claude: "Can you add 42 and 58 for me?"
 
 ## Next Steps
 
-Once you have completed this lab:
+Once you have completed this lab, continue up the four-lab ladder:
 
-1. **Explore WARNERCO Schematica** - See `src/warnerco/backend/` for a production-grade Python MCP implementation using FastMCP
-2. **Try the dashboards** - Run WARNERCO and visit http://localhost:8000/dash/
-3. **Study the Graph Memory tutorial** - See `docs/tutorials/graph-memory-tutorial.md` for advanced concepts
+1. **Lab 02 - MCP Chat CLI** (Python) - See [`../lab-02-mcp-chat/README.md`](../lab-02-mcp-chat/README.md) for a complete MCP client plus stdio server plus REPL.
+2. **Lab 03 - MCP Apps** (JS/TS) - See [`../lab-03-mcp-apps/README.md`](../lab-03-mcp-apps/README.md) for interactive `ui://` surfaces in Claude Desktop (SEP-1865).
+3. **Lab 04 - Remote MCP + OAuth on Azure** - See [`../../remote-mcp-apim-functions-python/QUICKSTART.md`](../../remote-mcp-apim-functions-python/QUICKSTART.md) for a remote MCP server secured by Entra ID OAuth via APIM.
+4. **Explore WARNERCO Schematica** - See `src/warnerco/backend/` for a production-grade Python MCP implementation using FastMCP. Run it and visit http://localhost:8000/dash/, then study `docs/tutorials/graph-memory-tutorial.md`.
 
 ---
 

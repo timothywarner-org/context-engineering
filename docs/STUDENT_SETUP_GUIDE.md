@@ -318,7 +318,7 @@ uv run uvicorn app.main:app --reload
 ```bash
 cd src/warnerco/backend
 
-# Start with MCP Inspector (opens browser at http://localhost:5173)
+# Start with MCP Inspector (opens browser at http://localhost:6274)
 npx @modelcontextprotocol/inspector uv run warnerco-mcp
 
 # You should see 28 tools listed: warn_list_robots, warn_get_robot, warn_semantic_search,

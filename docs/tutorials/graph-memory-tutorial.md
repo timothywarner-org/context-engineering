@@ -110,17 +110,17 @@ Expected output:
 Loading schematics from data/schematics/schematics.json...
 Found 25 schematics
 Creating entities...
-  - 25 robot entities
+  - 25 schematic entities
+  - 12 category entities
   - 12 component entities
-  - 6 category entities
-  - 4 system entities
+  - 9 model entities
+  - 56 tag entities
+  - 3 status entities
 Inferring relationships...
-  - 25 robot->category relationships
-  - 18 robot->system relationships
-  - 12 component->robot relationships
-Writing to graph.db...
+  - has_tag, compatible_with, belongs_to_model, has_category, has_status, contains
+Writing to data/graph/knowledge.db...
 Building NetworkX graph...
-Done! Graph has 47 nodes and 55 edges.
+Done! Graph has 117 entities and 221 relationships.
 ```
 
 ### Step 2: Verify the Graph
@@ -142,14 +142,15 @@ You should see:
 
 ```json
 {
-  "node_count": 47,
-  "edge_count": 55,
-  "density": 0.025,
-  "connected_components": 1,
+  "entity_count": 117,
+  "relationship_count": 221,
   "predicates": {
-    "depends_on": 18,
-    "contains": 12,
-    "has_category": 25
+    "has_tag": 75,
+    "compatible_with": 50,
+    "belongs_to_model": 25,
+    "has_category": 25,
+    "has_status": 25,
+    "contains": 21
   }
 }
 ```
@@ -306,16 +307,18 @@ Behind the scenes, WARNERCO:
 
 ### How the LangGraph Flow Works
 
-The 7-node pipeline:
+The 9-node pipeline:
 
 ```
 1. parse_intent      - Classify query (LOOKUP, DIAGNOSTIC, ANALYTICS, SEARCH)
 2. query_graph       - Find graph context if intent benefits from it
 3. inject_scratchpad - Add session working memory (observations, inferences)
-4. retrieve          - Get candidates from vector store (boosted by graph context)
-5. compress_context  - Minimize tokens while preserving key info
-6. reason            - LLM synthesizes response
-7. respond           - Format final output
+4. recall_episodes   - Pull past events (gated to DIAGNOSTIC/ANALYTICS)
+5. retrieve          - Get candidates from vector store (boosted by graph context)
+6. compress_context  - Minimize tokens while preserving key info
+7. reason            - LLM synthesizes response
+8. respond           - Format final output
+9. log_episode       - Append this turn to episodic memory
 ```
 
 ### When Does query_graph Activate?
@@ -426,7 +429,7 @@ Entity IDs are case-sensitive. Use exact IDs from the schematics (e.g., "WRN-000
 
 **Slow graph queries**
 
-The NetworkX graph loads on first query. Subsequent queries should be fast (<10ms). If still slow, check if `graph.db` is very large or corrupted.
+The NetworkX graph loads on first query. Subsequent queries should be fast (<10ms). If still slow, check if `data/graph/knowledge.db` is very large or corrupted.
 
 **MCP tools not appearing**
 

@@ -13,7 +13,7 @@ Agentic robot schematics system with semantic memory and retrieval-augmented gen
 ┌─────────────────────────────────────────────────────────────┐
 │                     FastAPI + FastMCP                       │
 ├─────────────────────────────────────────────────────────────┤
-│  LangGraph Flow (7-node Hybrid RAG)                         │
+│  LangGraph Flow (9-node Hybrid RAG)                         │
 │  parse_intent -> query_graph -> inject_scratchpad -> retrieve│
 │  -> compress -> reason -> respond                            │
 ├─────────────────────────────────────────────────────────────┤
@@ -43,7 +43,7 @@ src/warnerco/backend/
 │   │   ├── graph_store.py
 │   │   └── scratchpad_store.py
 │   └── langgraph/
-│       └── flow.py       # 7-node hybrid RAG orchestration
+│       └── flow.py       # 9-node hybrid RAG orchestration
 ├── data/
 │   ├── schematics/       # JSON source of truth
 │   └── chroma/           # Vector embeddings
@@ -96,15 +96,17 @@ Set `MEMORY_BACKEND` in `.env`:
 
 ## LangGraph Flow
 
-7-node hybrid retrieval-augmented generation:
+9-node hybrid retrieval-augmented generation:
 
 1. **parse_intent** - Classify query (lookup/diagnostic/analytics/search)
 2. **query_graph** - Enrich with knowledge graph relationships
-3. **inject_scratchpad** - Add session working memory
-4. **retrieve** - Fetch candidates from memory backend
-5. **compress_context** - Minimize token bloat
-6. **reason** - LLM generates response (Azure OpenAI gpt-4o-mini)
-7. **respond** - Format for dashboards/MCP
+3. **inject_scratchpad** - Add session working memory (CoALA working tier)
+4. **recall_episodes** - Recall prior episodes (CoALA episodic tier; gated to ANALYTICS/DIAGNOSTIC)
+5. **retrieve** - Fetch candidates from memory backend (CoALA semantic tier)
+6. **compress_context** - Minimize token bloat
+7. **reason** - LLM generates response (official `anthropic` SDK preferred, then Azure OpenAI, then OpenAI)
+8. **respond** - Format for dashboards/MCP
+9. **log_episode** - Write the interaction back to episodic memory (always)
 
 ## Adding Schematics
 

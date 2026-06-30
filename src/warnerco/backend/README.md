@@ -238,7 +238,7 @@ Implementation: Windows uses `netstat -ano` plus `taskkill /F /T /PID`; POSIX us
 
 ### Knowledge Graph
 
-The graph database lives at `data/graph/knowledge.db` and is populated by:
+The graph database is at `data/graph/knowledge.db` and is populated by:
 
 ```bash
 uv run python scripts/index_graph.py

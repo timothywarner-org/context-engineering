@@ -100,7 +100,7 @@ Before demoing in VS Code, verify the tool works using the MCP Inspector. This s
 npx @modelcontextprotocol/inspector uv run warnerco-mcp
 ```
 
-This opens a browser at `http://localhost:5173`. Once the Inspector loads:
+This opens a browser at `http://localhost:6274`. Once the Inspector loads:
 
 1. Click the **Tools** tab in the left sidebar.
 2. Find `warn_explain_schematic` in the tool list.

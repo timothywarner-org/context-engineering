@@ -46,16 +46,18 @@ flowchart TB
         end
     end
 
-    subgraph Orchestration["<b>LANGGRAPH 7-NODE HYBRID RAG PIPELINE</b>"]
+    subgraph Orchestration["<b>LANGGRAPH 9-NODE HYBRID RAG PIPELINE</b>"]
         direction LR
         LG1["parse<br/>intent"]
         LG2["query<br/>graph"]
         LG3["inject<br/>scratchpad"]
+        LG3b["recall<br/>episodes"]
         LG4["retrieve<br/>vectors"]
         LG5["compress<br/>context"]
         LG6["reason<br/>LLM"]
         LG7["respond<br/>format"]
-        LG1 --> LG2 --> LG3 --> LG4 --> LG5 --> LG6 --> LG7
+        LG8["log<br/>episode"]
+        LG1 --> LG2 --> LG3 --> LG3b --> LG4 --> LG5 --> LG6 --> LG7 --> LG8
     end
 
     subgraph Memory["<b>HYBRID MEMORY LAYER</b>"]
@@ -136,7 +138,7 @@ flowchart TB
 
 ### LangGraph Hybrid RAG Pipeline
 
-7-node flow: `parse_intent` -> `query_graph` -> `inject_scratchpad` -> `retrieve` -> `compress_context` -> `reason` -> `respond`
+9-node flow: `parse_intent` -> `query_graph` -> `inject_scratchpad` -> `recall_episodes` -> `retrieve` -> `compress_context` -> `reason` -> `respond` -> `log_episode`
 
 The `query_graph` node enriches retrieval context with relationship data from the knowledge graph. The `inject_scratchpad` node adds session-scoped working memory observations.
 

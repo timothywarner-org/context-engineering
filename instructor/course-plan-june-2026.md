@@ -110,14 +110,36 @@ Talk track: *"If you're not a dev, the front-end gives you almost no clues about
 - Configure GitHub Copilot in VS Code (`.vscode/mcp.json`) - schema differences and the input/PAT flow
 - Use progressive tool loading to keep a 28-tool server cheap
 - State production basics (auth, transport, monitoring) without a LangGraph detour
+- **Capstone:** wire **MCP Apps** servers into Claude Desktop and read the two-audience split - one tool call, structured JSON for the model and a rendered interactive surface for the human
 
 **Topics**
 1. **Progressive tool loading (10 min):** `warn_search_tools` / `warn_describe_tool` - load schemas on demand. Live: `count=20` default-capped, `26` with `limit=100`, of `28` total. The "code execution with MCP" pattern.
 2. **Claude Code as an MCP client (12 min):** the real `.claude/mcp.json` (two entries, pinned CoALA weights). Show context made visible: tools loading, `/context`.
 3. **GitHub Copilot in VS Code (12 min) - FIRST-CLASS:** the real `.vscode/mcp.json` (your server + GitHub's remote MCP). Schema contrasts (`servers` vs `mcpServers`, required `type`, `${input:github_pat}`). Agent mode picking up both servers.
-4. **Production basics (6 min):** stdio vs HTTP, auth on remote, monitoring. Mention LangGraph/LangChain here as **one ecosystem option** for multi-agent - not taught, just situated.
+4. **Production basics (6 min):** stdio vs HTTP, **auth on remote**, monitoring. The deployed exhibit for "auth on remote" is the **remote MCP server secured by OAuth** at `remote-mcp-apim-functions-python/` (adapted from Azure-Samples "Secure Remote MCP Servers using Azure API Management"). Frame it as **OAuth AAA - Authentication, Authorization, Accounting - in an Entra ID context**:
+   - **Architecture:** an MCP client connects over **SSE** to **Azure API Management (APIM)**. APIM is both the **OAuth authorization-server facade** to the client and a **secretless confidential client** to Entra ID. APIM authenticates to Entra with a **Federated Identity Credential (FIC)** off its managed identity - **no client secret**. APIM brokers the Entra login, caches the real Entra token server-side, and returns to the MCP client only an **AES-encrypted opaque session key**.
+   - **Backend:** an Azure Functions Python app (tools: `hello_mcp`, `get_snippet`, `save_snippet`).
+   - **Accounting:** App Insights + Log Analytics.
+   - **Demo beats:** the **secretless FIC** highlight (managed identity, no stored secret); the **401-is-the-gate** moment (unauthenticated call is rejected before reaching the backend); teardown same-day to control cost. Connect-and-demo steps are in `remote-mcp-apim-functions-python/QUICKSTART.md`.
+   - **Honesty note (spec currency):** the sample implements the **MCP 2025-03-26** authorization flow (**RFC 8414** Authorization Server Metadata discovery). It does **not** publish **RFC 9728** Protected Resource Metadata, and the 401 carries no `WWW-Authenticate` `resource_metadata` header. That is a discovery-flow gap vs. the newer spec, not a security hole - and it is the natural lead-in to a future **Azure Container Apps + native-APIM-MCP-mode** lab.
 
-**Notebook:** `notebooks/segment-4.ipynb` (already demos progressive loading + both client configs live).
+   Mention LangGraph/LangChain here as **one ecosystem option** for multi-agent - not taught, just situated.
+
+5. **CAPSTONE - MCP Apps / Lab 03 (10 min):** the sharpest version of the course thesis. A standard MCP tool returns plain text; an **MCP App** returns an **interactive UI** instead. This is the segment's closing beat - it builds on everything prior (a tool you wired into a client now renders a live surface), so trim earlier topics if the clock is tight.
+   - **Spec facts:** **SEP-1865**, spec version **2026-01-26**, status **Stable**. SDK is **`@modelcontextprotocol/ext-apps`** (JS/TS).
+   - **Mechanism:** a tool declares a **`ui://` resource** served as **`text/html`**. The host renders it in a **sandboxed iframe**. A **postMessage + JSON-RPC bridge** carries data into the UI and lets the UI call tools back through the host. Transport is **stdio** - Claude Desktop launches the server, no port.
+   - **Two-audience split (the thesis, made visible):** one tool call produces **two context payloads**. The **model** exchanges **structured JSON** (the context it reasons over); the **human** sees a **rendered interactive surface** (the context they reason over). The UI calls tools back through the host, so the surface is live, not a screenshot. That is context engineering made visible.
+   - **Three demo servers, zero clone / zero build** (published examples wired into Claude Desktop via stdio):
+
+   | Server | What the human sees | Two-audience round-trip |
+   |--------|---------------------|-------------------------|
+   | **budget-allocator** (lead) | Interactive sliders + reactive chart | Model sends allocations; human edits in the UI; edits flow back through the bridge - the cleanest round-trip |
+   | **map** | CesiumJS 3D globe | Model returns coordinates; human pans/zooms the rendered globe |
+   | **system-monitor** | Live CPU / memory | Model returns metrics; human reads a live updating surface |
+
+   - **Hands-on guide:** `labs/lab-03-mcp-apps/README.md`.
+
+**Notebook:** `notebooks/segment-4.ipynb` (already demos progressive loading + both client configs live; a **Lab 03 / MCP Apps** pointer was added to it for the capstone).
 
 ---
 
@@ -132,3 +154,7 @@ These four shaped how the course is built. Recording them here so the "why" is e
 3. **Lab 01 anatomy lives in Segment 2,** where the protocol is actually taught, rather than Segment 1's concept-first framing.
 
 4. **The consolidation "sleep cycle" is a demo, not a graded exercise.** It is the strongest memory-engineering moment, but also the most orchestration-flavored - so it is shown live without asking the room to build it.
+
+5. **A deployed remote-auth exhibit backs Segment 4's "auth on remote" topic.** The `remote-mcp-apim-functions-python/` deploy (APIM + Entra ID + Azure Functions) gives the room a **real, deployed** answer to "how does auth on a remote MCP server work," not slideware. It carries the **OAuth AAA** framing and the **secretless FIC** highlight. Cost is controlled by **teardown same-day**. The **spec-currency caveat** is noted in the topic (RFC 8414 yes, RFC 9728 no), so the gap is taught honestly and seeds a future ACA + native-APIM-MCP-mode lab.
+
+6. **MCP Apps got a dedicated JS/TS lab (Lab 03), not a WARNERCO notebook cell.** The **`@modelcontextprotocol/ext-apps`** SDK is **JS/TS**, so it cannot be bolted onto the Python flagship. A standalone lab keeps the language ladder clean: **Lab 01 (JS hello-world) -> Lab 02 (Python client + server) -> Lab 03 (UI)**. It also keeps the capstone zero-clone / zero-build (three published example servers wired into Claude Desktop via stdio), so the room spends the 10 minutes reading the two-audience split, not fighting a build.

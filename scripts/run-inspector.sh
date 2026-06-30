@@ -17,7 +17,7 @@ uv sync
 
 # Start MCP Inspector with the warnerco-mcp server
 echo -e "\n\033[32mLaunching MCP Inspector...\033[0m"
-echo -e "\033[36mBrowser will open at: http://localhost:5173\033[0m"
+echo -e "\033[36mBrowser will open at: http://localhost:6274\033[0m"
 echo -e "\033[33mPress Ctrl+C to stop\n\033[0m"
 
 # Run MCP Inspector pointing to our server

@@ -84,7 +84,7 @@ Run top to bottom. If a step fails, fix before moving on; nothing below assumes 
   ```bash
   npx @modelcontextprotocol/inspector uv run warnerco-mcp
   ```
-  - Expect: Inspector UI opens (default <http://localhost:5173>) and the server appears as `connected`.
+  - Expect: Inspector UI opens (default <http://localhost:6274>) and the server appears as `connected`.
 
 - [ ] **List tools via progressive loading**
   - In Inspector, call:
@@ -109,3 +109,34 @@ Run top to bottom. If a step fails, fix before moving on; nothing below assumes 
 - [ ] Coffee.
 
 If all boxes are checked, you are clear to teach.
+
+## 7. Remote MCP OAuth demo (optional, Azure)
+
+**Optional, cost-flagged.** Skip unless you plan to show the **OAuth-secured remote MCP server** today. **APIM Basicv2 meters hourly**, so deploy near class time and tear down same day. Run from `remote-mcp-apim-functions-python/`.
+
+- [ ] **Confirm the remote MCP server is deployed**
+  ```bash
+  cd remote-mcp-apim-functions-python
+  azd env get-values | grep SERVICE_API_ENDPOINTS
+  ```
+  - Expect: a `SERVICE_API_ENDPOINTS` line with the live APIM host (the host is generated per deploy).
+  - If empty: deploy with `azd up` if you want this demo (~7 min; APIM Basicv2 meters hourly).
+
+- [ ] **Confirm the 401 gate** (no token, no access - this is by design)
+  ```bash
+  curl -i https://<apim-host>.azure-api.net/mcp/sse
+  ```
+  - Replace `<apim-host>` with the value from `azd env get-values`.
+  - Expect: `HTTP/1.1 401 Unauthorized`. A plain browser or unauthenticated curl is rejected; an MCP client runs the Entra consent flow to obtain a token.
+
+- [ ] **Confirm the OAuth metadata endpoint**
+  ```bash
+  curl -i https://<apim-host>.azure-api.net/.well-known/oauth-authorization-server
+  ```
+  - Expect: `HTTP/1.1 200 OK` with a JSON body (the authorization-server metadata APIM exposes).
+
+- [ ] **Tear down after class** (stop the meter)
+  ```bash
+  azd down --purge --force
+  ```
+  - Run this same day. APIM Basicv2 bills hourly whether or not anyone connects.

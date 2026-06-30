@@ -62,9 +62,9 @@ tokens that reliably produce the desired behavior."
 **Why:** Anthropic's code-execution-with-MCP post reports a **98.7% token reduction**
 (150K → 2K) by loading tool definitions from a filesystem on demand instead of pinning
 all schemas. This is the single most viral idea in MCP teaching right now.
-**Where:** New `labs/lab-02-progressive-tools/` OR a 10-min demo in Segment 4.
-**Concrete demo:** Show WARNERCO's 28 tools loaded normally, then show a `search_tools`
-shim that exposes only matching tool schemas.
+**Where:** a 10-min demo in Segment 4 (shipped as `warn_search_tools` / `warn_describe_tool` plus `docs/tutorials/progressive-tool-loading.md`).
+**Concrete demo:** Show WARNERCO's 28 tools loaded normally, then show `warn_search_tools`
+exposing only matching tool schemas.
 **Source:** [Code execution with MCP](https://www.anthropic.com/engineering/code-execution-with-mcp)
 
 ### 5. Add Elicitation to WARNERCO as a teaching contrast
@@ -116,13 +116,20 @@ production" segment covering stateless sessions, `.well-known` server discovery,
 gateway patterns turns the course from "intro" into "intermediate."
 **Source:** [2026 MCP Roadmap](https://blog.modelcontextprotocol.io/posts/2026-mcp-roadmap/)
 
-### 10. Fill in Labs 02–06 with the patterns above
-- **Lab 02:** Progressive tool loading (rec #4).
-- **Lab 03:** Elicitation flow (rec #5).
-- **Lab 04:** Sampling — already partially done (`93ecb8d Add sampling to MCP server`).
-  Promote to a full lab.
-- **Lab 05:** Hybrid memory — choose vector vs graph vs scratchpad for three queries.
-- **Lab 06:** Production deployment — Azure Container App + APIM gateway.
+### 10. Where the patterns above landed (lab ladder, as shipped)
+The four real labs on disk are the ladder; the patterns from recs #4-#7 are folded into
+WARNERCO and the tutorials rather than into separate numbered labs.
+
+- **Lab 01** (`labs/lab-01-hello-mcp/`): Hello MCP, single `add` tool, JS.
+- **Lab 02** (`labs/lab-02-mcp-chat/`): MCP Chat CLI — complete Python client + stdio server + REPL.
+- **Lab 03** (`labs/lab-03-mcp-apps/`): MCP Apps — interactive `ui://` surfaces in Claude Desktop (SEP-1865).
+- **Lab 04** (`remote-mcp-apim-functions-python/`): Remote MCP secured by Entra ID OAuth via APIM (the production-deployment pattern, deployed live in Azure).
+
+Patterns delivered without a separate lab number:
+- **Progressive tool loading** (rec #4): shipped as `warn_search_tools` / `warn_describe_tool` plus `docs/tutorials/progressive-tool-loading.md`.
+- **Sampling** (rec #5 sibling): shipped in `warn_explain_schematic` + `warn_consolidate_memory`, walked through in `docs/tutorials/demo-sampling-vscode.md`.
+- **Elicitation** (rec #5): demonstrated by the interactive tools (`warn_guided_search`, `warn_feedback_loop`, `warn_replacement_advisor`).
+- **Hybrid memory** (rec #6): covered by `docs/tutorials/graph-memory-tutorial.md` and the four-tier CoALA walkthrough.
 
 ### 11. Add a "Tool Design Anti-Patterns" appendix
 **Why:** Anthropic explicitly calls out: bloated toolsets, overlapping functionality,
@@ -139,9 +146,9 @@ positions the course as current and gives students a "what's next" hook.
 
 ## What NOT to Change
 
-- **Don't rebuild the LangGraph flow.** The 7-node hybrid RAG pipeline is unusually
+- **Don't rebuild the LangGraph flow.** The 9-node hybrid RAG pipeline is unusually
   well-aligned with the 2026 agentic-RAG patterns (plan → retrieve → reason → respond
-  with hybrid memory). It's a strength.
+  with hybrid memory across all four CoALA tiers). It's a strength.
 - **Don't rename the 28 tools.** They're frozen and tested. Surface the overlap as
   *teaching material* (rec #11), not as cleanup.
 - **Don't gate Lab 01 on the new labs.** Lab 01 is the entry point and works as-is.

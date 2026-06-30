@@ -74,6 +74,17 @@ cd labs/lab-02-mcp-chat
 
 Vendored Anthropic course scaffold (attribution in `labs/lab-02-mcp-chat/NOTICE.md`). It is the smallest **complete Python MCP client + stdio FastMCP server + REPL** in the repo — the conceptual bridge between Lab 01 (JS hello-world) and WARNERCO (production-shaped). Server registers 2 tools (`read_doc_contents`, `edit_document`), 1 resource + 1 template (`docs://documents`, `docs://documents/{id}`), 1 prompt (`format`). The `run.ps1` launcher lifts `ANTHROPIC_API_KEY` from the repo-root `.env`. Needs `ANTHROPIC_API_KEY` and `CLAUDE_MODEL` (default `claude-sonnet-4-6`). The app is fully implemented — the upstream `# TODO` markers are kept inline as a before/after teaching artifact.
 
+### Lab 03 (MCP Apps, interactive UI)
+
+No clone, no build. Wires three published example servers into **Claude Desktop** over stdio:
+
+```jsonc
+// %APPDATA%\Claude\claude_desktop_config.json (mcpServers block; see labs/lab-03-mcp-apps/claude_desktop_config.json)
+"mcpapps-budget-allocator": { "command": "cmd", "args": ["/c","npx","-y","@modelcontextprotocol/server-budget-allocator","--stdio"] }
+```
+
+**MCP Apps** (**SEP-1865**, spec `2026-01-26`, status **Stable**): a tool declares a `ui://` resource served as `text/html`, the host renders it in a sandboxed iframe, and a **postMessage + JSON-RPC 2.0 bridge** carries data and lets the UI call tools back. SDK `@modelcontextprotocol/ext-apps` (**JS/TS only**, which is why this is a standalone lab, not a WARNERCO cell). Three servers (all `1.7.4`): `server-budget-allocator` (sliders + reactive chart), `server-map` (CesiumJS 3D globe), `server-system-monitor` (live CPU/memory). **Transport is per-server**: the config uses **stdio** (Claude Desktop launches it, no port); the same binary without `--stdio` starts Express on `http://localhost:3001/mcp` (`PORT` env). Windows: route the launcher through `cmd /c npx` so Claude Desktop resolves `npx` on `PATH`. Hands-on guide: `labs/lab-03-mcp-apps/README.md`.
+
 ## WARNERCO Architecture
 
 ```
@@ -177,7 +188,7 @@ If asked to add a third client (Cursor, Continue, etc.), mirror the `.claude/mcp
 ## Testing with MCP Inspector
 
 ```bash
-npx @modelcontextprotocol/inspector uv run warnerco-mcp   # http://localhost:5173
+npx @modelcontextprotocol/inspector uv run warnerco-mcp   # http://localhost:6274
 ```
 
 **Windows GUI launch — use the config file.** The Inspector GUI form mangles Windows paths (backslashes get eaten -> `os error 2`) and won't resolve a bare `uv`. Launch from the checked-in `inspector.json` (forward-slash paths + absolute `uv.exe`) instead:
@@ -195,6 +206,7 @@ npx @modelcontextprotocol/inspector --config src/warnerco/backend/inspector.json
 - `docs/tutorials/coala-explainer.md` — 15-min framework explainer with code pointers
 - `docs/tutorials/coala-memory-walkthrough.md` — ~4-min classroom four-tier demo
 - `docs/tutorials/progressive-tool-loading.md` — `warn_search_tools` / `warn_describe_tool` walkthrough
+- `docs/tutorials/remote-mcp-oauth-azure.md` - OAuth AAA on Azure: APIM as AI Gateway + Entra ID secretless FIC in front of a remote MCP server
 
 ## Authoritative External Sources
 

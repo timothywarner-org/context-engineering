@@ -1,8 +1,8 @@
 # Context Engineering with MCP - Hands-On Labs
 
-These progressive labs will take you from building your first MCP server to deploying production-ready AI memory systems.
+These progressive labs take you from building your first MCP server to connecting an OAuth-secured remote MCP server on Azure.
 
-**Note**: This course is a work-in-progress. Additional labs are planned and will be released over time.
+**Progression**: **Lab 01** (JS hello-world) -> **Lab 02** (Python client + server) -> **Lab 03** (interactive UI) -> **Lab 04** (remote + OAuth on Azure). JS to Python to UI to production-auth.
 
 **Primary Teaching Example**: WARNERCO Robotics Schematica at `src/warnerco/backend/` demonstrates all advanced concepts (FastMCP, LangGraph, Graph Memory, etc.).
 
@@ -29,67 +29,70 @@ Each lab includes:
 
 ---
 
-## Coming Soon
+### Lab 02: MCP Chat CLI (45 minutes)
+**Objective**: Build and run the smallest **complete MCP client + stdio FastMCP server + REPL** in Python
 
-The following labs are planned for future releases:
+**What you'll learn**:
+- How an **MCP client** connects to a **stdio FastMCP server** and drives a chat REPL
+- Server registration of **2 tools** (`read_doc_contents`, `edit_document`)
+- **1 resource plus 1 template** (`docs://documents`, `docs://documents/{id}`)
+- **1 prompt** (`format`)
+- On-rails launch with `run.ps1` (bootstraps `.env`, lifts `ANTHROPIC_API_KEY` from the repo-root `.env`, runs `main.py`)
 
-### Beginner Track
+**Start**: [lab-02-mcp-chat/](./lab-02-mcp-chat/) (run `./run.ps1`)
 
-**Lab 02: Tool Calling Patterns** (45 minutes)
-- Multiple tool registration
-- Input schema validation with JSON Schema
-- Error handling in tool handlers
-- Returning structured data
+---
 
-**Lab 03: Resources and Context** (45 minutes)
-- Resource registration and URI schemes
-- Dynamic resource generation
-- Combining tools and resources
-- Resource templating
+### Lab 03: MCP Apps (45 minutes)
+**Objective**: Return a rendered, interactive UI over MCP instead of plain text (Segment 4 capstone)
 
-### Intermediate Track
+**What you'll learn**:
+- **MCP Apps** (SEP-1865, spec 2026-01-26, status Stable): a tool declares a `ui://` resource served as `text/html`, the host renders it in a **sandboxed iframe**, and a **postMessage plus JSON-RPC bridge** carries data and lets the UI call tools back
+- The JS/TS SDK `@modelcontextprotocol/ext-apps`
+- Wiring **three published example servers** into Claude Desktop with **zero clone, zero build, via stdio**: `budget-allocator` (interactive sliders plus reactive chart), `map` (CesiumJS 3D globe), `system-monitor` (live CPU/memory charts)
 
-**Lab 04: Memory Patterns** (60 minutes)
-- Memory architecture patterns
-- Persistent storage with JSON files
-- Memory retrieval and search
-- Context window optimization
+**Start**: [lab-03-mcp-apps/README.md](./lab-03-mcp-apps/README.md)
 
-**Lab 05: Production Deployment** (60 minutes)
-- Docker containerization
-- Azure Container Apps deployment
-- Environment configuration
-- Health checks and monitoring
+---
 
-### Advanced Track
+### Lab 04: Remote MCP with OAuth on Azure (60 minutes)
+**Objective**: Deploy and connect to an **OAuth-secured remote MCP server** on Azure, and learn **OAuth AAA** (Authentication, Authorization, Accounting) with **Entra ID** and **Azure API Management (APIM)**
 
-**Lab 06: Advanced Patterns** (90 minutes)
-- Vector database integration
-- Semantic search with embeddings
-- Multi-agent coordination
-- MCP sampling (AI completions within context)
+**What you'll learn**:
+- **APIM as the AI Gateway and OAuth authorization-server facade** in front of an Azure Functions Python MCP server
+- **Entra ID app registration plus Federated Identity Credential** for **secretless** confidential-client auth (APIM uses its managed identity, no client secret)
+- Why a plain browser hit on the MCP endpoint returns **401** by design (no token, no access)
+- Connecting through an MCP client via **MCP Inspector over SSE** (the client runs the Entra consent flow)
+- **Same-day teardown** to control cost (APIM Basicv2 meters hourly)
+
+**Start**: [../remote-mcp-apim-functions-python/QUICKSTART.md](../remote-mcp-apim-functions-python/QUICKSTART.md)
+
+---
+
+## What's Next
+
+- **Known next step**: deploy the remote MCP server on **Azure Container Apps (ACA)** and adopt **native APIM MCP mode** as a follow-up to Lab 04.
+
+Additional labs may be added over time.
 
 ---
 
 ## Quick Start
 
-### Running Lab 01
+Each lab has its own launch path. The fastest start per lab:
 
 ```bash
-# Navigate to the lab
-cd labs/lab-01-hello-mcp
+# Lab 01 (JS) - Hello MCP
+cd labs/lab-01-hello-mcp/starter && npm install && npm start
 
-# Read the instructions
-cat README.md
+# Lab 02 (Python) - MCP Chat CLI (on-rails launcher lifts the API key)
+cd labs/lab-02-mcp-chat && ./run.ps1
 
-# Start with the starter code
-cd starter
-npm install
+# Lab 03 (JS/TS) - MCP Apps: no clone, no build. Paste the config into Claude Desktop
+#   see labs/lab-03-mcp-apps/README.md and claude_desktop_config.json
 
-# Follow the lab instructions...
-
-# When you're done, check your work against the solution
-cd ../solution
+# Lab 04 (Azure) - Remote MCP with OAuth: deploy, then connect with an MCP client
+cd remote-mcp-apim-functions-python && azd up   # see QUICKSTART.md to connect; azd down --purge --force to tear down
 ```
 
 ### Testing Your Solution
@@ -109,8 +112,9 @@ npx @modelcontextprotocol/inspector node src/index.js
 Track your progress:
 
 - [ ] **Lab 01**: Hello MCP - Build your first MCP server
-
-*More labs coming soon!*
+- [ ] **Lab 02**: MCP Chat CLI - Run a complete Python MCP client, stdio server, and REPL
+- [ ] **Lab 03**: MCP Apps - Render an interactive `ui://` surface in Claude Desktop
+- [ ] **Lab 04**: Remote MCP with OAuth on Azure - Deploy and connect to an OAuth-secured remote MCP server
 
 ---
 
@@ -175,13 +179,13 @@ npm install
 
 ## Beyond the Labs
 
-### Next Steps After Completing Lab 01
+### Next Steps After the Four Labs
 
-While waiting for additional labs, you can:
+Once you have worked through Lab 01 through Lab 04, you can:
 
 1. **Explore WARNERCO Schematica** - Study `src/warnerco/backend/` for a production-grade MCP implementation
 2. **Read the MCP specification** - Deepen your understanding of the protocol
-3. **Experiment with tools and resources** - Extend your Lab 01 server with additional features
+3. **Build your own MCP App** - Author a `ui://` surface from the Lab 03 escape hatch (`examples/basic-server-vanillajs` upstream)
 4. **Try the dashboards** - Run WARNERCO Schematica and explore `http://localhost:8000/dash/`
 5. **Study the Graph Memory tutorial** - See `docs/tutorials/graph-memory-tutorial.md`
 

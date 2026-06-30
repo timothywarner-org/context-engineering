@@ -33,7 +33,7 @@ For the MCP-side demo, in a second terminal:
 
 ```bash
 npx @modelcontextprotocol/inspector uv run warnerco-mcp
-# Opens http://localhost:5173
+# Opens http://localhost:6274
 ```
 
 ---
