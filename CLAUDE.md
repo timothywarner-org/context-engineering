@@ -180,6 +180,13 @@ If asked to add a third client (Cursor, Continue, etc.), mirror the `.claude/mcp
 npx @modelcontextprotocol/inspector uv run warnerco-mcp   # http://localhost:5173
 ```
 
+**Windows GUI launch — use the config file.** The Inspector GUI form mangles Windows paths (backslashes get eaten -> `os error 2`) and won't resolve a bare `uv`. Launch from the checked-in `inspector.json` (forward-slash paths + absolute `uv.exe`) instead:
+
+```powershell
+npx @modelcontextprotocol/inspector --config src/warnerco/backend/inspector.json --server warnerco-schematica
+# or --server warnerco-coala-memory for the EPISODIC-pinned CoALA demo entry
+```
+
 ## Instructor Materials
 
 - `instructor/course-plan-june-2026.md` — **canonical** course plan (context-first, delivered 2026-06-30): "consumer LLMs hide context, dev tools expose it", official-SDK-first, orchestration de-emphasized, GitHub Copilot first-class. The earlier orchestration-forward plan is archived at `instructor/archive/course-plan-april-2026-v1-ARCHIVED.md`.

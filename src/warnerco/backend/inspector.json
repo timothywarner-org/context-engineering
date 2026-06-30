@@ -1,0 +1,34 @@
+{
+  "mcpServers": {
+    "warnerco-schematica": {
+      "command": "C:/Users/timot/.local/bin/uv.exe",
+      "args": [
+        "run",
+        "--directory",
+        "C:/github/context-engineering/src/warnerco/backend",
+        "warnerco-mcp"
+      ],
+      "env": {
+        "MEMORY_BACKEND": "chroma"
+      }
+    },
+    "warnerco-coala-memory": {
+      "command": "C:/Users/timot/.local/bin/uv.exe",
+      "args": [
+        "run",
+        "--directory",
+        "C:/github/context-engineering/src/warnerco/backend",
+        "warnerco-mcp"
+      ],
+      "env": {
+        "MEMORY_BACKEND": "chroma",
+        "EPISODIC_DB_PATH": "data/episodic/events.db",
+        "EPISODIC_MAX_RETRIEVAL_K": "5",
+        "EPISODIC_RECENCY_HALF_LIFE_HOURS": "24.0",
+        "EPISODIC_WEIGHT_RECENCY": "0.4",
+        "EPISODIC_WEIGHT_IMPORTANCE": "0.3",
+        "EPISODIC_WEIGHT_RELEVANCE": "0.3"
+      }
+    }
+  }
+}
