@@ -210,3 +210,9 @@ class CliApp:
 
             except KeyboardInterrupt:
                 break
+            except Exception as e:
+                # A bad slash command (for example a bare "/format" with no doc
+                # id) or a failed resource lookup raises out of agent.run(). Catch
+                # it here so the REPL prints the message and keeps looping instead
+                # of crashing the whole session on one malformed line.
+                print(f"\nError: {e}")

@@ -50,12 +50,12 @@ uv run python scripts/index_graph.py
 
 ## Step 1: Configure the MCP Server in VS Code
 
-VS Code discovers MCP servers through a `.vscode/mcp.json` file in your workspace root. This repository already includes one. Open it and verify the `warnerco-schematica` entry:
+VS Code discovers MCP servers through a `.vscode/mcp.json` file in your workspace root. This repository already includes one. Open it and verify the `vscode-warnerco-schematica` entry:
 
 ```json
 {
   "servers": {
-    "warnerco-schematica": {
+    "vscode-warnerco-schematica": {
       "command": "uv",
       "args": ["run", "warnerco-mcp"],
       "cwd": "${workspaceFolder}/src/warnerco/backend",

@@ -602,6 +602,13 @@ async def warn_semantic_search(
         >>> for item in result.results:
         ...     print(f"{item.id}: {item.score:.2f} - {item.component}")
     """
+    # Reject empty/blank queries up front. An empty string has no tokens to
+    # embed, and the downstream retrieve node stalls indefinitely on it
+    # (observed: no return within 90s), so guard at the tool boundary with a
+    # clean error instead of hanging the whole pipeline.
+    if not query or not query.strip():
+        raise ValueError("query must be a non-empty search string")
+
     # Enforce top_k limits (documented as 1-50)
     top_k = max(1, min(top_k, 50))
 

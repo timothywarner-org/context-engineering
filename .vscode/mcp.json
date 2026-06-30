@@ -1,6 +1,6 @@
 {
   "servers": {
-    "oreilly-warnerco-schematica": {
+    "vscode-warnerco-schematica": {
       "type": "stdio",
       "command": "uv",
       "args": ["run", "warnerco-mcp"],
@@ -9,7 +9,7 @@
         "MEMORY_BACKEND": "chroma"
       }
     },
-    "github": {
+    "ghcopilot-warner": {
       "type": "http",
       "url": "https://api.githubcopilot.com/mcp/",
       "headers": {

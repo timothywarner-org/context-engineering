@@ -6,13 +6,15 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "test": "echo \"No unit test harness yet. Validate with: npx @modelcontextprotocol/inspector node src/index.js\" && exit 0"
+    "inspect": "npx @modelcontextprotocol/inspector node src/index.js",
+    "test": "echo \"No unit test harness yet. Validate with: npm run inspect\" && exit 0"
   },
   "keywords": ["mcp", "model-context-protocol", "lab", "learning"],
   "author": "MCP Training",
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
-    "dotenv": "^16.4.0"
+    "dotenv": "^16.4.0",
+    "zod": "^4.0.0"
   }
 }

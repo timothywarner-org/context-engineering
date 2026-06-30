@@ -74,10 +74,9 @@ class ToolManager:
                 tool_result_blocks.append(tool_result_part)
                 continue
 
+            tool_output: CallToolResult | None = None
             try:
-                tool_output: CallToolResult | None = await client.call_tool(
-                    tool_name, tool_input
-                )
+                tool_output = await client.call_tool(tool_name, tool_input)
                 items = []
                 if tool_output:
                     items = tool_output.content

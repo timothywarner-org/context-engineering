@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "warnerco-schematica": {
+    "claudedesktop-warnerco-schematica": {
       "command": "uv",
       "args": ["run", "warnerco-mcp"],
       "cwd": "C:/github/context-engineering/src/warnerco/backend",

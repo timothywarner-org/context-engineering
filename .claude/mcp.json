@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "warnerco-schematica-claude": {
+    "claude-warnerco-schematica": {
       "type": "stdio",
       "command": "uv",
       "args": ["run", "warnerco-mcp"],
@@ -12,7 +12,7 @@
         "sampling": "allowed"
       }
     },
-    "warnerco-coala-memory": {
+    "claude-warnerco-coala-memory": {
       "type": "stdio",
       "command": "uv",
       "args": ["run", "warnerco-mcp"],

@@ -1,6 +1,7 @@
 import asyncio
 import sys
 import os
+import shutil
 from dotenv import load_dotenv
 from contextlib import AsyncExitStack
 
@@ -29,10 +30,22 @@ async def main():
     server_scripts = sys.argv[1:]
     clients = {}
 
+    # How to launch the MCP server subprocess. The server's deps (mcp, pydantic)
+    # live in this project's uv-managed .venv, so bare `python mcp_server.py`
+    # only works if that venv's interpreter is already active. Default to `uv run`
+    # whenever uv is on PATH so the subprocess always resolves its deps; honor an
+    # explicit USE_UV=0 for learners who deliberately run without uv. This makes
+    # the app correct regardless of whether an older .env set USE_UV.
+    use_uv_env = os.getenv("USE_UV")
+    if use_uv_env is None:
+        use_uv = shutil.which("uv") is not None
+    else:
+        use_uv = use_uv_env == "1"
+
     command, args = (
         ("uv", ["run", "mcp_server.py"])
-        if os.getenv("USE_UV", "0") == "1"
-        else ("python", ["mcp_server.py"])
+        if use_uv
+        else (sys.executable, ["mcp_server.py"])
     )
 
     async with AsyncExitStack() as stack:

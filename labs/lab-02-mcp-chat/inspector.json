@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "lab02-docs": {
+      "command": "C:/Users/timot/.local/bin/uv.exe",
+      "args": [
+        "run",
+        "--directory",
+        "C:/github/context-engineering/labs/lab-02-mcp-chat",
+        "mcp_server.py"
+      ]
+    }
+  }
+}

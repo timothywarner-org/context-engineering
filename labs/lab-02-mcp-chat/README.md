@@ -93,7 +93,7 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 2. Install dependencies:
 
 ```bash
-pip install anthropic python-dotenv prompt-toolkit "mcp[cli]==1.8.0"
+pip install anthropic python-dotenv prompt-toolkit "mcp[cli]>=1.8.0"
 ```
 
 3. Run the project
@@ -101,6 +101,16 @@ pip install anthropic python-dotenv prompt-toolkit "mcp[cli]==1.8.0"
 ```bash
 python main.py
 ```
+
+## Inspect the server in MCP Inspector (showcase resources)
+
+To open the **server** (not the chat client) in MCP Inspector and browse its resources, use the checked-in config — it is the only GUI-proof launch on Windows:
+
+```powershell
+npx @modelcontextprotocol/inspector --config inspector.json --server lab02-docs
+```
+
+The config pins the **absolute `uv.exe`** path because Inspector's proxy spawns the command through Node's shell-less `child_process.spawn`, which cannot resolve a bare `uv` on Windows (you get `os error 2` / "program not found"). Once connected: **Resources** tab -> `docs://documents`; for the template, read `docs://documents/deposition.md`.
 
 ## Usage
 
@@ -110,11 +120,23 @@ Simply type your message and press Enter to chat with the model.
 
 ### Document Retrieval
 
-Use the @ symbol followed by a document ID to include document content in your query:
+Two ways to pull a document into the conversation:
+
+**1. Explicit mention with `@`** — injects the document's full content directly into the prompt (no tool call needed):
 
 ```
 > Tell me about @deposition.md
 ```
+
+**2. Natural language** — just refer to a document and Claude maps it to the right id and calls the `read_doc_contents` tool itself:
+
+```
+> read the deposition document
+```
+
+The chat client injects the list of available document ids into every prompt, so Claude can resolve "the deposition" to `deposition.md` without you typing the exact filename. Available ids: `deposition.md`, `report.pdf`, `financials.docx`, `outlook.pdf`, `plan.md`, `spec.txt`.
+
+> **Rerun safety:** `edit_document` mutates an in-memory dict in the server process. Each REPL launch starts a fresh `mcp_server.py` process, so edits reset to the seed values on restart. Runs are independent and idempotent by design.
 
 ### Commands
 

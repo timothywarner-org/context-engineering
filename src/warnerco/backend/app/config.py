@@ -29,7 +29,10 @@ class Settings(BaseSettings):
     memory_backend: MemoryBackend = MemoryBackend.CHROMA
 
     # Server Configuration
-    host: str = "0.0.0.0"
+    # Bind to loopback so the address uvicorn logs (http://127.0.0.1:8000) is the
+    # one you actually browse. 0.0.0.0 binds all interfaces but logs an
+    # unbrowsable URL on Windows; override host in .env if you need LAN access.
+    host: str = "127.0.0.1"
     port: int = 8000
     debug: bool = Field(default=False, validation_alias="APP_DEBUG")
 

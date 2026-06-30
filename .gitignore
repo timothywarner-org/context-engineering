@@ -183,6 +183,11 @@ claude_desktop_config.json
 *_config.json
 !example_config.json
 !sample_config.json
+# Learner-facing MCP client configs are intentionally shared (no secrets inside).
+# These un-ignores make shareability explicit instead of relying on already-tracked status.
+!config/claude_desktop_config.json
+!.claude/mcp.json
+!.vscode/mcp.json
 
 # API keys and tokens
 *.key
@@ -243,3 +248,11 @@ src/warnerco/backend/data/episodic/
 # Instructor tooling state - machine-local, not learner content (2026-06-29 audit)
 .claude/agent-memory/
 .claude/settings.local.json
+
+# Tim's personal demo cheat sheet - not for learners (gitignored on purpose)
+TIMS-NEVER-FAIL-DEMO-QUICKSTART.md
+
+# Screenshots dropped at repo root during debugging - never commit
+/*.png
+/*.jpg
+/*.jpeg

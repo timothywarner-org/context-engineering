@@ -61,6 +61,7 @@ npm install
 
 This installs:
 - `@modelcontextprotocol/sdk` - Core MCP library
+- `zod` - Schema library the SDK uses to define and validate tool inputs
 
 ### Step 3: Implement the Server (Fill in TODOs)
 
@@ -69,18 +70,20 @@ Open `src/index.js` and complete the following sections:
 #### TODO 1: Import Required MCP Components
 
 ```javascript
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { z } from 'zod';
 ```
 
 **Why?**
-- `Server` - Main MCP server class
+- `McpServer` - The high-level server class. It is the one that exposes the `.tool()` helper used below. The low-level `Server` (from `server/index.js`) has no `.tool()` method, so importing that instead throws `server.tool is not a function` at startup.
 - `StdioServerTransport` - Enables stdin/stdout communication (for local connections)
+- `z` (Zod) - Defines the tool's input schema. The SDK 1.x `.tool()` method expects a Zod shape, converts it to JSON Schema for the client, and validates arguments for you.
 
 #### TODO 2: Create Server Instance
 
 ```javascript
-const server = new Server(
+const server = new McpServer(
   {
     name: 'hello-mcp',
     version: '1.0.0'
@@ -104,18 +107,9 @@ server.tool(
   'add',                           // Tool name
   'Adds two numbers together',     // Description for AI
   {
-    type: 'object',
-    properties: {
-      a: {
-        type: 'number',
-        description: 'First number'
-      },
-      b: {
-        type: 'number',
-        description: 'Second number'
-      }
-    },
-    required: ['a', 'b']
+    // A Zod shape: one entry per parameter. .describe() text is surfaced to the AI.
+    a: z.number().describe('First number'),
+    b: z.number().describe('Second number')
   },
   async ({ a, b }) => {
     // Tool handler implementation goes here
@@ -124,10 +118,9 @@ server.tool(
 ```
 
 **Schema Explained**:
-- Uses JSON Schema to define expected parameters
-- `properties` defines parameter types and descriptions
-- `required` lists mandatory parameters
-- AI uses this schema to understand how to call the tool
+- The third argument is a **Zod shape**, not a hand-written JSON Schema object. The SDK converts it to JSON Schema (with `a` and `b` as required numbers) for the client.
+- `.describe()` adds a human/AI-readable hint for each parameter
+- Because the shape is typed, the SDK validates incoming arguments **before** your handler runs
 
 #### TODO 4: Implement Tool Handler Logic
 
@@ -135,9 +128,10 @@ Inside the tool handler, add:
 
 ```javascript
 async ({ a, b }) => {
-  // Validate inputs
-  if (typeof a !== 'number' || typeof b !== 'number') {
-    throw new Error('Both parameters must be numbers');
+  // Zod already guaranteed a and b are numbers. Guard only the non-finite
+  // edge cases (z.number() still admits NaN / Infinity).
+  if (!Number.isFinite(a) || !Number.isFinite(b)) {
+    throw new Error('Both parameters must be finite numbers');
   }
 
   // Perform calculation
@@ -196,30 +190,23 @@ The server is now running and waiting for connections. **Keep this terminal open
 
 ### Step 5: Test with MCP Inspector
 
-Open a **new terminal** and start MCP Inspector:
+From the `starter` directory, run:
 
 ```bash
-npx @modelcontextprotocol/inspector
+npm run inspect
 ```
 
-This will:
-1. Start a local web server
-2. Open your browser to `http://localhost:5173`
+This launches MCP Inspector **with the server already wired up** (`node src/index.js`), opens your browser to `http://localhost:5173`, and connects. Because `npm run` always sets the working directory to this package, the relative path `src/index.js` resolves every time, regardless of where you started.
+
+> **Why not type the path into the Inspector GUI?** A relative path like `.\src\index.js` is resolved against whatever directory you launched Inspector in. Launch from the wrong place and `node` cannot find the file, the child process exits instantly, and Inspector reports **"HTTP 404: Session not found"**. The `npm run inspect` script removes that failure mode. If you must use the GUI, supply the **full absolute path** to `src/index.js`.
 
 In the MCP Inspector web interface:
 
-1. **Connect to your server**:
-   - Transport: Select "Command"
-   - Command: `node`
-   - Args: Full path to your `src/index.js` file
-     - Example: `/Users/yourname/context-engineering/labs/lab-01-hello-mcp/starter/src/index.js`
-   - Click "Connect"
-
-2. **Verify connection**:
+1. **Verify connection**:
    - You should see "Connected" status
    - The "Tools" tab should show your `add` tool
 
-3. **Test the tool**:
+2. **Test the tool**:
    - Click the "Tools" tab
    - Click on "add"
    - Fill in the parameters:
@@ -231,7 +218,7 @@ In the MCP Inspector web interface:
      ```
    - Click "Run Tool"
 
-4. **Check the result**:
+3. **Check the result**:
    - You should see: `"The sum of 5 and 3 is 8"`
    - Check your server terminal - you should see the debug log:
      ```
@@ -272,10 +259,10 @@ Your lab is complete when:
 
 ## Testing
 
-Validate your implementation with the MCP Inspector — it connects to your server, lists tools, and lets you call `add` interactively:
+Validate your implementation with the MCP Inspector — it connects to your server, lists tools, and lets you call `add` interactively. Run from the `starter` directory:
 
 ```bash
-npx @modelcontextprotocol/inspector node src/index.js
+npm run inspect
 ```
 
 In the Inspector UI (default <http://localhost:5173>):
@@ -295,12 +282,19 @@ rm -rf node_modules package-lock.json
 npm install
 ```
 
+### Issue: "HTTP 404: Session not found" / "Connection Error" on Connect
+
+This means the stdio child process exited immediately — almost always because `node` could not find `src/index.js`. The relative path you typed in the GUI was resolved against the wrong working directory.
+
+**Fix**: use `npm run inspect` from the `starter` directory. `npm run` forces the working directory to this package, so `src/index.js` always resolves. If you insist on the GUI, set Args to the **full absolute path** to `src/index.js`.
+
 ### Issue: "Server starts but MCP Inspector can't connect"
 
 **Checklist**:
-1. Did you use the **full absolute path** to `src/index.js`?
+
+1. Are you launching with `npm run inspect` from the `starter` directory? (Or, in the GUI, using the **full absolute path** to `src/index.js`?)
 2. Is the server still running in the other terminal?
-3. Did you select "Command" transport (not HTTP)?
+3. Did you select "STDIO" transport (not HTTP)?
 4. Try restarting the Inspector
 
 ### Issue: "Tool returns undefined or null"
@@ -324,10 +318,10 @@ npm install
    - Connect transport
    - Handle requests
 
-2. **Tool schema uses JSON Schema**:
+2. **Tool schema is defined with a Zod shape**:
    - Defines parameter types
-   - Provides descriptions for AI
-   - Validates input automatically
+   - Provides descriptions for AI (via `.describe()`)
+   - The SDK converts it to JSON Schema for the client and validates input automatically
 
 3. **Response format is standardized**:
    ```javascript

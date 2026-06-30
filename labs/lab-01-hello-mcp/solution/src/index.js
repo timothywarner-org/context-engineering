@@ -10,12 +10,20 @@
  * - Response formatting
  */
 
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+// McpServer is the high-level class that exposes .tool(). The low-level Server
+// (from server/index.js) has no .tool() method, so importing that and calling
+// server.tool() throws "server.tool is not a function" at startup.
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+
+// .tool() expects a Zod "raw shape" for the input schema (not a hand-written
+// JSON Schema object). The SDK converts the shape to JSON Schema for the client
+// and validates/coerces arguments before your handler runs.
+import { z } from 'zod';
 
 async function main() {
   // Create server instance
-  const server = new Server(
+  const server = new McpServer(
     {
       name: 'hello-mcp',
       version: '1.0.0'
@@ -32,23 +40,14 @@ async function main() {
     'add',
     'Adds two numbers together',
     {
-      type: 'object',
-      properties: {
-        a: {
-          type: 'number',
-          description: 'First number'
-        },
-        b: {
-          type: 'number',
-          description: 'Second number'
-        }
-      },
-      required: ['a', 'b']
+      a: z.number().describe('First number'),
+      b: z.number().describe('Second number')
     },
     async ({ a, b }) => {
-      // Validate inputs
-      if (typeof a !== 'number' || typeof b !== 'number') {
-        throw new Error('Both parameters must be numbers');
+      // Zod guarantees a and b are numbers; guard the non-finite edge cases
+      // (z.number() admits NaN/Infinity).
+      if (!Number.isFinite(a) || !Number.isFinite(b)) {
+        throw new Error('Both parameters must be finite numbers');
       }
 
       // Perform calculation

@@ -140,19 +140,27 @@ def free_port(port: int) -> bool:
     return not _port_in_use(port)
 
 
-def start_server(port: int) -> int:
-    """Exec `warnerco-serve` with PORT overridden. Returns the process exit code."""
+def start_server(port: int, host: str = "127.0.0.1") -> int:
+    """Exec uvicorn with the given host/port. Returns the process exit code."""
     env = os.environ.copy()
     env["PORT"] = str(port)
     print(f"Starting WARNERCO HTTP server on port {port}...")
-    # Use the console script if available, fall back to uvicorn directly
-    cmd = [sys.executable, "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", str(port)]
+    # Browse line uses the bind host directly when it's loopback; for 0.0.0.0
+    # (all interfaces) point the human at localhost since 0.0.0.0 isn't browsable.
+    browse_host = "localhost" if host == "0.0.0.0" else host
+    print(f"Dashboard: http://{browse_host}:{port}/dash/")
+    cmd = [sys.executable, "-m", "uvicorn", "app.main:app", "--host", host, "--port", str(port)]
     return subprocess.call(cmd, env=env)
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port", type=int, default=int(os.environ.get("PORT", "8000")))
+    parser.add_argument(
+        "--host",
+        default=os.environ.get("HOST", "127.0.0.1"),
+        help="Bind host (default 127.0.0.1; use 0.0.0.0 for LAN access).",
+    )
     parser.add_argument(
         "--kill-only",
         "--no-start",
@@ -170,7 +178,7 @@ def main() -> int:
     if args.kill_only:
         return 0
 
-    return start_server(args.port)
+    return start_server(args.port, args.host)
 
 
 if __name__ == "__main__":

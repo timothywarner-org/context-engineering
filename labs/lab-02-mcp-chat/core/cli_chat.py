@@ -55,6 +55,15 @@ class CliChat(Chat):
         words = query.split()
         command = words[0].replace("/", "")
 
+        # A slash command requires a doc id argument (for example "/format
+        # deposition.md"). Without this guard, words[1] raises IndexError, which
+        # the REPL loop does not catch, so a bare "/format" crashes the whole app.
+        if len(words) < 2:
+            raise ValueError(
+                f"The /{command} command needs a document id, "
+                f'for example "/{command} deposition.md".'
+            )
+
         messages = await self.doc_client.get_prompt(
             command, {"doc_id": words[1]}
         )
@@ -68,11 +77,24 @@ class CliChat(Chat):
 
         added_resources = await self._extract_resources(query)
 
+        # Inject the document inventory so Claude can map a natural-language
+        # reference ("the deposition document") to a real doc id ("deposition.md")
+        # and call read_doc_contents itself. Without this list, the model has no
+        # way to know the available ids and stalls by asking the user for one.
+        doc_ids = await self.list_docs_ids()
+        available_docs = "\n".join(f"- {doc_id}" for doc_id in doc_ids)
+
         prompt = f"""
         The user has a question:
         <query>
         {query}
         </query>
+
+        The following document ids are available. Match natural-language references
+        (for example "the deposition" or "the financials") to the closest id below:
+        <available_documents>
+        {available_docs}
+        </available_documents>
 
         The following context may be useful in answering their question:
         <context>
@@ -82,7 +104,9 @@ class CliChat(Chat):
         Note the user's query might contain references to documents like "@report.docx". The "@" is only
         included as a way of mentioning the doc. The actual name of the document would be "report.docx".
         If the document content is included in this prompt, you don't need to use an additional tool to read the document.
-        Answer the user's question directly and concisely. Start with the exact information they need. 
+        If the content is NOT already provided but the user is asking about a document, call the
+        'read_doc_contents' tool with the matching id from the list above rather than asking the user for an id.
+        Answer the user's question directly and concisely. Start with the exact information they need.
         Don't refer to or mention the provided context in any way - just use it to inform your answer.
         """
 

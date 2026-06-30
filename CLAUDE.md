@@ -160,8 +160,10 @@ AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-ada-002
 
 Both `.vscode/mcp.json` and `.claude/mcp.json` are checked in, but they are **not symmetric** — VS Code was simplified for O'Reilly delivery:
 
-- **`.claude/mcp.json`** (teaching dual-entry): registers the same `warnerco-mcp` binary twice — `warnerco-schematica-claude` (general entry) and `warnerco-coala-memory` (same binary, pre-pins `EPISODIC_*` env so demo weights are class-stable). Pedagogical clarity, not a runtime split — there is no separate CoALA process.
-- **`.vscode/mcp.json`** (O'Reilly single-entry): one `oreilly-warnerco-schematica` server (`MEMORY_BACKEND=chroma`, `type: "stdio"`) plus the GitHub Copilot remote MCP server (`https://api.githubcopilot.com/mcp/`, PAT via `${input:github_pat}`). No `warnerco-coala-memory` entry, no `dev.watch`.
+- **`.claude/mcp.json`** (teaching dual-entry): registers the same `warnerco-mcp` binary twice — `claude-warnerco-schematica` (general entry) and `claude-warnerco-coala-memory` (same binary, pre-pins `EPISODIC_*` env so demo weights are class-stable). Pedagogical clarity, not a runtime split — there is no separate CoALA process.
+- **`.vscode/mcp.json`** (single-entry): one `vscode-warnerco-schematica` server (`MEMORY_BACKEND=chroma`, `type: "stdio"`) plus the GitHub Copilot remote MCP server `ghcopilot-warner` (`https://api.githubcopilot.com/mcp/`, PAT via `${input:github_pat}`). No CoALA-memory entry, no `dev.watch`.
+
+Server-entry names follow a `<client>-<app>` convention so the source client is obvious at a glance: `claude-*` (Claude Code), `vscode-*` (VS Code), `claudedesktop-*` (Claude Desktop, in `config/claude_desktop_config.json`), `ghcopilot-*` (GitHub Copilot remote MCP).
 
 If asked to add a third client (Cursor, Continue, etc.), mirror the `.claude/mcp.json` dual-entry pattern when teaching CoALA, or the lean `.vscode/mcp.json` single-entry when you just need the server.
 

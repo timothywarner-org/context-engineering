@@ -165,11 +165,11 @@ context-engineering/
 
 ### Claude Code (project scope)
 
-`.claude/mcp.json` is checked in with two entries pointing at the same server: `warnerco-schematica-claude` and `warnerco-coala-memory` (the second pre-pins the episodic-memory env vars for class demos).
+`.claude/mcp.json` is checked in with two entries pointing at the same server: `claude-warnerco-schematica` and `claude-warnerco-coala-memory` (the second pre-pins the episodic-memory env vars for class demos).
 
 ### VS Code Copilot
 
-`.vscode/mcp.json` is checked in with a single `oreilly-warnerco-schematica` entry (`MEMORY_BACKEND=chroma`) plus the GitHub Copilot remote MCP server. To list servers in VS Code: `Cmd/Ctrl+Shift+P → MCP: List Servers`.
+`.vscode/mcp.json` is checked in with a single `vscode-warnerco-schematica` entry (`MEMORY_BACKEND=chroma`) plus the GitHub Copilot remote MCP server `ghcopilot-warner`. To list servers in VS Code: `Cmd/Ctrl+Shift+P → MCP: List Servers`.
 
 ---
 
