@@ -1,0 +1,315 @@
+<!--
+    TOKEN POLICY
+    This policy implements the token endpoint for PKCE OAuth2 flow.
+    
+    Flow:
+    1. MCP client sends token request with code and code_verifier
+    2. We validate the code_verifier against the stored code_challenge
+    3. We retrieve the cached access token and return it to the client
+-->
+<policies>
+    <inbound>
+        <base />
+        <!-- STEP 1: Extract parameters from token request -->
+        <!-- Read the request body as a string while preserving it for later processing -->
+        <set-variable name="tokenRequestBody" value="@((string)context.Request.Body.As<string>(preserveContent: true))" />
+        
+        <!-- Extract the confirmation code from the request -->
+        <set-variable name="mcpConfirmConsentCode" value="@{
+            // Retrieve the raw body string
+            var body = context.Variables.GetValueOrDefault<string>("tokenRequestBody");
+            if (!string.IsNullOrEmpty(body))
+            {
+                // Split the body into name/value pairs
+                var pairs = body.Split('&');
+                foreach (var pair in pairs)
+                {
+                    var keyValue = pair.Split('=');
+                    if (keyValue.Length == 2)
+                    {
+                        if(keyValue[0] == "code")
+                        {
+                            return keyValue[1];
+                        }
+                    }
+                }
+            }
+            return "";
+        }" />              
+        <!-- Extract the code_verifier from the request and URL-decode it -->        
+        <set-variable name="mcpClientCodeVerifier" value="@{
+            // Retrieve the raw body string
+            var body = context.Variables.GetValueOrDefault<string>("tokenRequestBody");
+            if (!string.IsNullOrEmpty(body))
+            {
+                // Split the body into name/value pairs
+                var pairs = body.Split('&');
+                foreach (var pair in pairs)
+                {
+                    var keyValue = pair.Split('=');
+                    if (keyValue.Length == 2)
+                    {
+                        if(keyValue[0] == "code_verifier")
+                        {
+                            // URL-decode the code_verifier if needed
+                            return System.Net.WebUtility.UrlDecode(keyValue[1]);
+                        }
+                    }
+                }
+            }
+            return "";
+        }" />
+            
+        <!-- STEP 2: Extract state parameters -->
+        <set-variable name="mcpState" value="@((string)context.Request.Url.Query.GetValueOrDefault("state", ""))" />
+        <set-variable name="stateSession" value="@((string)context.Request.Url.Query.GetValueOrDefault("state_session", ""))" />        
+    </inbound>
+    <backend />
+    <outbound>
+        <base />
+        <!-- STEP 3: Retrieve stored MCP client data -->
+        <!-- Lookup the stored MCP client code challenge and challenge method from the cache -->
+        <cache-lookup-value key="@($"McpClientAuthData-{context.Variables.GetValueOrDefault("mcpConfirmConsentCode")}")" variable-name="mcpClientAuthData" />
+        
+        <!-- Extract the stored code challenge from the cached data -->
+        <set-variable name="storedMcpClientCodeChallenge" value="@{
+            var mcpAuthDataAsJObject = JObject.Parse((string)context.Variables["mcpClientAuthData"]);
+            return (string)mcpAuthDataAsJObject["mcpClientCodeChallenge"];
+        }" />            
+        <!-- STEP 4: Compute and validate the code challenge -->
+        <!-- Generate a challenge from the incoming code_verifier using the stored challenge method -->
+        <set-variable name="mcpServerComputedCodeChallenge" value="@{
+            var mcpAuthDataAsJObject = JObject.Parse((string)context.Variables["mcpClientAuthData"]);
+            string codeVerifier = (string)context.Variables.GetValueOrDefault("mcpClientCodeVerifier", "");
+            string codeChallengeMethod = ((string)mcpAuthDataAsJObject["mcpClientCodeChallengeMethod"]).ToLower();
+            
+            if(string.IsNullOrEmpty(codeVerifier)){
+                return string.Empty;
+            }
+            
+            if(codeChallengeMethod == "plain"){
+                // For "plain", no transformation is applied
+                return codeVerifier;
+            } else if(codeChallengeMethod == "s256"){
+                // For S256, compute the SHA256 hash, Base64 encode it, and convert to URL-safe format
+                using (var sha256 = System.Security.Cryptography.SHA256.Create())
+                {
+                    var bytes = System.Text.Encoding.UTF8.GetBytes(codeVerifier);
+                    var hash = sha256.ComputeHash(bytes);
+                    
+                    // Convert the hash to a Base64 string
+                    string base64 = Convert.ToBase64String(hash);
+
+                    // Convert Base64 string into a URL-safe variant
+                    // Replace '+' with '-', '/' with '_', and remove any '=' padding
+                    return base64.Replace("+", "-").Replace("/", "_").Replace("=", "");
+                }
+            } else {
+                // Unsupported method
+                return string.Empty;
+            }
+        }" />            
+        <!-- STEP 5: Verify code challenge matches -->
+        <choose>
+            <when condition="@(string.Compare((string)context.Variables.GetValueOrDefault("mcpServerComputedCodeChallenge", ""), (string)context.Variables.GetValueOrDefault("storedMcpClientCodeChallenge", "")) != 0)">
+                <!-- If they don't match, return an error -->
+                <return-response>
+                    <set-status code="400" reason="Bad Request" />
+                    <set-body>@("{\"error\": \"code_verifier does not match.\"}")</set-body>
+                </return-response>
+            </when>
+        </choose>
+        
+        <!-- STEP 5.5: Verify client registration -->
+        <!-- Extract client ID and redirect URI from the token request -->
+        <set-variable name="client_id" value="@{
+            // Retrieve the raw body string
+            var body = context.Variables.GetValueOrDefault<string>("tokenRequestBody");
+            if (!string.IsNullOrEmpty(body))
+            {
+                // Split the body into name/value pairs
+                var pairs = body.Split('&');
+                foreach (var pair in pairs)
+                {
+                    var keyValue = pair.Split('=');
+                    if (keyValue.Length == 2)
+                    {
+                        if(keyValue[0] == "client_id")
+                        {
+                            return System.Net.WebUtility.UrlDecode(keyValue[1]);
+                        }
+                    }
+                }
+            }
+            return "";
+        }" />
+        
+        <set-variable name="redirect_uri" value="@{
+            // Retrieve the raw body string
+            var body = context.Variables.GetValueOrDefault<string>("tokenRequestBody");
+            if (!string.IsNullOrEmpty(body))
+            {
+                // Split the body into name/value pairs
+                var pairs = body.Split('&');
+                foreach (var pair in pairs)
+                {
+                    var keyValue = pair.Split('=');
+                    if (keyValue.Length == 2)
+                    {
+                        if(keyValue[0] == "redirect_uri")
+                        {
+                            return System.Net.WebUtility.UrlDecode(keyValue[1]);
+                        }
+                    }
+                }
+            }
+            return "";
+        }" />
+        
+        <!-- Normalize the redirect URI -->
+        <set-variable name="normalized_redirect_uri" value="@{
+            string redirectUri = context.Variables.GetValueOrDefault<string>("redirect_uri", "");
+            return System.Net.WebUtility.UrlDecode(redirectUri);
+        }" />
+        
+        <!-- Look up client information from cache -->
+        <cache-lookup-value key="@($"ClientInfo-{context.Variables.GetValueOrDefault<string>("client_id")}")" variable-name="clientInfoJson" />
+        
+        <!-- If cache lookup failed, try to retrieve from CosmosDB -->
+        <choose>
+            <when condition="@(string.IsNullOrEmpty(context.Variables.GetValueOrDefault<string>("clientInfoJson")))">
+                <!-- Get CosmosDB access token using managed identity -->
+                <authentication-managed-identity resource="https://cosmos.azure.com" output-token-variable-name="cosmosAccessToken" />
+                
+                <send-request mode="new" response-variable-name="cosmosClientResponse" timeout="30" ignore-error="true">
+                    <set-url>@($"{{CosmosDbEndpoint}}/dbs/{{CosmosDbDatabase}}/colls/{{CosmosDbContainer}}/docs/{context.Variables.GetValueOrDefault<string>("client_id")}")</set-url>
+                    <set-method>GET</set-method>
+                    <set-header name="Content-Type" exists-action="override">
+                        <value>application/json</value>
+                    </set-header>
+                    <set-header name="x-ms-version" exists-action="override">
+                        <value>2018-12-31</value>
+                    </set-header>
+                    <set-header name="x-ms-partitionkey" exists-action="override">
+                        <value>@($"[\"{context.Variables.GetValueOrDefault<string>("client_id")}\"]")</value>
+                    </set-header>
+                    <set-header name="Authorization" exists-action="override">
+                        <value>@($"type=aad&ver=1.0&sig={context.Variables.GetValueOrDefault<string>("cosmosAccessToken")}")</value>
+                    </set-header>
+                </send-request>
+                
+                <!-- If CosmosDB request was successful, extract client info -->
+                <choose>
+                    <when condition="@(((IResponse)context.Variables["cosmosClientResponse"]).StatusCode == 200)">
+                        <set-variable name="clientInfoJson" value="@{
+                            var cosmosResponse = (IResponse)context.Variables["cosmosClientResponse"];
+                            var cosmosDocument = cosmosResponse.Body.As<JObject>();
+                            
+                            // Extract the client info fields we need
+                            var clientInfo = new JObject();
+                            clientInfo["client_name"] = cosmosDocument["client_name"];
+                            clientInfo["client_uri"] = cosmosDocument["client_uri"];
+                            clientInfo["redirect_uris"] = cosmosDocument["redirect_uris"];
+                            
+                            return clientInfo.ToString();
+                        }" />
+                        
+                        <!-- Store in cache for future requests -->
+                        <cache-store-value duration="3600" 
+                            key="@($"ClientInfo-{context.Variables.GetValueOrDefault<string>("client_id")}")" 
+                            value="@(context.Variables.GetValueOrDefault<string>("clientInfoJson"))" />
+                    </when>
+                </choose>
+            </when>
+        </choose>
+        
+        <!-- Verify that the client exists and the redirect URI is valid -->
+        <set-variable name="is_client_registered" value="@{
+            try {
+                string clientId = context.Variables.GetValueOrDefault<string>("client_id", "");
+                string redirectUri = context.Variables.GetValueOrDefault<string>("normalized_redirect_uri", "");
+                
+                if (string.IsNullOrEmpty(clientId)) {
+                    return false;
+                }
+                
+                // Get the client info from the variable set by cache-lookup-value
+                string clientInfoJson = context.Variables.GetValueOrDefault<string>("clientInfoJson");
+                  if (string.IsNullOrEmpty(clientInfoJson)) {
+                    context.Trace($"Client info not found in cache for client_id: {clientId}");
+                    return false;
+                }
+                
+                // Parse client info
+                JObject clientInfo = JObject.Parse(clientInfoJson);
+                JArray redirectUris = clientInfo["redirect_uris"]?.ToObject<JArray>();
+                
+                // Check if the redirect URI is in the registered URIs
+                if (redirectUris != null) {
+                    foreach (var uri in redirectUris) {
+                        // Normalize the URI from the cache for comparison
+                        string registeredUri = System.Net.WebUtility.UrlDecode(uri.ToString());
+                        if (registeredUri == redirectUri) {
+                            return true;
+                        }
+                    }
+                }
+                
+                context.Trace($"Redirect URI mismatch - URI: {redirectUri} not found in registered URIs");
+                return false;
+            }
+            catch (Exception ex) {
+                context.Trace($"Error checking client registration: {ex.Message}");
+                return false;
+            }
+        }" />
+        
+        <!-- Check if client is properly registered -->
+        <choose>
+            <when condition="@(!context.Variables.GetValueOrDefault<bool>("is_client_registered"))">
+                <!-- Client is not properly registered, return error -->
+                <return-response>
+                    <set-status code="401" reason="Unauthorized" />
+                    <set-header name="Content-Type" exists-action="override">
+                        <value>application/json</value>
+                    </set-header>
+                    <set-body>@{
+                        var errorResponse = new JObject();
+                        errorResponse["error"] = "invalid_client";
+                        errorResponse["error_description"] = "Client not found or redirect URI is invalid.";
+                        return errorResponse.ToString();
+                    }</set-body>
+                </return-response>
+            </when>
+        </choose>
+
+        <!-- STEP 6: Retrieve cached tokens -->
+        <!-- Get the access token stored during the authorization process -->
+        <cache-lookup-value key="@($"AccessToken-{context.Variables.GetValueOrDefault("mcpConfirmConsentCode")}")" variable-name="cachedSessionToken" />
+        
+        <!-- STEP 7: Generate token response -->
+        <set-variable name="jsonPayload" value="@{
+            var accessToken = context.Variables.GetValueOrDefault<string>("cachedSessionToken");
+            var payloadObject = new
+            {
+                access_token = accessToken,
+                token_type = "Bearer",
+                expires_in = 3600,
+                refresh_token = "",
+                scope = "openid profile email"
+            };
+
+            // Serialize the object to a JSON string.
+            return Newtonsoft.Json.JsonConvert.SerializeObject(payloadObject);
+        }" />
+        <set-body template="none">@{
+            return (string)context.Variables.GetValueOrDefault("jsonPayload", "");
+        }</set-body>
+        <set-header name="access-control-allow-origin" exists-action="override">
+            <value>*</value>
+        </set-header>
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>

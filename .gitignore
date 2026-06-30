@@ -1,3 +1,6 @@
+# Claude teaching sidecar workspace (sanitize before sharing)
+from-claude/
+
 # PPT cruft
 ~*.pptx
 ~$warner-context-engineering-oct-2025.pptx
