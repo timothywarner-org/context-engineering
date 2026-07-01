@@ -288,6 +288,25 @@ This means the stdio child process exited immediately — almost always because 
 
 **Fix**: use `npm run inspect` from the `starter` directory. `npm run` forces the working directory to this package, so `src/index.js` always resolves. If you insist on the GUI, set Args to the **full absolute path** to `src/index.js`.
 
+### Issue: "Failed to spawn: `.srcindex.js` — program not found" (Windows)
+
+Same root cause, uglier symptom. A single-backslash path (`.\src\index.js`) had its backslashes eaten before the spawn call, collapsing `.` + `src` + `index.js` into the bogus program name `.srcindex.js`. The MCP layer then tried to run a program with that literal name, which does not exist.
+
+This comes from either the **Inspector GUI form** (it eats backslashes) or a **client config with single-backslash Windows paths** (in JSON, `\s` and `\i` are invalid escapes).
+
+**Fix**: never hand a Windows backslash path to the spawn layer.
+
+1. **Inspector**: run `npm run inspect` from the `starter` directory. No path typed, nothing to mangle.
+2. **Client config** (Claude Desktop / Claude Code): set `cwd` to the `starter` folder and use the relative forward-slash arg `src/index.js`. See the Claude Desktop example in [Going Further](#challenge-5-test-with-claude-desktop) above.
+
+**Verify the server itself is healthy** (isolates a path bug from a code bug). From `starter`, pipe an `initialize` request straight into the server:
+
+```powershell
+'{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"smoke","version":"1.0"}}}' | node src/index.js
+```
+
+A JSON `result` with `serverInfo` back on stdout means the server spawns and speaks MCP — your problem is the launch path, not the code.
+
 ### Issue: "Server starts but MCP Inspector can't connect"
 
 **Checklist**:
@@ -376,11 +395,14 @@ If you have Claude Desktop configured, add this server to your config and test w
   "mcpServers": {
     "hello-mcp": {
       "command": "node",
-      "args": ["/absolute/path/to/labs/lab-01-hello-mcp/starter/src/index.js"]
+      "args": ["src/index.js"],
+      "cwd": "C:/github/context-engineering/labs/lab-01-hello-mcp/starter"
     }
   }
 }
 ```
+
+**Windows note**: set `cwd` to the `starter` folder and keep `args` as the relative `src/index.js`. Two reasons. First, the spawn layer never sees a backslash, so it cannot mangle one (a single-backslash path like `.\src\index.js` collapses to a bogus program name such as `.srcindex.js`, and the launch fails with `Failed to spawn: program not found`). Second, JSON treats `\s` and `\i` as invalid escapes, so a literal Windows path in `args` would need doubled backslashes (`C:\\...\\src\\index.js`) anyway. Forward slashes in `cwd` sidestep both traps. `node` on Windows reads `/` without complaint.
 
 Then ask Claude: "Can you add 42 and 58 for me?"
 
