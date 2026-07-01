@@ -18,7 +18,16 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY app ./app
 COPY static ./static
-COPY data ./data
+
+# Seed data lives at /app/seed, NOT /app/data. The Azure Files volume mounts at
+# /app/data at runtime and would shadow anything baked there; the entrypoint copies
+# seed -> data on first boot (see entrypoint.sh). Locally (no volume) the entrypoint
+# still seeds /app/data, so dev behaviour is unchanged.
+COPY data ./seed
+
+# Entrypoint seeds the persistent volume then execs uvicorn.
+COPY entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
 
 # Environment
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -37,5 +46,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
     CMD python -c "import sys,urllib.request; \
     sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3).status==200 else 1)" || exit 1
 
-# Run application
-CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--forwarded-allow-ips", "*"]
+# Run via the seeding entrypoint (copies baked seed onto the volume, then uvicorn)
+CMD ["./entrypoint.sh"]

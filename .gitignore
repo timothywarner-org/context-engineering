@@ -259,3 +259,6 @@ TIMS-NEVER-FAIL-DEMO-QUICKSTART.md
 /*.png
 /*.jpg
 /*.jpeg
+
+# Live-deployment reconstitution snapshots (contain real subscription/tenant/object IDs — keep local, not in public repo)
+src/warnerco/infra/reconstitute/

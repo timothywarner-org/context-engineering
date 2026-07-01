@@ -1,0 +1,44 @@
+<!--
+  WARNERCO Schematica - APIM API-scope policy
+  Applied to the schematica-api API resource so it covers all operations
+  (wildcard api-all and mcp-all).
+
+  Token substitution strategy: Bicep string interpolation injects tenantId and
+  appId directly into the <value> element of the rawxml policy string at deploy
+  time - see the apimApiPolicy resource in main.bicep. Named values were the
+  other option but would require an extra resource per token and add no security
+  benefit here because tenantId and appId are non-secret configuration values.
+
+  validate-jwt behaviour:
+    - 401 if the Authorization header is missing or token is invalid
+    - 401 if the 'roles' claim does not contain 'Schematica.Access'
+    - Passes the Bearer token downstream to the ACA backend (pass-through)
+-->
+<policies>
+  <inbound>
+    <base />
+    <validate-jwt header-name="Authorization" failed-validation-httpcode="401"
+                  failed-validation-error-message="Unauthorized: valid Entra ID token with Schematica.Access role required">
+      <openid-config url="https://login.microsoftonline.com/{tenantId}/v2.0/.well-known/openid-configuration" />
+      <audiences>
+        <audience>{appId}</audience>
+        <audience>api://{appId}</audience>
+        <audience>api://{tenantId}/warnerco-schematica</audience>
+      </audiences>
+      <required-claims>
+        <claim name="roles" match="any">
+          <value>Schematica.Access</value>
+        </claim>
+      </required-claims>
+    </validate-jwt>
+  </inbound>
+  <backend>
+    <base />
+  </backend>
+  <outbound>
+    <base />
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>

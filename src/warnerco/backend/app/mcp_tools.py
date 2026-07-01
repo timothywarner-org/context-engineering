@@ -45,6 +45,7 @@ from fastmcp import FastMCP, Context
 
 from app.adapters import get_memory_store
 from app.langgraph import run_query
+from app._dashboard_app import DASHBOARD_HTML
 
 
 # =============================================================================
@@ -2302,6 +2303,78 @@ The schematic with ID `{schematic_id}` was not found in the database.
 """
 
     return doc
+
+
+# =============================================================================
+# MCP APP (SEP-1865) - INTERACTIVE DASHBOARD UI
+# =============================================================================
+# An MCP App is a normal MCP resource whose content is `text/html;profile=mcp-app`,
+# linked from a tool via `_meta.ui.resourceUri`. The host renders the HTML in a
+# sandboxed iframe and bridges data/tool-calls over postMessage + JSON-RPC 2.0.
+# The whole thing stays pure Python: the HTML (with its vanilla-JS bridge) lives in
+# app/_dashboard_app.py and is served verbatim here. No JS SDK, no second server.
+
+@mcp.resource(
+    uri="ui://warnerco/dashboard",
+    name="WARNERCO Schematics Dashboard",
+    # The `;profile=mcp-app` suffix is what flags this resource as an MCP App UI
+    # (vs. an ordinary text/html resource) to a SEP-1865 host.
+    mime_type="text/html;profile=mcp-app",
+    # Declares the iframe's content-security needs to the host. This UI talks only
+    # to the host over postMessage and never fetches the network itself, so the
+    # domain lists stay empty -- the strictest, safest posture.
+    meta={
+        "ui": {
+            "csp": {
+                "connectDomains": [],
+                "resourceDomains": [],
+                "frameDomains": [],
+                "baseUriDomains": [],
+            },
+            "prefersBorder": True,
+        }
+    },
+)
+async def dashboard_ui() -> str:
+    """Serve the interactive WARNERCO dashboard as MCP App HTML.
+
+    Returns the self-contained page (inline CSS + postMessage/JSON-RPC bridge)
+    that the host renders in a sandboxed iframe. The page receives its seed data
+    via the host's `ui/notifications/tool-input` push (sent because the linked
+    `warn_show_dashboard` tool returns a `seeded` payload), and calls
+    `warn_semantic_search` back through the host for live queries.
+    """
+    return DASHBOARD_HTML
+
+
+@mcp.tool(
+    name="warn_show_dashboard",
+    # `_meta.ui.resourceUri` is the SEP-1865 linkage: invoking this tool tells the
+    # host to render the named ui:// resource and push this tool's result to it.
+    meta={"ui": {"resourceUri": "ui://warnerco/dashboard"}},
+)
+async def warn_show_dashboard() -> Dict[str, Any]:
+    """Open the interactive WARNERCO schematics dashboard.
+
+    Renders a live dashboard (four stat tiles + a semantic-search box) inside the
+    host as an MCP App. The returned `seeded` payload is delivered to the iframe
+    by the host as the tool input, populating the tiles without a network round
+    trip; the search box then calls `warn_semantic_search` back through the bridge.
+
+    Returns:
+        A dict with a `seeded` key carrying the current memory snapshot
+        (total/indexed counts, per-category breakdown, active backend).
+    """
+    memory = get_memory_store()
+    stats = await memory.get_memory_stats()
+    return {
+        "seeded": {
+            "total": stats.total_schematics,
+            "indexed": stats.indexed_count,
+            "categories": stats.categories,
+            "backend": stats.backend,
+        }
+    }
 
 
 @mcp.resource("catalog://categories")

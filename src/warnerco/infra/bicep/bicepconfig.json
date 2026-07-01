@@ -1,0 +1,17 @@
+{
+  // Microsoft Graph Bicep extension, used by modules/entra-app.bicep
+  // (the `extension microsoftGraphV1` statement). Two things are required:
+  //   1. experimentalFeaturesEnabled.extensibility - the extension model is still
+  //      gated behind this flag for the Graph provider.
+  //   2. an "extensions" alias mapping the name to the published MCR artifact, pinned
+  //      to a concrete version so the Entra schema (applications@v1.0,
+  //      appRoleAssignedTo@v1.0) is reproducible across machines.
+  // Requires Bicep CLI >= 0.36 (`az bicep upgrade`). Newer Graph type tags are at
+  // mcr.microsoft.com/artifact/mar/bicep/extensions/microsoftgraph/v1.0/tags.
+  "experimentalFeaturesEnabled": {
+    "extensibility": true
+  },
+  "extensions": {
+    "microsoftGraphV1": "br:mcr.microsoft.com/bicep/extensions/microsoftgraph/v1.0:1.0.0"
+  }
+}

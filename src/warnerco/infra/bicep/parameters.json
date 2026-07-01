@@ -9,16 +9,33 @@
       "value": false
     },
     "enableAiSearch": {
-      "value": false
-    },
-    "replicaMin": {
-      "value": 0
-    },
-    "replicaMax": {
-      "value": 3
+      "value": true
     },
     "containerImage": {
       "value": "REPLACE_WITH_YOUR_ACR.azurecr.io/warnerco-schematica:latest"
+    },
+    "anthropicApiKey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/REPLACE_WITH_SUBSCRIPTION_ID/resourceGroups/REPLACE_WITH_RG/providers/Microsoft.KeyVault/vaults/REPLACE_WITH_KEYVAULT_NAME"
+        },
+        "secretName": "anthropic-api-key"
+      }
+    },
+    "azureSearchKey": {
+      "value": ""
+    },
+    "azureSearchEndpoint": {
+      "value": ""
+    },
+    "claudeModel": {
+      "value": "claude-sonnet-4-6"
+    },
+    "timUserObjectId": {
+      "value": "REPLACE_WITH_ENTRA_USER_OBJECT_ID"
+    },
+    "entraAppUniqueName": {
+      "value": "warnerco-schematica"
     }
   }
 }

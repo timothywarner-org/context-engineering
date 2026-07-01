@@ -13,8 +13,13 @@ from app.api import router as api_router
 from app.config import settings
 from app.mcp_tools import mcp
 
-# Create FastMCP HTTP app (streamable HTTP) for lifespan integration
-mcp_app = mcp.http_app(transport="http", path="/")
+# Create FastMCP HTTP app (streamable HTTP) for lifespan integration.
+# stateless_http=True: each request is self-contained, so no server-side session
+# has to survive between calls. This is what lets the container scale or sit behind
+# an APIM gateway that reuses/retries connections without breaking MCP sessions.
+# In-call ctx.elicit() still works -- elicitation rides the single tool-call request,
+# it does not depend on cross-request session persistence.
+mcp_app = mcp.http_app(transport="http", path="/", stateless_http=True)
 
 
 def get_cors_origins() -> list[str]:

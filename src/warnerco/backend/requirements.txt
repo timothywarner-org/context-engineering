@@ -16,6 +16,12 @@ python-dotenv>=1.0.0
 networkx>=3.0
 tiktoken>=0.5.0
 
-# Azure AI Search integration
-azure-search-documents>=11.4.0
-azure-core>=1.30.0
+# LLM reasoning (node 6 of the LangGraph pipeline). Anthropic-first per app/config.py.
+# Absent here, the container build omits the SDK and the reason node silently degrades to a stub.
+anthropic>=0.113.0
+
+# Azure AI Search integration. azure-identity supplies DefaultAzureCredential for
+# managed-identity auth paths; pins match the [project.optional-dependencies] azure extra.
+azure-search-documents>=11.5.0
+azure-identity>=1.19.0
+azure-core>=1.32.0
