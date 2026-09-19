@@ -8,6 +8,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Default to ≤3-file changes** for a feature. If you're touching more, justify it.
 - **Operational escape hatches required** for anything that runs as a server/daemon (port-killers, `--kill-only`, idempotent re-runs). See `scripts/restart_server.py` as the model.
 - **Terse responses.** Lead with the action; end with the verification result. Skip planning sections unless asked.
+- **No low-effort jargon (Tim, 2026-08-21).** Banned outright in prose, commits, docs, and replies:
+  "ask" as a noun ("the ask", "two asks"), "learnings", "key learning", "load-bearing",
+  "double-click on", "net-net", "table stakes", "key takeaway", "heavy lift", "step-change".
+  Name the concrete thing instead. Bare "learning" is allowed only in fixed compounds
+  (learning objective/outcome, learner, machine learning, learning path/curve).
+  Enforced mechanically by `voice_lint.py` in the user-scope `tim-warner-voice` skill.
 - **Absolute paths in Bash** — `cd` between tool calls has broken parallel batches in this repo.
 - Tim is a senior engineer (MVP/MCT, 25+ years). Frame as peer-to-peer. Cite file paths and line numbers.
 
